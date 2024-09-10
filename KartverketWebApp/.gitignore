@@ -1,19 +1,2 @@
 # Ignore Visual Studio files
 .vs/
-
-# Ignore build files
-bin/
-obj/
-
-# Ignore node_modules for Node.js projects
-node_modules/
-
-# Ignore log files
-*.log
-
-# Ignore temporary files
-*.tmp
-
-# Ignore IDE settings
-.idea/
-*.iml
