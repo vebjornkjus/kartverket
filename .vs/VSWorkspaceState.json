@@ -1,7 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\KartverketWebApp",
+    "\\KartverketWebApp\\KartverketWebApp",
+    "\\KartverketWebApp\\KartverketWebApp\\bin",
+    "\\KartverketWebApp\\KartverketWebApp\\Controllers",
+    "\\KartverketWebApp\\KartverketWebApp\\Models",
+    "\\KartverketWebApp\\KartverketWebApp\\obj",
+    "\\KartverketWebApp\\KartverketWebApp\\Properties",
+    "\\KartverketWebApp\\KartverketWebApp\\Views",
+    "\\KartverketWebApp\\KartverketWebApp\\Views\\Home"
   ],
-  "SelectedNode": "\\C:\\Users\\frede\\Desktop\\skole\\H\u00F8st2024\\Programeringsprosjekt\\kartverket",
+  "SelectedNode": "\\KartverketWebApp\\KartverketWebApp\\Views\\Home\\TakkRapport.cshtml",
   "PreviewInSolutionExplorer": false
 }

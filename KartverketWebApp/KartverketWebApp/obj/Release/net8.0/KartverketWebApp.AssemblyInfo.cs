@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KartverketWebApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b8d24e9f55de2837dce6f94d90dd8e3d1f21c9e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41179662373110fcfc125058d184509a8725e92a")]
 [assembly: System.Reflection.AssemblyProductAttribute("KartverketWebApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KartverketWebApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
