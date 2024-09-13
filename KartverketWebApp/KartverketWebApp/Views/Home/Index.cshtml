@@ -3,9 +3,53 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p>denne kommer fra en annen branch</p>
+    <h1 class="display-4">Kart</h1>
 </div>
 
+<div class="center-container">
+    <div id="map"></div>
+</div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+
+    var map = L.map('map').setView([58.1548282, 8.0081166, 13], 13);
+
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    osm.addTo(map);
+
+    var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+        minZoom: 0,
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        ext: 'png'
+    });
+
+    var popup = L.popup();
+    
+    function onMapClick(e) {
+        popup
+            .setLatLng(e.latlng)
+            .setContent(
+                '<div id="Rapporter-btn">' +
+                'You clicked the map at ' + e.latlng.toString() + '<br>' +
+                '<button id="popupButton">Rapporter feil</button>' // Add a button inside the popup
+
+            )
+            .openOn(map);
+
+        // Attach an event listener to the button after popup is open
+        map.on('popupopen', function () {
+            document.getElementById("popupButton").addEventListener("click", function () {
+                window.location.href = '/Home/TakkRapport';
+            });
+        });
+    }
+
+    // Listen for map clicks
+    map.on('click', onMapClick);
+
+</script>
