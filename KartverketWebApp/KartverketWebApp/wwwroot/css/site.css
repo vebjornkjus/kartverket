@@ -18,5 +18,23 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center; /* Horizontally center */
+    align-items: center; /* Vertically center */
+
+}
+
+
+#map {
+    width: 50%;
+    height: 50vh;
+}
+
+#Rapporter-btn{
+    text-align:center;
+    padding: 5px;
 }

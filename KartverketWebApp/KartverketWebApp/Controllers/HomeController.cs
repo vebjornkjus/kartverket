@@ -18,6 +18,11 @@ namespace KartverketWebApp.Controllers
             return View();
         }
 
+        public IActionResult TakkRapport()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

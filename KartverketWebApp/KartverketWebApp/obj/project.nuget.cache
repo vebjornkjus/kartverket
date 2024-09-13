@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "2dtcXRyHbk4=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\frede\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.21.0\\microsoft.visualstudio.azure.containers.tools.targets.1.21.0.nupkg.sha512"
+  ],
+  "logs": []
+}
