@@ -2,19 +2,19 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Kart</h1>
-</div>
+
 
 <div class="center-container">
     <div id="map"></div>
 </div>
+<div class="center-container"><button type="submit" class="btn_submit">Raporter</button></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.pm@2.13.0/dist/leaflet.pm.min.js"></script>
 
 <script>
 
-    var map = L.map('map').setView([58.1548282, 8.0081166, 13], 13);
+    var map = L.map('map').setView([58.1548282, 8.0081166], 13);
 
     var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -27,6 +27,8 @@
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         ext: 'png'
     });
+
+
 
     var popup = L.popup();
     
@@ -51,5 +53,4 @@
 
     // Listen for map clicks
     map.on('click', onMapClick);
-
 </script>

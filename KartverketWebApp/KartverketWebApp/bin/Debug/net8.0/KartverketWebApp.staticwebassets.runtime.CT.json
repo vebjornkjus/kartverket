@@ -27,6 +27,20 @@
         },
         "Patterns": null
       },
+      "images": {
+        "Children": {
+          "standard_kartverket.png": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/standard_kartverket.png"
+            },
+            "Patterns": null
+          }
+        },
+        "Asset": null,
+        "Patterns": null
+      },
       "js": {
         "Children": {
           "site.js": {

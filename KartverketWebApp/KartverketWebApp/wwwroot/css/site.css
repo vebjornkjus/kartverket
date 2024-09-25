@@ -12,29 +12,47 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+.btn_submit {
+    margin-top: -10vh;
+    padding: 7px;
+    z-index: 3;
+    border-radius: 7px;
+    border: 2px solid #A25C10;
+    background-color: #FCEBCD;
+    color: #A25C10;
+}
+
+#kartverket_logo {
+    width: 147px;
+}
+
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
     margin-bottom: 60px;
+    background-color: #F4F2F2;
 }
 
 .center-container {
     display: flex;
     justify-content: center; /* Horizontally center */
     align-items: center; /* Vertically center */
-
 }
 
 
 #map {
-    width: 50%;
-    height: 50vh;
+    width: 70%;
+    height: 65vh;
+    border-radius: 11px;
+    z-index: 2;
+    margin-top: -13vh;
 }
 
 #Rapporter-btn{
     text-align:center;
-    padding: 5px;
+    padding: 10px;
 }
+
