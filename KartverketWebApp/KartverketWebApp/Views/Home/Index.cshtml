@@ -2,55 +2,67 @@
     ViewData["Title"] = "Home Page";
 }
 
+@model KartverketWebApp.Models.PositionModel
 
+<div class="green_bar"></div>
 
-<div class="center-container">
-    <div id="map"></div>
+<div class="app_main">
+    <div class="map_container">
+        <div id="map"></div>
+        <div class="center-container">
+            <button class="btn_map">Rapporter</button>
+        </div>  
+    </div>
+    <div class="form_area">
+        <form asp-action="Index" method="post">
+            <input type="hidden" id="latitude" name="latitude" />
+            <input type="hidden" id="longitude" name="longitude" />
+            <input type="text" id="brukernavn" name="brukernavn" />
+            <div class="description_container">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-control"></textarea>
+            </div>
+            <div class="center-container">
+                <button type="submit" class="btn_submit">Rapporter</button>
+            </div>
+        </form>
+    </div>
 </div>
-<div class="center-container"><button type="submit" class="btn_submit">Raporter</button></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="https://unpkg.com/leaflet.pm@2.13.0/dist/leaflet.pm.min.js"></script>
+
+
+
 
 <script>
-
     var map = L.map('map').setView([58.1548282, 8.0081166], 13);
-
-    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    var osm = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
     });
     osm.addTo(map);
 
-    var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
-        minZoom: 0,
-        maxZoom: 20,
-        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        ext: 'png'
+    const button = document.querySelector('.btn_map');
+    const div1 = document.querySelector('.map_container');
+    const div2 = document.querySelector('.form_area');
+    const div3 = document.querySelector('.app_main');
+    const div4 = document.querySelector('.btn_map');
+
+    button.addEventListener('click', function () {
+        // Toggle the 'transformed' class on the div
+        div1.classList.toggle('map_container_transform');
+        div2.classList.toggle('form_area_transform');
+        div3.classList.toggle('app_main_transform');
+        div4.classList.toggle('btn_map_transform');
+
     });
 
-
-
-    var popup = L.popup();
-    
     function onMapClick(e) {
-        popup
-            .setLatLng(e.latlng)
-            .setContent(
-                '<div id="Rapporter-btn">' +
-                'You clicked the map at ' + e.latlng.toString() + '<br>' +
-                '<button id="popupButton">Rapporter feil</button>' // Add a button inside the popup
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
 
-            )
-            .openOn(map);
+        L.marker([lat, lng]).addTo(map);
 
-        // Attach an event listener to the button after popup is open
-        map.on('popupopen', function () {
-            document.getElementById("popupButton").addEventListener("click", function () {
-                window.location.href = '/Home/TakkRapport';
-            });
-        });
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
     }
-
     // Listen for map clicks
     map.on('click', onMapClick);
 </script>

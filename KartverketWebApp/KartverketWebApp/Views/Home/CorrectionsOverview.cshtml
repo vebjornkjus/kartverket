@@ -1,0 +1,62 @@
+﻿@model List<KartverketWebApp.Models.PositionModel>
+
+<div class="center-container"><h2>Registrerte endringer</h2></div>
+
+
+<div class="app_main">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Map</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var position in Model)
+            {
+                <tr>
+                    <td>
+                        <div id="map_corrections"></div>
+                    </td>
+                    <td>@position.Latitude</td>
+                    <td>@position.Longitude</td>
+                    <td>@position.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="map_container">
+    <div id="map_corrections"></div>
+</div>
+@section Scripts {
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <script>
+        // Ensure the model is properly serialized
+        var positions = @Html.Raw(Json.Serialize(Model)); // Correctly serialize the model
+
+        // Check if there are any positions
+        if (positions.length > 0) {
+            // Set the initial view to the first position's coordinates
+            var map = L.map('map_corrections').setView([positions[0].latitude, positions[0].longitude], 13);
+            var osm = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {});
+            osm.addTo(map);
+
+            // Loop through the positions to create markers
+            positions.forEach(function (position) {
+                if (position.latitude && position.longitude) {
+                    L.marker([position.latitude, position.longitude]).addTo(map); // Create markers for each position
+                } else {
+                    console.warn('Position is missing latitude or longitude:', position);
+                }
+            });
+        } else {
+            console.warn('No positions available to display on the map.');
+        }
+    </script>
+}
