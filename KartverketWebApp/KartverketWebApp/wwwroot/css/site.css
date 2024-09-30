@@ -1,3 +1,4 @@
+
 html {
     font-size: 14px;
     position: relative;
@@ -12,29 +13,30 @@ html {
 
 .app_main {
     display: flex;
+    position: relative;
     width: 70vw;
-    height: 65vh;
+    height: 86.41vh;
     justify-content: space-between; /* Space between the two items */
     align-items: center; /* Vertically center */
-    z-index: 2;
-    margin-top: -13vh;
+    z-index: 4;
     margin-left: auto;
     margin-right: auto;
-    gap: 5vw;
+    font-family: Muli, Verdana, sans-serif;
+    gap: 0vw;
     transition: all 0.5s ease; /* Added transition */
 }
 
 .app_main_transform {
     display: flex;
+    position: relative;
     width: 90vw;
-    height: 65vh;
-    justify-content: space-between; /* Space between the two items */
-    align-items: center; /* Vertically center */
-    z-index: 2;
-    margin-top: -13vh;
+    height: 86.41vh;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
     margin-left: auto;
     margin-right: auto;
-    gap: 5vw;
+    gap: 3vw;
 }
 
 body {
@@ -44,12 +46,19 @@ body {
     overflow-x: hidden;
 }
 
+#brukernavn{
+    width: 100%;
+}
+
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .btn_map {
     top: -7vh;
+    cursor: pointer;
+    display: block;
     padding: 7px;
     z-index: 1000;
     border-radius: 7px;
@@ -67,7 +76,7 @@ body {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-.btn_map_transform{
+.btn_map_transform {
     display: none;
 }
 
@@ -81,7 +90,6 @@ body {
     color: black;
     font-family: Muli, Verdana, sans-serif;
     width: 20vw;
-    position: relative;
 }
     .btn_submit:hover {
         text-decoration: underline;
@@ -89,44 +97,82 @@ body {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
-.green_bar {
-    width: 100vw;
-    height: 175px;
-    margin: 0;
-    padding: 0;
-    background-color: #D0ECD6;
-}
-
-#kartverket_logo {
-    width: 147px;
-}
-
 .center-container {
     display: flex;
-    justify-content: center; /* Horizontally center */
-    align-items: center; /* Vertically center */
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.correction_table {
+    display: flex;
+    position: relative;
+    width: 70vw;
+    height: 65vh;
+    justify-content: center;
+    align-items: flex-start; 
+    z-index: 4;
+    font-family: Muli, Verdana, sans-serif;
+    transition: all 0.5s ease;
+}
+
+#form_id{
+    height: 100%;
 }
 
 .form_area {
     display: none;
-    transition: all 0.5s ease; /* Added transition */
+    transition: all 0.5s ease;
 }
 
 .form_area_transform {
     display: block;
+    position: relative;
+    z-index: 9999;
     flex: 1;
     height: 65vh;
     background-color: #F8E7C9;
     border-radius: 11px;
 }
 
+.form_container {
+    display: flex;
+    position: relative;
+    z-index: 9999;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 10%;
+    height: 90%;
+}
+
+.green_bar {
+    position: relative;
+    z-index: 3;
+    width: 100vw;
+    height: 43vh;
+    margin-top: -86.41vh;
+    padding: 0;
+    background-color: #D0ECD6;
+}
+
+
+#kartverket_logo {
+    width: 147px;
+}
+
 .map_container {
     flex: 1;
+    display: block;
+    position: relative;
+    z-index: 5;
     margin-top: 0 auto;
     height: 65vh;
     width: 70vw;
     border-radius: 11px;
     transition: all 0.5s ease;
+}
+
+.map_container_hidden {
+    display: none;
 }
 
 .map_container_transform {
@@ -136,6 +182,7 @@ body {
     border-radius: 11px;
 }
 #map {
+    display: block;
     width: 100%;
     height: 100%;
 }
@@ -145,6 +192,82 @@ body {
     height: 20vh;
 }
 
+.map_selector {
+    flex: 1;
+    background-color: #FCEBCD;
+    border-radius: 11px;
+    margin-left: 1%;
+    margin-right: 1%;
+    height: 65vh;
+    cursor: pointer;
+}
+
+    .map_selector_img {
+        max-width: 100%;
+        position: relative;
+        z-index: 1003;
+        background-color: grey;
+        height: 55%;
+        border-radius: 11px;
+    }
+        .map_selector_img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 11px;
+        }
+
+.map_selector_text {
+    z-index: 1002;
+    position: relative;
+    height: 45%;
+    border-radius: 7px;
+    background-color: #FCEBCD;
+    margin-top: -15%;
+}
+
+    .map_selector_text h1 {
+        font-size: 2vw;
+        text-decoration: underline;
+        margin: 8%;
+        padding-top: 18%;
+    }
+
+        .map_selector_text:hover h1 {
+            font-size: 2vw;
+            text-decoration: none;
+            margin: 8%;
+            padding-top: 18%;
+        }
+
+    .map_selector_text p {
+        font-size: 1vw;
+        margin: 8%;
+    }
+
+    .map_selector_text:hover {
+        position: relative;
+        bottom: 5%;
+        z-index: 1004;
+        border-radius: 7px;
+        text-decoration: none;
+    }
+
+.map_selection_container {
+    display: flex;
+    position: relative;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    z-index: 1002;
+    height: 65vh;
+    width: 120%;
+}
+
+.map_selection_container_hidden {
+    display: none;
+}
+
 #rapporter-btn {
     height: 10vh;
     width: 10vh;
@@ -152,14 +275,16 @@ body {
     padding: 0px;
 }
 
-#popupButton {
-    height: 100%;
+#rapport_type {
     width: 100%;
-    z-index: 3;
-    border-radius: 7px;
-    border: 1px solid #A25C10;
-    background-color: #FCEBCD;
-    color: #A25C10;
+}
+
+.submit_container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    bottom: 5%;
 }
 
 

@@ -13,7 +13,8 @@ a.navbar-brand {
 }
 
 .nav-stedholder {
-    position: static;
+    position: relative;
+    z-index: 2000;
     background-color: white;
     top: 0;
     width: 100%;
@@ -55,4 +56,3 @@ button.accept-policy {
   line-height: 60px;
 
 }
-

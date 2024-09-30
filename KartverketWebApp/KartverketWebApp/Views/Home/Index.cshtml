@@ -4,56 +4,196 @@
 
 @model KartverketWebApp.Models.PositionModel
 
-<div class="green_bar"></div>
+
 
 <div class="app_main">
-    <div class="map_container">
+    <div class="map_selection_container">
+        <div class="map_selector">
+            <div class="map_selector_img">
+                <img src="~/images/kartogkompass.jpg" />
+            </div>
+            <div onclick="MapSelect1()" class="map_selector_text">
+            <h1>Norge kart</h1>
+            <p>Har du vært på tur og oppdaget noe
+                som bør rettes eller oppdateres i
+                kartet? Er det et stedsnavn som er
+                feilplassert i kartet, som mangler
+                eller som er skrevet feil?
+            </p>
+            </div>
+        </div>
+        <div class="map_selector">
+            <div class="map_selector_img">
+            <img src="~/images/img_0269.jpg" />
+            </div>
+            <div onclick="MapSelect2()" class="map_selector_text">
+            <h1>Turkart</h1>
+            <p>
+                Har du merket, skiltet eller 
+                tilrettelagt en turrute? Legg den inn
+                i den nasjonale databasen for
+                turruter!
+            </p>
+            </div>
+        </div>
+        <div class="map_selector">
+            <div class="map_selector_img">
+                <img src="~/images/sjokart.jpg" />
+            </div>
+            <div onclick="MapSelect3()" class="map_selector_text">
+            <h1>Sjøkart</h1>
+            <p>
+                Har du oppdaget en uregistrert
+                grunne eller observert andre
+                mangler eller i sjøkartet? Meld det
+                inn her så hjelper du andre
+                sjøfarende.
+            </p>
+            </div>
+        </div>
+    </div>
+    <div class="map_container_hidden">
         <div id="map"></div>
         <div class="center-container">
-            <button class="btn_map">Rapporter</button>
+            <button class="btn_map_transform">Rapporter</button>
         </div>  
     </div>
     <div class="form_area">
-        <form asp-action="Index" method="post">
-            <input type="hidden" id="latitude" name="latitude" />
-            <input type="hidden" id="longitude" name="longitude" />
-            <input type="text" id="brukernavn" name="brukernavn" />
-            <div class="description_container">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" class="form-control"></textarea>
+        <div class="form_container">
+            <form asp-action="Index" method="post" id="form_id">
+                <input type="hidden" id="latitude" name="latitude" />
+                <input type="hidden" id="longitude" name="longitude" />
+                <label for="brukernavn">Brukernavn</label>
+                        <input type="text" id="brukernavn" name="brukernavn" />
+                        <select id="rapport_type" name="rapport_type">
+                            <option value="" disabled selected>
+                                Velg rapport kategori...
+                            </option>
+                            <option value="Gjengrodd vei">
+                                Gjengrodd vei
+                            </option>
+                               <option value="Sti på eiendom">
+                                Sti på eiendom
+                            </option>
+                                <option value="Annet">
+                                Annet
+                            </option>
+                        </select>
+                <div class="description_container">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control"></textarea>
+                </div>
+            </form>
+            <div class="submit_container">
+                <button type="submit" class="btn_submit" form="form_id">Rapporter</button>
             </div>
-            <div class="center-container">
-                <button type="submit" class="btn_submit">Rapporter</button>
-            </div>
-        </form>
+            <input type="hidden" id="map_type" name="map_type" form="form_id"/>
+        </div>
     </div>
 </div>
+<div class="green_bar"></div>
 
 
 
 
 
 <script>
-    var map = L.map('map').setView([58.1548282, 8.0081166], 13);
-    var osm = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+    // Define different map layers
+    var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
     });
-    osm.addTo(map);
 
-    const button = document.querySelector('.btn_map');
-    const div1 = document.querySelector('.map_container');
+    var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
+        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+    });
+
+    var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
+        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+    });
+
+    var map = L.map('map', {
+        center: [58.1548282, 8.0081166],
+        zoom: 13,
+        layers: [norgeKart]
+    });
+    
+    //bytter ut map_selection_container med map_container får å vise kartet etter et kart blir valgt
+    const map_selector1 = document.querySelector('.map_container_hidden');
+    const map_selector2 = document.querySelector('.map_selection_container');
+
+    function MapSelect1() {
+        map.removeLayer(turKart);
+        map.removeLayer(sjoKart);
+        map.addLayer(norgeKart);
+
+        map_selector1.classList.remove('map_container_hidden');
+        map_selector1.classList.add('map_container');
+        map_selector2.classList.add('map_selection_container_hidden');
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 50);
+
+        //setter verdi for i for kart type i form
+        document.getElementById('map_type').value = "Norge kart";
+    }
+
+    function MapSelect2() {
+        map.removeLayer(norgeKart); 
+        map.removeLayer(sjoKart);
+        map.addLayer(turKart); 
+
+        map_selector1.classList.remove('map_container_hidden');
+        map_selector1.classList.add('map_container');
+        map_selector2.classList.add('map_selection_container_hidden');
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 50);
+
+        //setter verdi for i for kart type i form
+        document.getElementById('map_type').value = "Turkart";
+    }
+
+    function MapSelect3() {
+        map.removeLayer(norgeKart);
+        map.removeLayer(turKart);
+        map.addLayer(sjoKart);
+       
+        map_selector1.classList.remove('map_container_hidden');
+        map_selector1.classList.add('map_container');
+        map_selector2.classList.add('map_selection_container_hidden');
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 50);
+
+        //setter verdi for i for kart type i form
+        document.getElementById('map_type').value = "Sjøkart";
+    }
+
+
+    //Fjerner jnapp etter den blir tykket på og trasformerer map_container til å innehode form_area
+    //etter knappen blir trykket på
+    const button = document.querySelector('.btn_map_transform');
+    const div1 = document.querySelector('.map_container_hidden');
     const div2 = document.querySelector('.form_area');
     const div3 = document.querySelector('.app_main');
-    const div4 = document.querySelector('.btn_map');
+    const div4 = document.querySelector('.btn_map_transform');
+
 
     button.addEventListener('click', function () {
         // Toggle the 'transformed' class on the div
         div1.classList.toggle('map_container_transform');
         div2.classList.toggle('form_area_transform');
         div3.classList.toggle('app_main_transform');
-        div4.classList.toggle('btn_map_transform');
+        div4.classList.remove('btn_map');
+        div4.classList.add('btn_map_transform');
+
 
     });
 
+    //funksjon for å legge til punkter og legge til i form
     function onMapClick(e) {
         var lat = e.latlng.lat;
         var lng = e.latlng.lng;
@@ -62,6 +202,10 @@
 
         document.getElementById('latitude').value = lat;
         document.getElementById('longitude').value = lng;
+
+        //legger til knapp etter at et punkt har blitt valgt
+        div4.classList.remove('btn_map_transform');
+        div4.classList.add('btn_map');
     }
     // Listen for map clicks
     map.on('click', onMapClick);

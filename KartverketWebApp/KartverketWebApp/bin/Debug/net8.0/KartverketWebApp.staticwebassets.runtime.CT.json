@@ -29,6 +29,30 @@
       },
       "images": {
         "Children": {
+          "img_0269.jpg": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/img_0269.jpg"
+            },
+            "Patterns": null
+          },
+          "kartogkompass.jpg": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/kartogkompass.jpg"
+            },
+            "Patterns": null
+          },
+          "sjokart.jpg": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/sjokart.jpg"
+            },
+            "Patterns": null
+          },
           "standard_kartverket.png": {
             "Children": null,
             "Asset": {
