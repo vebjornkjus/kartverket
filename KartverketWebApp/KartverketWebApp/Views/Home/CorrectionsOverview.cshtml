@@ -1,5 +1,6 @@
 ﻿@model List<KartverketWebApp.Models.PositionModel>
 
+
 <div class="center-container"><h2>Registrerte endringer</h2></div>
 
 <div class="corrections_table">
@@ -14,19 +15,17 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var position in Model)
+            @foreach (var sted in Model)
             {
-                <tr>
-                    <td>
-                        <div id="map_corrections"></div>
-                    </td>
-                    <td>@position.Brukernavn</td>
-                    <td>@position.Longitude, @position.Latitude, @position.Map_type</td>
-                    <td>@position.Rapport_type</td>
-                    <td>@position.Description</td>
-
-
-                </tr>
+                    <tr>
+                        <td>
+                            <div id="map_corrections"></div>
+                        </td>
+                        <td>@sted.Brukernavn</td>
+                        <td>@sted.Longitude, @sted.Latitude, @sted.Map_type, @sted.Fylkesnavn, @sted.Fylkesnummer, @sted.Kommunenavn, @sted.Kommunenummer</td>
+                        <td>@sted.Rapport_type</td>
+                        <td>@sted.Description</td>
+                    </tr>
             }
         </tbody>
     </table>

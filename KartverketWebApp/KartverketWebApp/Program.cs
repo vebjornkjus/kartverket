@@ -1,7 +1,12 @@
+using KartverketWebApp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register HttpClient and LocationService with DI
+builder.Services.AddHttpClient<StednavnService>();
 
 var app = builder.Build();
 

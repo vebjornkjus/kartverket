@@ -88,10 +88,18 @@
                 <button type="submit" class="btn_submit" form="form_id">Rapporter</button>
             </div>
             <input type="hidden" id="map_type" name="map_type" form="form_id"/>
+            <input type="hidden" name="koordsys" value="4258" form="form_id" />
         </div>
     </div>
 </div>
 <div class="green_bar"></div>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+        <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+        </div>
+}
 
 
 
@@ -134,7 +142,7 @@
             map.invalidateSize();
         }, 50);
 
-        //setter verdi for i for kart type i form
+        //setter verdi for i kart type i form
         document.getElementById('map_type').value = "Norge kart";
     }
 
