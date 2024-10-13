@@ -1,4 +1,6 @@
-﻿@model List<KartverketWebApp.Models.PositionModel>
+﻿@model KartverketWebApp.Models.CombinedViewModel;
+
+
 
 
 <div class="center-container"><h2>Registrerte endringer</h2></div>
@@ -8,25 +10,31 @@
         <thead>
             <tr>
                 <th>Map</th>
-                <th>Brukernavn</th>
+                <th>Tittel</th>
                 <th>Kartdata</th>
                 <th>Kategori</th>
                 <th>Description</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var sted in Model)
+            @foreach (var sted in Model.Positions)
             {
-                    <tr>
-                        <td>
-                            <div id="map_corrections"></div>
-                        </td>
-                        <td>@sted.Brukernavn</td>
-                        <td>@sted.Longitude, @sted.Latitude, @sted.Map_type, @sted.Fylkesnavn, @sted.Fylkesnummer, @sted.Kommunenavn, @sted.Kommunenummer</td>
-                        <td>@sted.Rapport_type</td>
-                        <td>@sted.Description</td>
-                    </tr>
+                   <tr>
+                    <td>
+                        <div id="map_corrections"></div>
+                    </td>
+                    <td>@sted.Tittel</td>
+                    <td>
+                        @sted.Ost, @sted.Nord, @sted.Map_type
+                    </td>
+                    <td>@sted.Rapport_type</td>
+                    <td>@sted.Description</td>
+                    <td>
+                        @Html.Partial("_Stednavn", Model.Stednavn) <!-- Pass StednavnViewModel -->
+                    </td>
+               </tr>
             }
+
         </tbody>
     </table>
 </div>
@@ -39,14 +47,14 @@
 
     <script>
         // Ensure the model is properly serialized
-        var positions = @Html.Raw(Json.Serialize(Model));
+        var positions = @Html.Raw(Json.Serialize(Model.Positions));
 
         // Check if there are any positions
         if (positions.length > 0) {
             positions.forEach(function (position) {
                 // Create a unique map for each position
 
-                var map = L.map('map_corrections').setView([position.latitude, position.longitude], 13);
+                var map = L.map('map_corrections').setView([position.nord, position.ost], 13);
 
                 var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
                     attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
@@ -72,10 +80,10 @@
                         }
 
                         // Create marker for the current position
-                        if (position.latitude && position.longitude) {
-                            L.marker([position.latitude, position.longitude]).addTo(map);
+                        if (position.nord && position.ost) {
+                            L.marker([position.nord, position.ost]).addTo(map);
                         } else {
-                            console.warn('Position is missing latitude or longitude:', position);
+                            console.warn('Position is missing nord or ost:', position);
                         }
                     });
                 } else {

@@ -106,7 +106,7 @@ body {
 .correction_table {
     display: flex;
     position: relative;
-    width: 70vw;
+    margin: 10%;
     height: 65vh;
     justify-content: center;
     align-items: flex-start; 

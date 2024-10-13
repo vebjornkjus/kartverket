@@ -1,43 +1,51 @@
-﻿// Services/LocationService.cs
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using KartverketWebApp.API_Models;
 using KartverketWebApp.Models;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Web;
 
 namespace KartverketWebApp.Services
 {
-    public class StednavnService
+        public class StednavnService : IStednavn
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<StednavnService> _logger;
-
-        public StednavnService(HttpClient httpClient, ILogger<StednavnService> logger)
-        {
-            _httpClient = httpClient;
-            _logger = logger;
-        }
-        public async Task<PositionModel> GetLocationData(double latitude, double longitude, int koordsys)
-        {
-            // Create the query string
-            string query = $"?nord={latitude}&ost={longitude}&koordsys={koordsys}";
-
-            // Define the API URL, assuming base URL is set up in configuration
-            string url = "https://api.kartverket.no/kommuneinfo/v1/punkt" + query;
-
-            // Send the HTTP GET request
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
-
-            // Ensure a successful response
-            if (response.IsSuccessStatusCode)
+            private readonly HttpClient _httpClient;
+            private readonly ILogger<StednavnService> _logger;
+            private readonly ApiSettings _apiSettings;
+        public StednavnService(HttpClient httpClient, ILogger<StednavnService> logger, IOptions<ApiSettings> apiSettings)
             {
-                // Parse the JSON response
-                string jsonString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<PositionModel>(jsonString);
-            }
+                _httpClient = httpClient;
+                _logger = logger;
+                _apiSettings = apiSettings.Value;
 
-            return null; // or handle error as needed
+            _logger.LogInformation("StednavnService initialized successfully.");
+            }
+        public async Task<StednavnResponse> GetStednavnAsync(double nord, double ost, int koordsys)
+        {
+            try
+            {
+                // Log the URL being called
+                _logger.LogInformation($"Sending API request to: {_apiSettings.StedsnavnApiBaseUrl}/punkt?nord={nord}&ost={ost}&koordsys={koordsys}");
+
+                var response = await _httpClient.GetAsync($"{_apiSettings.StedsnavnApiBaseUrl}/punkt?nord={nord}&ost={ost}&koordsys={koordsys}");
+                response.EnsureSuccessStatusCode();
+
+
+                var json = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"Position Data Response: {json}");
+
+
+                var stednavnResponse = JsonSerializer.Deserialize<StednavnResponse>(json);
+                return stednavnResponse;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching position data: {ex.Message}");
+                return new StednavnResponse { Fylkesnavn = "Error: Unable to fetch data" };
+            }
         }
     }
-}
+    }
 

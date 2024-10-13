@@ -4,8 +4,6 @@
 
 @model KartverketWebApp.Models.PositionModel
 
-
-
 <div class="app_main">
     <div class="map_selection_container">
         <div class="map_selector">
@@ -61,10 +59,10 @@
     <div class="form_area">
         <div class="form_container">
             <form asp-action="Index" method="post" id="form_id">
-                <input type="hidden" id="latitude" name="latitude" />
-                <input type="hidden" id="longitude" name="longitude" />
-                <label for="brukernavn">Brukernavn</label>
-                        <input type="text" id="brukernavn" name="brukernavn" />
+                <input type="hidden" id="nord" name="nord" />
+                <input type="hidden" id="ost" name="ost" />
+                <label for="tittel">Tittel</label><br/>
+                        <input type="text" id="tittel" name="Tittel" />
                         <select id="rapport_type" name="rapport_type">
                             <option value="" disabled selected>
                                 Velg rapport kategori...
@@ -208,8 +206,8 @@
 
         L.marker([lat, lng]).addTo(map);
 
-        document.getElementById('latitude').value = lat;
-        document.getElementById('longitude').value = lng;
+        document.getElementById('nord').value = lat;
+        document.getElementById('ost').value = lng;
 
         //legger til knapp etter at et punkt har blitt valgt
         div4.classList.remove('btn_map_transform');
