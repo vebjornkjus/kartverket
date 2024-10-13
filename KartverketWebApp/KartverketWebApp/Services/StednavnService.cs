@@ -24,10 +24,13 @@ namespace KartverketWebApp.Services
             }
         public async Task<StednavnResponse> GetStednavnAsync(double nord, double ost, int koordsys)
         {
+            _logger.LogInformation("GetStednavnAsync method called.");
+
             try
             {
-                // Log the URL being called
+                _logger.LogInformation("Reached before API request log.");
                 _logger.LogInformation($"Sending API request to: {_apiSettings.StedsnavnApiBaseUrl}/punkt?nord={nord}&ost={ost}&koordsys={koordsys}");
+                _logger.LogInformation("Reached after API request log.");
 
                 var response = await _httpClient.GetAsync($"{_apiSettings.StedsnavnApiBaseUrl}/punkt?nord={nord}&ost={ost}&koordsys={koordsys}");
                 response.EnsureSuccessStatusCode();

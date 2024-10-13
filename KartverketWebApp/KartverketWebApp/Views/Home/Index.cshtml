@@ -59,6 +59,7 @@
     <div class="form_area">
         <div class="form_container">
             <form asp-action="Index" method="post" id="form_id">
+                @Html.AntiForgeryToken()
                 <input type="hidden" id="nord" name="nord" />
                 <input type="hidden" id="ost" name="ost" />
                 <label for="tittel">Tittel</label><br/>
