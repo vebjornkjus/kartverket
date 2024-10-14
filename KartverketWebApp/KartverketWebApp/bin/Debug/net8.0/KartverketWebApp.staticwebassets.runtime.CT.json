@@ -29,6 +29,14 @@
       },
       "images": {
         "Children": {
+          "b838081b-67f6-47f7-b144-8b1df93fd62b.webp": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/b838081b-67f6-47f7-b144-8b1df93fd62b.webp"
+            },
+            "Patterns": null
+          },
           "img_0269.jpg": {
             "Children": null,
             "Asset": {

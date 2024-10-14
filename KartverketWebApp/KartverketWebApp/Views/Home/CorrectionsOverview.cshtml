@@ -17,24 +17,23 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var sted in Model.Positions)
+            @for (int i = 0; i < Model.Positions.Count; i++)
             {
-                   <tr>
+                var sted = Model.Positions[i];
+                var stednavn = Model.Stednavn.Count > i ? Model.Stednavn[i] : null;
+
+                <tr>
                     <td>
-                        <div id="map_corrections"></div>
+                        <div id="map_corrections_@i" class="map_corrections"></div> <!-- Ensure each map has a unique id -->
                     </td>
                     <td>@sted.Tittel</td>
                     <td>
-                        @sted.Ost, @sted.Nord, @sted.Map_type
+                        @sted.Nord, @sted.Ost, @sted.Map_type, @(stednavn != null ? stednavn.Fylkesnavn : "N/A"), @(stednavn != null ? stednavn.Kommunenavn : "N/A")
                     </td>
                     <td>@sted.Rapport_type</td>
                     <td>@sted.Description</td>
-                    <td>
-                        @Html.Partial("_Stednavn", Model.Stednavn) <!-- Pass StednavnViewModel -->
-                    </td>
-               </tr>
+                </tr>
             }
-
         </tbody>
     </table>
 </div>
@@ -51,10 +50,11 @@
 
         // Check if there are any positions
         if (positions.length > 0) {
-            positions.forEach(function (position) {
+            positions.forEach(function (position, index) {
                 // Create a unique map for each position
 
-                var map = L.map('map_corrections').setView([position.nord, position.ost], 13);
+               var map = L.map('map_corrections_' + index).setView([position.nord, position.ost], 13);
+
 
                 var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
                     attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'

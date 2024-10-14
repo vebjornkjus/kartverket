@@ -1,6 +1,7 @@
 using KartverketWebApp.Models;
 using KartverketWebApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
@@ -11,6 +12,7 @@ namespace KartverketWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IStednavn _stednavnService;
         private static List<PositionModel> positions = new List<PositionModel>();
+        private static List<StednavnViewModel> stednavn = new List<StednavnViewModel>();
 
         public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService)
         {
@@ -39,21 +41,47 @@ namespace KartverketWebApp.Controllers
             // Return the Index view, no model passed
             return View();
         }
-
         [HttpPost]
-        public IActionResult Index(PositionModel model)
-        {       
+        public async Task<IActionResult> Index(PositionModel positionModel, StednavnViewModel stednavnModel)
+        {
             if (ModelState.IsValid)
             {
-                // Add the valid model to the positions list
-                positions.Add(model);
+                // Add the valid position model to the positions list
+                positions.Add(positionModel);
 
-                // Redirect to the CorrectionsOverview action to display the updated list
-                return RedirectToAction("CorrectionsOverview");
+                // Call the Stednavn API to get the geographical data
+                var stednavnResponse = await _stednavnService.GetStednavnAsync(positionModel.Nord, positionModel.Ost, positionModel.Koordsys);
+
+                if (stednavnResponse != null)
+                {
+                    _logger.LogInformation("Received StednavnResponse from API.");
+                    _logger.LogInformation($"Fylkesnavn: {stednavnResponse.Fylkesnavn}");
+                    _logger.LogInformation($"Fylkesnummer: {stednavnResponse.Fylkesnummer}");
+                    _logger.LogInformation($"Kommunenavn: {stednavnResponse.Kommunenavn}");
+                    _logger.LogInformation($"Kommunenummer: {stednavnResponse.Kommunenummer}");
+
+                    stednavn.Add(new StednavnViewModel
+                    {
+                        Fylkesnavn = stednavnResponse.Fylkesnavn,
+                        Fylkesnummer = stednavnResponse.Fylkesnummer,
+                        Kommunenavn = stednavnResponse.Kommunenavn,
+                        Kommunenummer = stednavnResponse.Kommunenummer
+                    });
+
+                    // Redirect to the CorrectionsOverview action to display the updated list
+                    return RedirectToAction("CorrectionsOverview");
+                }
+                else
+                {
+                    ViewData["Error"] = $"No results found for coordinates: nord {positionModel.Nord}, ost {positionModel.Ost}, Koordsys {positionModel.Koordsys}.";
+                    return View("Index");
+                }
             }
+
             ViewBag.ErrorMessage = "Failed to retrieve location data.";
-            return View(model); // Return the same view with model errors
+            return View(positionModel);
         }
+
 
         public IActionResult CorrectionsOverview()
         {
@@ -61,41 +89,17 @@ namespace KartverketWebApp.Controllers
             var viewModel = new CombinedViewModel
             {
                 Positions = positions ?? new List<PositionModel>(), // Ensure positions is not null
-                Stednavn = new StednavnViewModel() // Initialize as needed
+                Stednavn = stednavn ?? new List<StednavnViewModel>() // Initialize as needed
             };
 
-            _logger.LogInformation($"Stednavn data: Fylkesnavn = {viewModel.Stednavn?.Fylkesnavn}, Kommunenavn = {viewModel.Stednavn?.Kommunenavn}");
+            foreach (var navn in viewModel.Stednavn)
+            {
+                _logger.LogInformation($"Stednavn data: Fylkesnavn = {navn.Fylkesnavn}, Kommunenavn = {navn.Kommunenavn}");
+            }
 
             return View(viewModel); // Return the view with CombinedViewModel
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Stedsnavn(double nord, double ost, int koordsys)
-        {
-            // Fetch data from the API service
-            var stednavnResponse = await _stednavnService.GetStednavnAsync(nord, ost, koordsys);
-
-
-            // Check if data exists
-            if (stednavnResponse != null)
-            {
-                // Map the response to StednavnViewModel
-                var viewModel = new StednavnViewModel
-                {
-                    Fylkesnavn = stednavnResponse.Fylkesnavn,
-                    Fylkesnummer = stednavnResponse.Fylkesnummer,
-                    Kommunenavn = stednavnResponse.Kommunenavn,
-                    Kommunenummer = stednavnResponse.Kommunenummer
-                };
-
-                return View("CorrectionsOverview", viewModel); // Ensure this view is returned
-            }
-            else
-            {
-                ViewData["Error"] = $"No results found for coordinates: nord {nord}, ost {ost}, Koordsys {koordsys}.";
-                return View("Index");
-            }
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -41,6 +41,16 @@ namespace KartverketWebApp.Services
 
 
                 var stednavnResponse = JsonSerializer.Deserialize<StednavnResponse>(json);
+                // Check if data was deserialized properly
+                if (stednavnResponse != null)
+                {
+                    _logger.LogInformation($"Deserialized StednavnResponse: Fylkesnavn = {stednavnResponse.Fylkesnavn}, Kommunenavn = {stednavnResponse.Kommunenavn}, Kommunenummer = {stednavnResponse.Kommunenummer}");
+                }
+                else
+                {
+                    _logger.LogWarning("StednavnResponse is null after deserialization.");
+                }
+
                 return stednavnResponse;
             }
             catch (Exception ex)

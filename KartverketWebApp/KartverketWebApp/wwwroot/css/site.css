@@ -187,7 +187,7 @@ body {
     height: 100%;
 }
 
-#map_corrections {
+.map_corrections {
     width:20vw;
     height: 20vh;
 }
