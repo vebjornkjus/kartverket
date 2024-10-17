@@ -1,0 +1,51 @@
+﻿@{
+    // Pass the ViewBag data as JSON to JavaScript
+    var coordinatesJson = ViewBag.Coordinates;
+}
+
+<div class="center-container">
+<div id="map" style=" width: 60vw; height: 60vh;"> </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script>
+    // Leaflet map setup
+    var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+    });
+
+    var map = L.map('map', {
+        center: [58.1548282, 8.0081166],
+        zoom: 13,
+        layers: [norgeKart]
+    });
+
+    // Safely insert the coordinates JSON passed from the controller into JavaScript
+    var coordinatesJson = @Html.Raw(ViewBag.Coordinates); // ViewBag.Coordinates is a JSON array
+    console.log("Coordinates JSON:", coordinatesJson);
+
+    try {
+        // Extract the first polygon (assuming coordinates are structured as GeoJSON MultiPolygon)
+        var polygonCoordinates = coordinatesJson[0][0].map(function (coord) {
+            console.log("Original coord:", coord); // Debugging: log original coordinates
+
+            // Swap [lng, lat] to [lat, lng] for Leaflet
+            var swappedCoord = [coord[1], coord[0]]; // Correctly swap lng and lat
+            console.log("Swapped coord:", swappedCoord); // Debugging: log swapped coordinates
+            return swappedCoord;
+        });
+
+        // Create the polygon on the map
+        var polygon = L.polygon(polygonCoordinates, {
+            color: 'blue',
+            fillColor: '#3388ff',
+            fillOpacity: 0.5
+        }).addTo(map);
+
+        // Fit the map bounds to the polygon
+        map.fitBounds(polygon.getBounds());
+    } catch (error) {
+        console.error("Error processing coordinates JSON:", error);
+    }
+</script>

@@ -1,8 +1,9 @@
-﻿@{
+﻿@using Newtonsoft.Json
+@{
     ViewData["Title"] = "Home Page";
 }
 
-@model KartverketWebApp.Models.PositionModel
+@model KartverketWebApp.Models.SokeModel
 
 <div class="app_main">
     <div class="map_selection_container">
@@ -53,6 +54,12 @@
     <div class="map_container_hidden">
         <div id="map"></div>
         <div class="center-container">
+                <div id="sok_background">
+                    <form id="sokeForm" asp-action="Sok" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="text" name="kommuneName" id="kommuneName" />
+                    </form>
+                </div>
             <button class="btn_map_transform">Rapporter</button>
         </div>  
     </div>
@@ -90,6 +97,8 @@
             <input type="hidden" name="koordsys" value="4258" form="form_id" />
         </div>
     </div>
+
+    </div>
 </div>
 <div class="green_bar"></div>
 
@@ -118,6 +127,8 @@
         attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
     });
 
+
+  
     var map = L.map('map', {
         center: [58.1548282, 8.0081166],
         zoom: 13,
@@ -214,6 +225,7 @@
         div4.classList.remove('btn_map_transform');
         div4.classList.add('btn_map');
     }
+
     // Listen for map clicks
     map.on('click', onMapClick);
 </script>

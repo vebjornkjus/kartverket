@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
 
 // Register services and their interfaces
+builder.Services.AddHttpClient<ISokeService, SokeService>();
 builder.Services.AddHttpClient<IStednavn, StednavnService>();
 
 // Add services to the container.

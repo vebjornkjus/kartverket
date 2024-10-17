@@ -279,13 +279,34 @@ body {
     width: 100%;
 }
 
-.submit_container {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    bottom: 5%;
+#sok_background {  
+    position:absolute;
+    margin-top: -63vh;
+    width: 40vw;
+    height: 6vh;
+    border-radius:999px;
+    background-color: white;
+    z-index: 1000;
 }
+
+    #sok_background form{
+        text-align:center;
+        width: 90%;
+        height:100%;
+    }
+
+        #sok_background form input {
+            width: 100%;
+            height: 100%;
+        }
+
+    .submit_container {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        bottom: 5%;
+    }
 
 
 

@@ -1,9 +1,13 @@
-using KartverketWebApp.Models;
-using KartverketWebApp.Services;
-using Microsoft.AspNetCore.Mvc;
+    using KartverketWebApp.API_Models;
+    using KartverketWebApp.Models;
+    using KartverketWebApp.Services;
+    using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+    using Microsoft.Extensions.Logging;
+    using System.Diagnostics;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace KartverketWebApp.Controllers
 {
@@ -11,13 +15,20 @@ namespace KartverketWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IStednavn _stednavnService;
+        private readonly ISokeService _sokeService;
         private static List<PositionModel> positions = new List<PositionModel>();
         private static List<StednavnViewModel> stednavn = new List<StednavnViewModel>();
+        private readonly HttpClient _httpClient;
+        private readonly ApiSettings _apiSettings;
 
-        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService)
+
+        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings)
         {
             _logger = logger;
             _stednavnService = stedsnavnService;
+            _sokeService = sokeService;
+            _httpClient = httpClient;
+            _apiSettings = apiSettings.Value;
         }
 
         public IActionResult TakkRapport()
@@ -26,6 +37,11 @@ namespace KartverketWebApp.Controllers
         }
 
         public IActionResult Admin()
+        {
+            return View();
+        }
+
+        public IActionResult soke()
         {
             return View();
         }
@@ -100,11 +116,95 @@ namespace KartverketWebApp.Controllers
             return View(viewModel); // Return the view with CombinedViewModel
         }
 
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public async Task<IActionResult> Sok(string kommuneName)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (string.IsNullOrEmpty(kommuneName))
+            {
+                ViewData["Error"] = "Please enter a valid Kommune Number.";
+                return View("Index");
+            }
+
+            try
+            {
+                // Get the full KommunerResponse
+                var kommunerResponse = await _sokeService.GetSokeAsync(kommuneName);
+
+                if (kommunerResponse != null && kommunerResponse.AntallTreff > 0)
+                {
+                    // Ensure that we access the first municipality in the list
+                    var kommune = kommunerResponse.Kommuner.FirstOrDefault();
+
+                    if (kommune != null)
+                    {
+                        _logger.LogInformation("Received valid response from API.");
+                        _logger.LogInformation($"Komunenummer: {kommune.Kommunenummer}");
+
+                        var viewModel = new SokeModel
+                        {
+                            Kommunenummer = kommune.Kommunenummer ?? "N/A",
+                        };
+
+                        return RedirectToAction("Soke", new { kommunenummer = viewModel.Kommunenummer });
+                    }
+                }
+
+                // If no results were found
+                ViewData["Error"] = $"No results found for Kommune '{kommuneName}'.";
+                return View("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred during API call to GetSokeAsync");
+                ViewData["Error"] = "An error occurred while fetching data. Please try again.";
+                return View("Index");
+            }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Soke(string kommunenummer)
+        {
+            _logger.LogInformation($"Komunenummer passed from sokeModel: {kommunenummer}");
+
+            // Fetch the raw JSON from the API
+            var response = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{kommunenummer}/omrade");
+            response.EnsureSuccessStatusCode();
+
+            _logger.LogInformation("Successfully received response from API for kommune: {kommunenummer}", kommunenummer);
+
+            var content = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("Raw JSON response: {Content}", content);
+
+            try
+            {
+                // Parse the JSON content (without deserializing it into a C# class)
+                var jsonDoc = JsonDocument.Parse(content);
+
+                // Check if 'omrade' and 'coordinates' properties exist
+                if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
+                    omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
+                {
+                    // Extract the 'coordinates' array from the 'omrade' object
+                    var coordinates = coordinatesElement.GetRawText();
+
+                    // Pass the raw coordinates to the view using ViewBag
+                    ViewBag.Coordinates = coordinates;
+                    _logger.LogInformation("API response for coordinates: {coordinates}", coordinates);
+
+                    return View("Soke");
+                }
+                else
+                {
+                    _logger.LogError("The expected properties 'omrade' or 'coordinates' were not found in the JSON response.");
+                    return BadRequest("Invalid JSON structure.");
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Error parsing JSON for kommune: {kommunenummer}", kommunenummer);
+                return BadRequest("Invalid JSON format.");
+            }
+        }
+
     }
 }
