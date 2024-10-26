@@ -1,11 +1,11 @@
-    using KartverketWebApp.API_Models;
-    using KartverketWebApp.Models;
-    using KartverketWebApp.Services;
-    using Microsoft.AspNetCore.Mvc;
+using KartverketWebApp.API_Models;
+using KartverketWebApp.Models;
+using KartverketWebApp.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -62,44 +62,72 @@ namespace KartverketWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Add the valid position model to the positions list
-                positions.Add(positionModel);
-
-                // Call the Stednavn API to get the geographical data
-                var stednavnResponse = await _stednavnService.GetStednavnAsync(positionModel.Nord, positionModel.Ost, positionModel.Koordsys);
-
-                if (stednavnResponse != null)
+                var newPosition = new PositionModel
                 {
-                    _logger.LogInformation("Received StednavnResponse from API.");
-                    _logger.LogInformation($"Fylkesnavn: {stednavnResponse.Fylkesnavn}");
-                    _logger.LogInformation($"Fylkesnummer: {stednavnResponse.Fylkesnummer}");
-                    _logger.LogInformation($"Kommunenavn: {stednavnResponse.Kommunenavn}");
-                    _logger.LogInformation($"Kommunenummer: {stednavnResponse.Kommunenummer}");
+                    Kart_endring_id = Guid.NewGuid().ToString(),
+                    Koordsys = positionModel.Koordsys,
+                    Tittel = positionModel.Tittel,
+                    Description = positionModel.Description,
+                    Map_type = positionModel.Map_type,
+                    Rapport_type = positionModel.Rapport_type
+                };
 
-                    stednavn.Add(new StednavnViewModel
+                // Add each coordinate from the submitted PositionModel to the newPositionModel's Coordinates list
+                foreach (var coordinate in positionModel.Coordinates)
+                {
+                    newPosition.Coordinates.Add(new PositionModel.Coordinate
                     {
-                        Fylkesnavn = stednavnResponse.Fylkesnavn,
-                        Fylkesnummer = stednavnResponse.Fylkesnummer,
-                        Kommunenavn = stednavnResponse.Kommunenavn,
-                        Kommunenummer = stednavnResponse.Kommunenummer
+                        Nord = coordinate.Nord,
+                        Ost = coordinate.Ost
                     });
-
-                    // Redirect to the CorrectionsOverview action to display the updated list
-                    return RedirectToAction("CorrectionsOverview");
+                    _logger.LogInformation("Added coordinate: Nord = {Nord}, Ost = {Ost}", coordinate.Nord, coordinate.Ost);
                 }
-                else
+
+                positions.Add(newPosition);
+
+                if (positionModel.Coordinates.Count > 0)
                 {
-                    ViewData["Error"] = $"No results found for coordinates: nord {positionModel.Nord}, ost {positionModel.Ost}, Koordsys {positionModel.Koordsys}.";
-                    return View("Index");
-                }
-            }
+                    var firstCoordinate = positionModel.Coordinates[0];
 
-            ViewBag.ErrorMessage = "Failed to retrieve location data.";
+                    // Call the Stednavn API using the first coordinate
+                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoordinate.Nord, firstCoordinate.Ost, positionModel.Koordsys);
+
+
+                    if (stednavnResponse != null)
+                    {
+                        _logger.LogInformation("Received StednavnResponse from API.");
+                        _logger.LogInformation($"Fylkesnavn: {stednavnResponse.Fylkesnavn}");
+                        _logger.LogInformation($"Fylkesnummer: {stednavnResponse.Fylkesnummer}");
+                        _logger.LogInformation($"Kommunenavn: {stednavnResponse.Kommunenavn}");
+                        _logger.LogInformation($"Kommunenummer: {stednavnResponse.Kommunenummer}");
+
+                        stednavn.Add(new StednavnViewModel
+                        {
+                            Fylkesnavn = stednavnResponse.Fylkesnavn,
+                            Fylkesnummer = stednavnResponse.Fylkesnummer,
+                            Kommunenavn = stednavnResponse.Kommunenavn,
+                            Kommunenummer = stednavnResponse.Kommunenummer
+                        });
+
+                        // Redirect to the CorrectionsOverview action to display the updated list
+                        return RedirectToAction("CorrectionsOverview");
+                    }
+                    else
+                    {
+                        ViewData["Error"] = $"No results found for coordinates: nord {firstCoordinate.Nord}, ost {firstCoordinate.Ost}, Koordsys {positionModel.Koordsys}.";
+                        return View("Index");
+                    }
+                }
+
+                _logger.LogError("Failed to retrieve location data for PositionModel: Coordinates = {Coordinates}, Koordsys = {Koordsys}", positionModel.Coordinates, positionModel.Koordsys);
+
+            }
             return View(positionModel);
         }
 
 
-        public IActionResult CorrectionsOverview()
+
+            public IActionResult CorrectionsOverview()
         {
             // Prepare the CombinedViewModel to be passed to the view
             var viewModel = new CombinedViewModel

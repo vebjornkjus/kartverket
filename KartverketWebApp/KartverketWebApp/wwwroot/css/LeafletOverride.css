@@ -1,0 +1,50 @@
+﻿.leaflet-marker-icon,
+.leaflet-div-icon {
+    background-color: #0078A8; /* Custom color for dots */
+    border: 2px solid #ffffff; /* Border color for visibility */
+    border-radius: 50%; /* Make them circular */
+    width: 10px; /* Size of the dots */
+    height: 10px;
+}
+/* Customize all toolbar buttons */
+
+.leaflet-bar {
+    box-shadow: none;
+    border: none !important;
+    border-radius: 50% !important;
+}
+
+
+.leaflet-bar a {
+    background-color: white; /* Set a custom background color */
+    border-bottom: none;
+
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+}
+
+    .leaflet-bar a:hover,
+    .leaflet-bar a:focus {
+        background-color: #f4f4f4;
+    }
+
+
+.leaflet-bar a.leaflet-disabled {
+    cursor: default;
+    background-color: #e5e5e5;
+    color: #d4d4d4;
+}
+
+    .leaflet-bar a:first-child {
+        border-radius: 50% !important;
+    }
+
+    .leaflet-bar a:last-child {
+        border-radius: 50% !important;
+
+    }

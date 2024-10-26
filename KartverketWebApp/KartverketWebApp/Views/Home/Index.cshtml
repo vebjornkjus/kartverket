@@ -2,8 +2,8 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-
-@model KartverketWebApp.Models.SokeModel
+@model KartverketWebApp.Models.PositionModel
+@* @model KartverketWebApp.Models.SokeModel *@
 
 <div class="app_main">
     <div class="map_selection_container">
@@ -67,8 +67,6 @@
         <div class="form_container">
             <form asp-action="Index" method="post" id="form_id">
                 @Html.AntiForgeryToken()
-                <input type="hidden" id="nord" name="nord" />
-                <input type="hidden" id="ost" name="ost" />
                 <label for="tittel">Tittel</label><br/>
                         <input type="text" id="tittel" name="Tittel" />
                         <select id="rapport_type" name="rapport_type">
@@ -211,21 +209,78 @@
 
     });
 
-    //funksjon for å legge til punkter og legge til i form
-    function onMapClick(e) {
-        var lat = e.latlng.lat;
-        var lng = e.latlng.lng;
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
 
-        L.marker([lat, lng]).addTo(map);
+    // Creates the drawing control on the left hand side
+    // The drawing control enables drawing of markers, polygons, and polylines
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polygon: false,
+            polyline: true,
+            marker: false,
+            circle: false,
+            circlemarker: false, 
+            rectangle: false
+        },
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+    map.addControl(drawControl);
 
-        document.getElementById('nord').value = lat;
-        document.getElementById('ost').value = lng;
+    // Event handling when a layer is drawn on the map
+    map.on(L.Draw.Event.CREATED, function (e) {
+        var type = e.layerType,
+            layer = e.layer;
 
-        //legger til knapp etter at et punkt har blitt valgt
+        drawnItems.addLayer(layer);
+
+        // Get the GeoJSON representation of the drawn layer
+        var geoJsonData = layer.toGeoJSON();
+
+        // Extract coordinates as separate latitude and longitude lists
+        var latitudes = [];
+        var longitudes = [];
+        geoJsonData.geometry.coordinates.forEach(function (coord) {
+            latitudes.push(coord[1]); // Latitude is the second element in each coordinate pair
+            longitudes.push(coord[0]); // Longitude is the first element in each coordinate pair
+        });
+
+        // Remove any existing coordinates inputs
+        document.querySelectorAll(".coordinate-input").forEach((el) => el.remove());
+
+        // Dynamically create hidden fields for each coordinate pair
+        latitudes.forEach((latitude, index) => {
+            let latInput = document.createElement("input");
+            latInput.type = "hidden";
+            latInput.name = `Coordinates[${index}].Nord`;
+            latInput.value = latitude;
+            latInput.classList.add("coordinate-input");
+
+            let lonInput = document.createElement("input");
+            lonInput.type = "hidden";
+            lonInput.name = `Coordinates[${index}].Ost`;
+            lonInput.value = longitudes[index];
+            lonInput.classList.add("coordinate-input");
+
+            document.getElementById("form_id").appendChild(latInput);
+            document.getElementById("form_id").appendChild(lonInput);
+        });
+    });
+
+    map.on('draw:created', function (e) {
+        // When the drawing is finished, the event is triggered
+
+        // Access the layer (e.g., polygon, polyline) created by the user
+        var layer = e.layer;
+
+        // Add the layer to the map (optional, if you need it to appear on the map)
+        map.addLayer(layer);
+
+        // Access your div element and modify its classes
         div4.classList.remove('btn_map_transform');
         div4.classList.add('btn_map');
-    }
+    });
 
-    // Listen for map clicks
-    map.on('click', onMapClick);
 </script>

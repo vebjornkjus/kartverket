@@ -5,6 +5,9 @@
 
 <div class="center-container"><h2>Registrerte endringer</h2></div>
 
+<p>Positions Count: @Model.Positions.Count</p>
+<p>Stednavn Count: @Model.Stednavn.Count</p>
+
 <div class="corrections_table">
     <table class="table table-bordered">
         <thead>
@@ -28,7 +31,17 @@
                     </td>
                     <td>@sted.Tittel</td>
                     <td>
-                        @sted.Nord, @sted.Ost, @sted.Map_type, @(stednavn != null ? stednavn.Fylkesnavn : "N/A"), @(stednavn != null ? stednavn.Kommunenavn : "N/A")
+                        @sted.Map_type, @(stednavn != null ? stednavn.Fylkesnavn : "N/A"), @(stednavn != null ? stednavn.Kommunenavn : "N/A")
+                        <table>
+                            <tr>
+                                <td>
+                                    @foreach (var coord in sted.Coordinates)
+                                    {
+                                        <p>Nord: @coord.Nord, Ost: @coord.Ost</p>
+                                    }
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                     <td>@sted.Rapport_type</td>
                     <td>@sted.Description</td>
@@ -48,46 +61,49 @@
         // Ensure the model is properly serialized
         var positions = @Html.Raw(Json.Serialize(Model.Positions));
 
-        // Check if there are any positions
         if (positions.length > 0) {
             positions.forEach(function (position, index) {
-                // Create a unique map for each position
+                // Check if coordinates exists and has items
+                if (position.coordinates && position.coordinates.length > 0) {
+                    // Use the first coordinate to set map view
+                    var firstCoord = position.coordinates[0];
+                    var map = L.map('map_corrections_' + index).setView([firstCoord.nord, firstCoord.ost], 13);
 
-               var map = L.map('map_corrections_' + index).setView([position.nord, position.ost], 13);
-
-
-                var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
-                    attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                });
-
-                var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
-                    attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                });
-
-                var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
-                    attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                });
-
-                        // Add the appropriate map layer
-                        if (position.map_type === "Norge kart") {
-                            map.addLayer(norgeKart);
-                        } else if (position.map_type === "Turkart") {
-                            map.addLayer(turKart);
-                        } else if (position.map_type === "Sjøkart") {
-                            map.addLayer(sjoKart);
-                        } else {
-                            console.warn('Map not available for:', position.map_type);
-                        }
-
-                        // Create marker for the current position
-                        if (position.nord && position.ost) {
-                            L.marker([position.nord, position.ost]).addTo(map);
-                        } else {
-                            console.warn('Position is missing nord or ost:', position);
-                        }
+                    var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
                     });
+                    var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
+                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                    });
+                    var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
+                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                    });
+
+                    // Add the appropriate map layer
+                    if (position.map_type === "Norge kart") {
+                        map.addLayer(norgeKart);
+                    } else if (position.map_type === "Turkart") {
+                        map.addLayer(turKart);
+                    } else if (position.map_type === "Sjøkart") {
+                        map.addLayer(sjoKart);
+                    } else {
+                        console.warn('Map not available for:', position.map_type);
+                    }
+
+                    // Collect the coordinates for the polyline
+                    var latlngs = position.coordinates.map(function (coord) {
+                        return [coord.nord, coord.ost];
+                    });
+
+                    // Draw the polyline on the map
+                    var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
                 } else {
-                    console.warn('No positions available to display on the map.');
+                    console.warn('Position is missing coordinates:', position);
                 }
+                map.fitBounds(polyline.getBounds());
+            });
+        } else {
+            console.warn('No positions available to display on the map.');
+        }
     </script>
 }
