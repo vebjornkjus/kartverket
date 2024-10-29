@@ -15,8 +15,8 @@ services:
     networks:
       - backend
 
-  KartverketWebApp:
-    image: ${DOCKER_REGISTRY-}KartverketWebApp
+  kartverketwebapp:
+    image: ${DOCKER_REGISTRY-}kartverketwebapp
     build:
       context: .  # Ensure this path is correct
       dockerfile: KartverketWebApp/Dockerfile  # Ensure this file exists
