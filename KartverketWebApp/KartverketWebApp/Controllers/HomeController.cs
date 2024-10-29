@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
+using KartverketWebApp.Data;
 
 namespace KartverketWebApp.Controllers
 {
@@ -20,15 +21,17 @@ namespace KartverketWebApp.Controllers
         private static List<StednavnViewModel> stednavn = new List<StednavnViewModel>();
         private readonly HttpClient _httpClient;
         private readonly ApiSettings _apiSettings;
+        private readonly ApplicationDbContext _context;
 
 
-        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings)
+        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings, ApplicationDbContext context)
         {
             _logger = logger;
             _stednavnService = stedsnavnService;
             _sokeService = sokeService;
             _httpClient = httpClient;
             _apiSettings = apiSettings.Value;
+            _context = context;
         }
 
         public IActionResult TakkRapport()

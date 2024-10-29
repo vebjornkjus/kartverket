@@ -1,7 +1,9 @@
 using KartverketWebApp.Services;
 using KartverketWebApp;
 using KartverketWebApp.API_Models;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using KartverketWebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,11 @@ builder.Services.AddHttpClient<IStednavn, StednavnService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//Add database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("MariaDbConnection"),
+    new MySqlServerVersion(new Version(10, 5, 9)))); // replace with your MariaDB version
 
 // Add logging configuration
 builder.Logging.ClearProviders();  // Clear any default logging providers

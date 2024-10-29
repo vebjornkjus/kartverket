@@ -67,26 +67,47 @@
         <div class="form_container">
             <form asp-action="Index" method="post" id="form_id">
                 @Html.AntiForgeryToken()
-                <label for="tittel">Tittel</label><br/>
-                        <input type="text" id="tittel" name="Tittel" />
-                        <select id="rapport_type" name="rapport_type">
-                            <option value="" disabled selected>
-                                Velg rapport kategori...
-                            </option>
-                            <option value="Gjengrodd vei">
-                                Gjengrodd vei
-                            </option>
-                               <option value="Sti på eiendom">
-                                Sti på eiendom
-                            </option>
-                                <option value="Annet">
-                                Annet
-                            </option>
-                        </select>
-                <div class="description_container">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-control"></textarea>
-                </div>
+                <table id="form_table">
+                    <tr>
+                        <td>
+                            <div id="form_tittel">
+                                <label for="tittel">Tittel</label><br />
+                                <input type="text" id="tittel" name="Tittel" />
+                            </div>
+                        </td>
+
+                     </tr>
+                    <tr>
+                        <td>
+                            <div id="form_option">
+                                <select id="rapport_type" name="rapport_type">
+                                    <option value="" disabled selected>
+                                        Velg rapport kategori...
+                                    </option>
+                                    <option value="Gjengrodd vei">
+                                        Gjengrodd vei
+                                    </option>
+                                    <option value="Sti på eiendom">
+                                        Sti på eiendom
+                                    </option>
+                                    <option value="Annet">
+                                        Annet
+                                    </option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form_description">
+                                <label for="description">Description</label>
+                                <textarea id="description" name="description" class="form-control"></textarea>
+                            </div>
+                        </td>
+
+                    </tr>
+                </table>
+
             </form>
             <div class="submit_container">
                 <button type="submit" class="btn_submit" form="form_id">Rapporter</button>
@@ -128,8 +149,8 @@
 
   
     var map = L.map('map', {
-        center: [58.1548282, 8.0081166],
-        zoom: 13,
+        center: [62.15, 8.5],
+        zoom: 5,
         layers: [norgeKart]
     });
     

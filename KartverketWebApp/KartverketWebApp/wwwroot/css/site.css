@@ -117,6 +117,7 @@ body {
 
 #form_id{
     height: 100%;
+    width: 80%
 }
 
 .form_area {
@@ -140,8 +141,8 @@ body {
     z-index: 9999;
     align-items: flex-start;
     justify-content: center;
-    margin: 10%;
     height: 90%;
+    width: 100%
 }
 
 .green_bar {
@@ -152,6 +153,86 @@ body {
     margin-top: -86.41vh;
     padding: 0;
     background-color: #D0ECD6;
+}
+
+.form_description {
+    width: 100%;
+    position: relative;
+}
+
+    .form_description textarea {
+        border: none;
+        background-color: white;
+        color: #000;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-radius: 7px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+        .form_description textarea:focus {
+            outline: none;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form_description textarea text {
+            margin: 5%;
+        }
+
+#form_option {
+    width: 100%;
+    position: relative;
+}
+
+    #form_option select {
+        border: none;
+        background-color: white;
+        color: #000;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-radius: 7px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+        #form_option select:focus {
+            outline: none;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #form_option select text {
+            margin: 5%;
+        }
+
+#form_tittel {
+    width: 100%;
+    position: relative;
+}
+    #form_tittel input {
+        border: none;
+        background-color: white;
+        color: #000;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-radius: 7px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+        #form_tittel input:focus {
+            outline: none;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        #form_tittel input text {
+            margin: 5%;
+        }
+
+#form_table{
+    width: 100%;
 }
 
 
