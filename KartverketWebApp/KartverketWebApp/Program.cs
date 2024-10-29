@@ -20,7 +20,7 @@ builder.Services.AddControllersWithViews();
 //Add database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("MariaDbConnection"),
-    new MySqlServerVersion(new Version(10, 5, 9)))); // replace with your MariaDB version
+    new MySqlServerVersion(new Version(10, 5, 9))));    // replace with your MariaDB version
 
 // Add logging configuration
 builder.Logging.ClearProviders();  // Clear any default logging providers

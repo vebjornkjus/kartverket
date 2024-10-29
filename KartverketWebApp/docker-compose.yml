@@ -1,14 +1,13 @@
-version: '3.8'
+version: '3.4'
 
 services:
   mariadb:
     image: mariadb:latest
-    container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: toppHemmelig007!@
-      MYSQL_DATABASE: Kartverketdb
+      MYSQL_DATABASE: geochangesdb
       MYSQL_USER: root
-      MYSQL_PASSWORD: toppHemmelig007!@
+      MYSQL_PASSWORD: nestenHemmelig007!@
     ports:
       - "3306:3306"
     volumes:
@@ -17,16 +16,16 @@ services:
       - backend
 
   KartverketWebApp:
-    image: ${DOCKER_REGISTRY-}kartverkwebapp
+    image: ${DOCKER_REGISTRY-}KartverketWebApp
     build:
-      context: .
-      dockerfile: KartverketWebApp/Dockerfile
+      context: .  # Ensure this path is correct
+      dockerfile: KartverketWebApp/Dockerfile  # Ensure this file exists
     ports:
-      - "5000:80"
-    depends_on:
+      - "8080:80"
+    depends_on:  # This should be aligned correctly
       - mariadb
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=mariadb;Database=Kartverketdb;User=root;Password=toppHemmelig007!@;"
+    environment:  # This should be aligned correctly
+      ConnectionStrings_defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
     networks:
       - backend
 
