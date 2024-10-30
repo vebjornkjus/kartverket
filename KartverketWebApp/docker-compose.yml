@@ -15,8 +15,8 @@ services:
     networks:
       - backend
 
-  KartverketWebApp:
-    image: ${DOCKER_REGISTRY-}KartverketWebApp
+  kartverketwebapp:
+    image: ${DOCKER_REGISTRY-}kartverketwebapp
     build:
       context: .  # Ensure this path is correct
       dockerfile: KartverketWebApp/Dockerfile  # Ensure this file exists
@@ -25,7 +25,7 @@ services:
     depends_on:  # This should be aligned correctly
       - mariadb
     environment:  # This should be aligned correctly
-      ConnectionStrings_defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
+      ConnectionStrings__defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
     networks:
       - backend
 
