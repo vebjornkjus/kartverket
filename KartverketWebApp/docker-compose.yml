@@ -25,7 +25,7 @@ services:
     depends_on:  # This should be aligned correctly
       - mariadb
     environment:  # This should be aligned correctly
-      ConnectionStrings_defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
+      ConnectionStrings__defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
     networks:
       - backend
 
