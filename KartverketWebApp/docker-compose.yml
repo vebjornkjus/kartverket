@@ -5,13 +5,14 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: toppHemmelig007!@
-      MYSQL_DATABASE: geochangesdb
+      MYSQL_DATABASE: Kartverketdb
       MYSQL_USER: root
       MYSQL_PASSWORD: nestenHemmelig007!@
     ports:
       - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
 
@@ -25,7 +26,7 @@ services:
     depends_on:  # This should be aligned correctly
       - mariadb
     environment:  # This should be aligned correctly
-      ConnectionStrings__defaultConnection: "Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;"
+      ConnectionStrings__defaultConnection: "Server=mariadb;Database=Kartverketdb;User=root;Password=nestenHemmelig007!@;"
     networks:
       - backend
 

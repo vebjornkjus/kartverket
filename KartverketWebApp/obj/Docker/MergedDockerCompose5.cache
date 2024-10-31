@@ -12,7 +12,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_HTTPS_PORTS: "8081"
-      ConnectionStrings__defaultConnection: Server=mariadb;Database=Kartverketdb;User=root;Password=nestenHemmelig007!@;
+      ConnectionStrings__defaultConnection: Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;
     image: kartverketwebapp
     networks:
       backend: null
@@ -42,7 +42,7 @@ services:
           create_host_path: true
   mariadb:
     environment:
-      MYSQL_DATABASE: Kartverketdb
+      MYSQL_DATABASE: geochangesdb
       MYSQL_PASSWORD: nestenHemmelig007!@
       MYSQL_ROOT_PASSWORD: toppHemmelig007!@
       MYSQL_USER: root
@@ -59,11 +59,6 @@ services:
         source: mariadb_data
         target: /var/lib/mysql
         volume: {}
-      - type: bind
-        source: C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\init.sql
-        target: /docker-entrypoint-initdb.d/init.sql
-        bind:
-          create_host_path: true
 networks:
   backend:
     name: dockercompose5128432346281072997_backend

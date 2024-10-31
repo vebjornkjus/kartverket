@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gyveo\\Source\\Repos\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {}
+    "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gyveo\\Source\\Repos\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {
+    "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gyveo\\Source\\Repos\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+        "projectUniqueName": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
         "projectName": "KartverketWebApp",
-        "projectPath": "C:\\Users\\gyveo\\Source\\Repos\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
-        "packagesPath": "C:\\Users\\gyveo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gyveo\\Source\\Repos\\kartverket\\KartverketWebApp\\KartverketWebApp\\obj\\",
+        "projectPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+        "packagesPath": "C:\\Users\\frede\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\gyveo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\frede\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -120,7 +120,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
