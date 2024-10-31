@@ -4,7 +4,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>3e9b3974-a4d8-43bc-b6d0-00a0d1421be7</ProjectGuid>
+    <ProjectGuid>d7f490f7-14d2-4eb8-85c9-f416ccb7e630</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>kartverketwebapp</DockerServiceName>
