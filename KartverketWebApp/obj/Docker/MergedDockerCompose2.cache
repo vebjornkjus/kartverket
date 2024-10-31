@@ -1,0 +1,67 @@
+name: dockercompose5128432346281072997
+services:
+  kartverketwebapp:
+    build:
+      context: C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp
+      dockerfile: KartverketWebApp/Dockerfile
+    depends_on:
+      mariadb:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__defaultConnection: Server=mariadb;Database=geochangesdb;User=root;Password=nestenHemmelig007!@;
+    image: kartverketwebapp
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\frede\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\frede\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  mariadb:
+    environment:
+      MYSQL_DATABASE: geochangesdb
+      MYSQL_PASSWORD: nestenHemmelig007!@
+      MYSQL_ROOT_PASSWORD: toppHemmelig007!@
+      MYSQL_USER: root
+    image: mariadb:latest
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        target: 3306
+        published: "3306"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: mariadb_data
+        target: /var/lib/mysql
+        volume: {}
+networks:
+  backend:
+    name: dockercompose5128432346281072997_backend
+volumes:
+  mariadb_data:
+    name: dockercompose5128432346281072997_mariadb_data
