@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using KartverketWebApp.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace KartverketWebApp.Controllers
 {
@@ -35,6 +36,11 @@ namespace KartverketWebApp.Controllers
         }
 
         public IActionResult TakkRapport()
+        {
+            return View();
+        }
+
+        public IActionResult Innlogging()
         {
             return View();
         }

@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Logg inn";
+}
+
+
+<link rel="stylesheet" href="~/css/Login.css" />
+
+<div class="login_main">
+    <div class="login_container">
+        <h1>Logg inn</h1>
+        
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+            <label for="brukernavn">Brukernavn</label>
+            <input type="text" id="brukernavn" name="brukernavn" required />
+
+            <label for="passord">Passord</label>
+            <input type="password" id="passord" name="passord" required />
+
+            <button type="submit" class="btn_login">Logg inn</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // JavaScript direkte i cshtml-filen (valgfritt)
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const username = document.getElementById('brukernavn').value.trim();
+        const password = document.getElementById('passord').value.trim();
+
+        if (!username || !password) {
+            alert('Vennligst fyll inn både brukernavn og passord.');
+            event.preventDefault();
+        }
+    });
+</script>
