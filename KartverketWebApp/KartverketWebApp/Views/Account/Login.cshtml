@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<link rel="stylesheet" href="~/css/Login.css">
+
+
+<div class="login_main">
+    <div class="login_container">
+        <img id="kartverket_logo" src="~/images/standard_kartverket.png" alt="Kartverket Logo">
+
+        <form asp-action="Login" method="post">
+            <label for="username">Brukernavn</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Passord</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn_login">Logg inn</button>
+        </form>
+
+        <p>Har du ikke en konto?</p>
+        <a href="/Account/Register" class="btn_register">Registrer deg</a>
+    </div>
+</div>
