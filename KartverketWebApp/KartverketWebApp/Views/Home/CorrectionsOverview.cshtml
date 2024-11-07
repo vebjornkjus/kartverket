@@ -1,4 +1,4 @@
-﻿@model KartverketWebApp.Models.CombinedViewModel;
+﻿@* @model KartverketWebApp.Models.CombinedViewModel;
 
 
 
@@ -31,7 +31,7 @@
                     </td>
                     <td>@sted.Tittel</td>
                     <td>
-                        @sted.Map_type, @(stednavn != null ? stednavn.Fylkesnavn : "N/A"), @(stednavn != null ? stednavn.Kommunenavn : "N/A")
+                        @sted.MapType, @(stednavn != null ? stednavn.Fylkesnavn : "N/A"), @(stednavn != null ? stednavn.Kommunenavn : "N/A")
                         <table>
                             <tr>
                                 <td>
@@ -43,8 +43,8 @@
                             </tr>
                         </table>
                     </td>
-                    <td>@sted.Rapport_type</td>
-                    <td>@sted.Description</td>
+                    <td>@sted.RapportType</td>
+                    <td>@sted.Beskrivelse</td>
                 </tr>
             }
         </tbody>
@@ -80,14 +80,14 @@
                     });
 
                     // Add the appropriate map layer
-                    if (position.map_type === "Norge kart") {
+                    if (position.MapType === "Norge kart") {
                         map.addLayer(norgeKart);
-                    } else if (position.map_type === "Turkart") {
+                    } else if (position.MapType === "Turkart") {
                         map.addLayer(turKart);
-                    } else if (position.map_type === "Sjøkart") {
+                    } else if (position.MapType === "Sjøkart") {
                         map.addLayer(sjoKart);
                     } else {
-                        console.warn('Map not available for:', position.map_type);
+                        console.warn('Map not available for:', position.MapType);
                     }
 
                     // Collect the coordinates for the polyline
@@ -106,4 +106,4 @@
             console.warn('No positions available to display on the map.');
         }
      </script>
-}
+} *@

@@ -37,6 +37,14 @@
       },
       "images": {
         "Children": {
+          "5c3e7649-f72e-4625-8561-845ce1d98b01.webp": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/5c3e7649-f72e-4625-8561-845ce1d98b01.webp"
+            },
+            "Patterns": null
+          },
           "b838081b-67f6-47f7-b144-8b1df93fd62b.webp": {
             "Children": null,
             "Asset": {

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using KartverketWebApp.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace KartverketWebApp.Controllers
 {
@@ -61,7 +62,7 @@ namespace KartverketWebApp.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Index(PositionModel positionModel, StednavnViewModel stednavnModel)
+        public async Task<IActionResult> Index(PositionModel positionModel, Kart kart, StednavnViewModel stednavnModel)
         {
             if (ModelState.IsValid)
             {
@@ -70,10 +71,24 @@ namespace KartverketWebApp.Controllers
                     Kart_endring_id = Guid.NewGuid().ToString(),
                     Koordsys = positionModel.Koordsys,
                     Tittel = positionModel.Tittel,
-                    Description = positionModel.Description,
-                    Map_type = positionModel.Map_type,
-                    Rapport_type = positionModel.Rapport_type
+                    Beskrivelse = positionModel.Beskrivelse,
+                    MapType = positionModel.MapType,
+                    RapportType = positionModel.RapportType
                 };
+
+                var newKart = new Kart
+                {
+                    Koordsys = kart.Koordsys,
+                    Tittel = kart.Tittel,
+                    Beskrivelse = kart.Beskrivelse,
+                    MapType = kart.MapType,
+                    RapportType = kart.RapportType
+                };
+
+                _context.Kart.Add(newKart);
+                _context.SaveChanges();
+
+
 
                 // Add each coordinate from the submitted PositionModel to the newPositionModel's Coordinates list
                 foreach (var coordinate in positionModel.Coordinates)
@@ -128,15 +143,89 @@ namespace KartverketWebApp.Controllers
             return View(positionModel);
         }
 
+        public async Task<IActionResult> Saksbehandler()
+        {
+            // Retrieve rapporter with related data
+            var rapporter = await _context.Rapport
+                .Include(r => r.Person)
+                .Include(r => r.Kart)
+                    .ThenInclude(k => k.Koordinater)
+                .ToListAsync();
+
+            var stednavnList = new List<StednavnViewModel>();
+
+            // Process coordinates for each Kart in the retrieved Rapport list
+            foreach (var rapport in rapporter)
+            {
+                var kart = rapport.Kart;
+
+                // Check if Kart has any coordinates
+                if (kart?.Koordinater != null && kart.Koordinater.Count > 0)
+                {
+                    var firstCoordinate = kart.Koordinater.First();
+
+                    // Call the Stednavn API using the first coordinate
+                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoordinate.Nord, firstCoordinate.Ost, kart.Koordsys);
+
+                    if (stednavnResponse != null)
+                    {
+                        _logger.LogInformation("Received StednavnResponse from API.");
+                        _logger.LogInformation("Fylkesnavn: {Fylkesnavn}", stednavnResponse.Fylkesnavn);
+                        _logger.LogInformation("Fylkesnummer: {Fylkesnummer}", stednavnResponse.Fylkesnummer);
+                        _logger.LogInformation("Kommunenavn: {Kommunenavn}", stednavnResponse.Kommunenavn);
+                        _logger.LogInformation("Kommunenummer: {Kommunenummer}", stednavnResponse.Kommunenummer);
+
+                        // Add Stednavn data to the list
+                        stednavnList.Add(new StednavnViewModel
+                        {
+                            Fylkesnavn = stednavnResponse.Fylkesnavn,
+                            Fylkesnummer = stednavnResponse.Fylkesnummer,
+                            Kommunenavn = stednavnResponse.Kommunenavn,
+                            Kommunenummer = stednavnResponse.Kommunenummer
+                        });
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No results found for coordinates: Nord = {Nord}, Ost = {Ost}, Koordsys = {Koordsys}",
+                            firstCoordinate.Nord, firstCoordinate.Ost, kart.Koordsys);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Kart {KartId} has no coordinates.", kart?.KartEndringId);
+                }
+            }
+
+            // Prepare the view model
+            var combinedViewModel = new CombinedViewModel
+            {
+                Rapporter = rapporter,
+                Stednavn = stednavnList
+            };
+
+            // Return the view with the CombinedViewModel
+            return View(combinedViewModel);
+        }
 
 
-            public IActionResult CorrectionsOverview()
+
+        public IActionResult CorrectionsOverview()
         {
             // Prepare the CombinedViewModel to be passed to the view
+            var kartData = _context.Kart.ToList();
+            var koordinatData = _context.Koordinater.ToList();
+
             var viewModel = new CombinedViewModel
             {
                 Positions = positions ?? new List<PositionModel>(), // Ensure positions is not null
-                Stednavn = stednavn ?? new List<StednavnViewModel>() // Initialize as needed
+                Stednavn = stednavn ?? new List<StednavnViewModel>(), // Initialize as needed
+                KartData = _context.Kart
+                    .Include(k => k.Koordinater) // Laster inn relasjon til Koordinater
+                    .Include(k => k.Rapporter)   // Laster inn relasjon til Rapporter
+                    .ToList(),
+                KoordinatData = _context.Koordinater
+                    .Include(k => k.Kart) // Laster inn relasjon til Kart
+                    .ToList()
             };
 
             foreach (var navn in viewModel.Stednavn)

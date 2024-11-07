@@ -11,8 +11,12 @@ namespace KartverketWebApp.Data
         public double Nord { get; set; }
         public double Ost { get; set; }
 
-        public ICollection<Kart> Kart { get; set; }
+        public int KartEndringId { get; set; } // Foreign key to Kart
+
+        // Navigation Property
+        public Kart Kart { get; set; }
     }
 
 }
+
 

@@ -1,9 +1,7 @@
-﻿namespace KartverketWebApp.Data
-{
-    using Microsoft.EntityFrameworkCore;
-    using System.Collections.Generic;
-    using System.Reflection.Emit;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace KartverketWebApp.Data
+{
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -16,26 +14,35 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure one-to-many relationship between Kart and Koordinater
             modelBuilder.Entity<Kart>()
-                .HasOne(k => k.Koordinater)
-                .WithMany()
-                .HasForeignKey(k => k.KoordinaterId);
+                .HasMany(k => k.Koordinater)
+                .WithOne(ko => ko.Kart)
+                .HasForeignKey(ko => ko.KartEndringId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Rapport>()
-                .HasOne(r => r.Person)
-                .WithMany(p => p.Rapporter)
-                .HasForeignKey(r => r.PersonId);
+            // Configure one-to-many relationship between Kart and Rapport
+            modelBuilder.Entity<Kart>()
+                .HasMany(k => k.Rapporter)
+                .WithOne(r => r.Kart)
+                .HasForeignKey(r => r.KartEndringId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Rapport>()
-                .HasOne(r => r.Kart)
-                .WithMany(k => k.Rapporter)
-                .HasForeignKey(r => r.KartEndringId);
-
+            // Configure one-to-many relationship between Person and Rapport
             modelBuilder.Entity<Person>()
-                .HasOne(p => p.Bruker)
-                .WithMany(b => b.Personer)
-                .HasForeignKey(p => p.BrukerId);
+                .HasMany(p => p.Rapporter)
+                .WithOne(r => r.Person)
+                .HasForeignKey(r => r.PersonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure optional one-to-many relationship between Bruker and Person
+            modelBuilder.Entity<Bruker>()
+                .HasMany(b => b.Personer)
+                .WithOne(p => p.Bruker)
+                .HasForeignKey(p => p.BrukerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Other configurations can go here...
         }
     }
-
 }

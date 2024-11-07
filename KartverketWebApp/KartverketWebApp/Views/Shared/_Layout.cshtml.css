@@ -56,3 +56,10 @@ button.accept-policy {
   line-height: 60px;
 
 }
+
+#saksbehandler{
+    position: absolute;
+    right: 10vw;
+    top: 0vh;
+
+}

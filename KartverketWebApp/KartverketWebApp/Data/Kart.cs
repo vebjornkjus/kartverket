@@ -8,14 +8,16 @@ namespace KartverketWebApp.Data
         [Key]
         public int KartEndringId { get; set; }
 
-        public int? KoordinaterId { get; set; }
-        public int Koordsys { get; set; }
         public string Tittel { get; set; }
         public string Beskrivelse { get; set; }
+        public int Koordsys { get; set; }
         public string MapType { get; set; }
         public string RapportType { get; set; }
 
-        public Koordinater Koordinater { get; set; }
-        public ICollection<Rapport> Rapporter { get; set; }
+        // Navigation Properties
+        public ICollection<Koordinater> Koordinater { get; set; } // One-to-Many with Koordinater
+        public ICollection<Rapport> Rapporter { get; set; } // One-to-Many with Rapport
     }
+
 }
+

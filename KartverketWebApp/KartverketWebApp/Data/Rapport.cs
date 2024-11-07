@@ -7,11 +7,13 @@ namespace KartverketWebApp.Data
         [Key]
         public int RapportId { get; set; }
 
-        public int PersonId { get; set; }
-        public int KartEndringId { get; set; }
         public string RapportStatus { get; set; }
         public DateTime Opprettet { get; set; }
 
+        public int PersonId { get; set; } // Foreign key to Person
+        public int KartEndringId { get; set; } // Foreign key to Kart
+
+        // Navigation Properties
         public Person Person { get; set; }
         public Kart Kart { get; set; }
     }

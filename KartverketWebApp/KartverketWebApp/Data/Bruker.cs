@@ -11,6 +11,7 @@ namespace KartverketWebApp.Data
         public string Passord { get; set; }
         public string BrukerType { get; set; }
 
-        public ICollection<Person> Personer { get; set; }
+        // Navigation Property
+        public ICollection<Person> Personer { get; set; } // One-to-Many with Person
     }
 }

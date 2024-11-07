@@ -11,11 +11,11 @@ namespace KartverketWebApp.Models
 
         public string? Tittel { get; set; }
 
-        public string? Description { get; set; }
+        public string? Beskrivelse { get; set; }
 
-        public string? Map_type { get; set; }
+        public string? MapType { get; set; }
 
-        public string? Rapport_type { get; set; }
+        public string? RapportType { get; set; }
 
         public class Coordinate
         {
