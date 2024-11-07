@@ -1,0 +1,35 @@
+﻿@model KartverketWebApp.Models.CombinedViewModel
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kart Tittel</th>
+            <th>Innsender</th>
+            <th>Kart</th>
+            <th>Kommune</th>
+            <th>Fylke</th>
+            <th>Opprettet</th>
+            <th>Rapport Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0; // To keep track of the index for Stednavn
+        }
+        @foreach (var rapport in Model.Rapporter)
+        {
+            // Get the corresponding Stednavn if available
+            var stednavn = Model.Stednavn.Count > i ? Model.Stednavn[i] : null;
+            <tr>
+                <td>@rapport.Kart?.Tittel</td>
+                <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
+                <td>@rapport.Kart?.MapType</td>
+                <td> @stednavn?.Kommunenavn</td>
+                <td>@stednavn?.Fylkesnavn</td>
+                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                <td>@rapport.RapportStatus</td>
+            </tr>
+            i++; // Increment the index to keep in sync with Stednavn
+        }
+    </tbody>
+</table>
