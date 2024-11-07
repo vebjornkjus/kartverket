@@ -4,6 +4,7 @@ using KartverketWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartverketWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241107133813_CreateIdentitySchema")]
+    partial class CreateIdentitySchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,6 +62,12 @@ namespace KartverketWebApp.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("KoordinaterId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KoordinaterKoordinatId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Koordsys")
                         .HasColumnType("int");
 
@@ -76,6 +85,10 @@ namespace KartverketWebApp.Migrations
 
                     b.HasKey("KartEndringId");
 
+                    b.HasIndex("KoordinaterId");
+
+                    b.HasIndex("KoordinaterKoordinatId");
+
                     b.ToTable("Kart");
                 });
 
@@ -87,9 +100,6 @@ namespace KartverketWebApp.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("KoordinatId"));
 
-                    b.Property<int>("KartEndringId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Nord")
                         .HasColumnType("double");
 
@@ -100,8 +110,6 @@ namespace KartverketWebApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("KoordinatId");
-
-                    b.HasIndex("KartEndringId");
 
                     b.ToTable("Koordinater");
                 });
@@ -371,21 +379,22 @@ namespace KartverketWebApp.Migrations
 
             modelBuilder.Entity("KartverketWebApp.Data.Kart", b =>
                 {
-                    b.HasOne("KartverketWebApp.Data.Kart", "Kart")
-                        .WithMany("Koordinater")
-                        .HasForeignKey("KartEndringId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("KartverketWebApp.Data.Koordinater", "Koordinater")
+                        .WithMany()
+                        .HasForeignKey("KoordinaterId");
 
-                    b.Navigation("Kart");
+                    b.HasOne("KartverketWebApp.Data.Koordinater", null)
+                        .WithMany("Kart")
+                        .HasForeignKey("KoordinaterKoordinatId");
+
+                    b.Navigation("Koordinater");
                 });
 
             modelBuilder.Entity("KartverketWebApp.Data.Person", b =>
                 {
                     b.HasOne("KartverketWebApp.Data.Bruker", "Bruker")
                         .WithMany("Personer")
-                        .HasForeignKey("BrukerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("BrukerId");
 
                     b.Navigation("Bruker");
                 });
@@ -395,13 +404,13 @@ namespace KartverketWebApp.Migrations
                     b.HasOne("KartverketWebApp.Data.Kart", "Kart")
                         .WithMany("Rapporter")
                         .HasForeignKey("KartEndringId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("KartverketWebApp.Data.Person", "Person")
                         .WithMany("Rapporter")
                         .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Kart");
@@ -467,9 +476,12 @@ namespace KartverketWebApp.Migrations
 
             modelBuilder.Entity("KartverketWebApp.Data.Kart", b =>
                 {
-                    b.Navigation("Koordinater");
-
                     b.Navigation("Rapporter");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Koordinater", b =>
+                {
+                    b.Navigation("Kart");
                 });
 
             modelBuilder.Entity("KartverketWebApp.Data.Person", b =>

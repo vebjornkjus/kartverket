@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 namespace KartverketWebApp.Data
 {
-    public class ApplicationDbContext : DbContext
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -15,6 +18,8 @@ namespace KartverketWebApp.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure one-to-many relationship between Kart and Koordinater
+            base.OnModelCreating(modelBuilder);  // Sikre Identity-konfigurasjon
+
             modelBuilder.Entity<Kart>()
                 .HasMany(k => k.Koordinater)
                 .WithOne(ko => ko.Kart)

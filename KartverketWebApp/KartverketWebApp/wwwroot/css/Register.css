@@ -1,0 +1,73 @@
+.register_main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f2f2f2;
+}
+
+.register_container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.register_container h2 {
+    margin-bottom: 1rem;
+    font-size: 24px;
+    color: #333;
+}
+
+.register_container label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #666;
+}
+
+.register_container input[type="email"],
+.register_container input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.register_container button[type="submit"] {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.7rem;
+    background-color: #28a745;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.register_container button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+.register_container a.btn_login {
+    display: block;
+    margin-top: 1rem;
+    padding: 0.7rem;
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.register_container a.btn_login:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+#kartverket_logo {
+    width: 147px;
+}
