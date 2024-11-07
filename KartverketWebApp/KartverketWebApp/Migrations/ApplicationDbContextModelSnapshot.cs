@@ -369,7 +369,7 @@ namespace KartverketWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("KartverketWebApp.Data.Kart", b =>
+            modelBuilder.Entity("KartverketWebApp.Data.Koordinater", b =>
                 {
                     b.HasOne("KartverketWebApp.Data.Kart", "Kart")
                         .WithMany("Koordinater")

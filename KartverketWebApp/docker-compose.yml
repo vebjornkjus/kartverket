@@ -3,6 +3,7 @@ version: '3.4'
 services:
   mariadb:
     image: mariadb:latest
+    container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: toppHemmelig007!@
       MYSQL_DATABASE: Kartverketdb
@@ -26,7 +27,7 @@ services:
     depends_on:  # This should be aligned correctly
       - mariadb
     environment:  # This should be aligned correctly
-      ConnectionStrings__defaultConnection: "Server=mariadb;Database=Kartverketdb;User=root;Password=nestenHemmelig007!@;"
+      ConnectionStrings__MariaDbConnection: "Server=mariadb;Database=Kartverketdb;User=root;Password=toppHemmelig007!@;"
     networks:
       - backend
 
