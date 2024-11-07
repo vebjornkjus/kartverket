@@ -1,10 +1,10 @@
 ﻿namespace KartverketWebApp.Data
 {
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
-    using System.Collections.Generic;
-    using System.Reflection.Emit;
 
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -16,6 +16,8 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);  // Sikre Identity-konfigurasjon
+
             modelBuilder.Entity<Kart>()
                 .HasOne(k => k.Koordinater)
                 .WithMany()
@@ -37,5 +39,4 @@
                 .HasForeignKey(p => p.BrukerId);
         }
     }
-
 }

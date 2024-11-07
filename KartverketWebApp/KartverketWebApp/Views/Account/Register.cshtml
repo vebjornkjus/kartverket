@@ -1,0 +1,33 @@
+@model KartverketWebApp.Models.RegisterViewModel
+
+<link rel="stylesheet" href="~/css/Register.css">
+
+<div class="register_main">
+    <div class="register_container">
+        
+        <img id="kartverket_logo" src="~/images/standard_kartverket.png" alt="Kartverket Logo">
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="All"></div>
+            
+            <div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" type="email" />
+            </div>
+            
+            <div>
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" />
+            </div>
+            
+            <div>
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" type="password" />
+            </div>
+            
+            <button type="submit">Register</button>
+        </form>
+        
+        <a class="btn_login" href="/Account/Login">Already have an account? Login here</a>
+    </div>
+</div>
