@@ -12,22 +12,22 @@
             
             <div>
                 <label asp-for="Email"></label>
-                <input asp-for="Email" type="email" />
+                <input asp-for="Email" type="email" required />
             </div>
             
             <div>
                 <label asp-for="Password"></label>
-                <input asp-for="Password" type="password" />
+                <input asp-for="Password" type="password" required />
             </div>
             
             <div>
                 <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" type="password" />
+                <input asp-for="ConfirmPassword" type="password" required />
             </div>
             
-            <button type="submit">Register</button>
+            <button type="submit" class="btn_register">Registrer deg</button>
         </form>
         
-        <a class="btn_login" href="/Account/Login">Already have an account? Login here</a>
+        <a class="btn_login" href="/Account/Login">Allerede registrert? Logg inn her</a>
     </div>
 </div>
