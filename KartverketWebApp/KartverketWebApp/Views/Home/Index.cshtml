@@ -80,7 +80,7 @@
                     <tr>
                         <td>
                             <div id="form_option">
-                                <select id="rapport_type" name="RapportType">
+                                <select id="rapport_type" name="rapport_type">
                                     <option value="" disabled selected>
                                         Velg rapport kategori...
                                     </option>
@@ -100,8 +100,8 @@
                     <tr>
                         <td>
                             <div class="form_description">
-                                <label for="description">Beskrivelse</label>
-                                <textarea id="description" name="Beskrivelse" class="form-control"></textarea>
+                                <label for="description">Description</label>
+                                <textarea id="description" name="description" class="form-control"></textarea>
                             </div>
                         </td>
 
@@ -112,8 +112,8 @@
             <div class="submit_container">
                 <button type="submit" class="btn_submit" form="form_id">Rapporter</button>
             </div>
-            <input type="hidden" id="map_type" name="MapType" form="form_id"/>
-            <input type="hidden" name="Koordsys" value="4258" form="form_id" />
+            <input type="hidden" id="map_type" name="map_type" form="form_id"/>
+            <input type="hidden" name="koordsys" value="4258" form="form_id" />
         </div>
     </div>
 
@@ -127,10 +127,6 @@
         @ViewBag.ErrorMessage
         </div>
 }
-
-
-
-
 
 <script>
     // Define different map layers
@@ -146,15 +142,25 @@
         attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
     });
 
-
-  
+    // Initial map setup
     var map = L.map('map', {
         center: [62.15, 8.5],
         zoom: 5,
         layers: [norgeKart]
     });
+
+    // Attempt to use geolocation to update map's position
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            map.setView([position.coords.latitude, position.coords.longitude], 15);
+        }, function () {
+            alert("Kunne ikke hente geolokasjon. Sentrerer kartet til Norge.");
+        });
+    } else {
+        alert("Geolokasjon støttes ikke av nettleseren din.");
+    }
     
-    //bytter ut map_selection_container med map_container får å vise kartet etter et kart blir valgt
+    //bytter ut map_selection_container med map_container for å vise kartet etter et kart blir valgt
     const map_selector1 = document.querySelector('.map_container_hidden');
     const map_selector2 = document.querySelector('.map_selection_container');
 
