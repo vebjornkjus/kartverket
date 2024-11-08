@@ -4,6 +4,8 @@ namespace KartverketWebApp.Data
 {
     public class Bruker
     {
+        internal string IdentityUserId;
+
         [Key]
         public int BrukerId { get; set; }
 
