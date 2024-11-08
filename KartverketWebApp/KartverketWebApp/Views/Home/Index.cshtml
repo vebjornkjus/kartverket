@@ -275,19 +275,20 @@
         latitudes.forEach((latitude, index) => {
             let latInput = document.createElement("input");
             latInput.type = "hidden";
-            latInput.name = `Coordinates[${index}].Nord`;
+            latInput.name = `koordinater[${index}].Nord`; // Matches the parameter name and structure
             latInput.value = latitude;
             latInput.classList.add("coordinate-input");
 
             let lonInput = document.createElement("input");
             lonInput.type = "hidden";
-            lonInput.name = `Coordinates[${index}].Ost`;
+            lonInput.name = `koordinater[${index}].Ost`; // Matches the parameter name and structure
             lonInput.value = longitudes[index];
             lonInput.classList.add("coordinate-input");
 
             document.getElementById("form_id").appendChild(latInput);
             document.getElementById("form_id").appendChild(lonInput);
         });
+
     });
 
     map.on('draw:created', function (e) {

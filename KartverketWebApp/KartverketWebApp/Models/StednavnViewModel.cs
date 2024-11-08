@@ -2,7 +2,8 @@
 {
     public class StednavnViewModel
 	{
-		public string? Fylkesnavn { get; set; }
+        public int KartEndringId { get; set; }  // Link to Kart
+        public string? Fylkesnavn { get; set; }
 
 		public string? Fylkesnummer { get; set; }
 

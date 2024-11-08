@@ -21,10 +21,10 @@ namespace KartverketWebApp.Data
             base.OnModelCreating(modelBuilder);  // Sikre Identity-konfigurasjon
 
             modelBuilder.Entity<Kart>()
-                .HasMany(k => k.Koordinater)
-                .WithOne(ko => ko.Kart)
-                .HasForeignKey(ko => ko.KartEndringId)
-                .OnDelete(DeleteBehavior.Restrict);
+                  .HasMany(k => k.Koordinater)
+                  .WithOne(ko => ko.Kart)
+                  .HasForeignKey(ko => ko.KartEndringId)
+                  .OnDelete(DeleteBehavior.Restrict); // Use Restrict to prevent cascade delete
 
             // Configure one-to-many relationship between Kart and Rapport
             modelBuilder.Entity<Kart>()

@@ -11,6 +11,7 @@ using System.Text.Json;
 using KartverketWebApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static KartverketWebApp.Models.PositionModel;
 
 namespace KartverketWebApp.Controllers
 {
@@ -68,90 +69,65 @@ namespace KartverketWebApp.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Index(PositionModel positionModel, Kart kart, StednavnViewModel stednavnModel)
+        public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater)
         {
+            _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
+            foreach (var koord in koordinater)
+            {
+                _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
+            }
             if (ModelState.IsValid)
             {
-                var newPosition = new PositionModel
-                {
-                    Kart_endring_id = Guid.NewGuid().ToString(),
-                    Koordsys = positionModel.Koordsys,
-                    Tittel = positionModel.Tittel,
-                    Beskrivelse = positionModel.Beskrivelse,
-                    MapType = positionModel.MapType,
-                    RapportType = positionModel.RapportType
-                };
-
+                // Add the Kart to the database
                 var newKart = new Kart
                 {
-                    Koordsys = kart.Koordsys,
-                    Tittel = kart.Tittel,
-                    Beskrivelse = kart.Beskrivelse,
-                    MapType = kart.MapType,
-                    RapportType = kart.RapportType
+                    Koordsys = koordsys,
+                    Tittel = tittel,
+                    Beskrivelse = beskrivelse,
+                    MapType = mapType,
+                    RapportType = rapportType
+                };
+               
+                _context.Kart.Add(newKart);
+                await _context.SaveChangesAsync();
+
+                var newKoordinater = koordinater.Select((koord, index) => new Koordinater
+                {
+                    KartEndringId = newKart.KartEndringId,
+                    Nord = koord.Nord,
+                    Ost = koord.Ost,
+                    Rekkefolge = index + 1  // Order in sequence
+                }).ToList();
+
+                _logger.LogInformation("Received coordinates:");
+                foreach (var koord in koordinater)
+                {
+                    _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
+                }
+
+                _context.Koordinater.AddRange(newKoordinater);
+                await _context.SaveChangesAsync();
+
+                var newRapport = new Rapport
+                {
+                    RapportStatus = "Uåpnet",
+                    Opprettet = DateTime.Now,
+                    KartEndringId = newKart.KartEndringId, // Associate the newRapport with the newKart
+                    PersonId = 1 //Setter person id som 1 MIDLERTIDIG
                 };
 
-                _context.Kart.Add(newKart);
-                _context.SaveChanges();
+                _context.Rapport.Add(newRapport);
+                await _context.SaveChangesAsync();
 
-
-
-                // Add each coordinate from the submitted PositionModel to the newPositionModel's Coordinates list
-                foreach (var coordinate in positionModel.Coordinates)
-                {
-                    newPosition.Coordinates.Add(new PositionModel.Coordinate
-                    {
-                        Nord = coordinate.Nord,
-                        Ost = coordinate.Ost
-                    });
-                    _logger.LogInformation("Added coordinate: Nord = {Nord}, Ost = {Ost}", coordinate.Nord, coordinate.Ost);
-                }
-
-                positions.Add(newPosition);
-
-                if (positionModel.Coordinates.Count > 0)
-                {
-                    var firstCoordinate = positionModel.Coordinates[0];
-
-                    // Call the Stednavn API using the first coordinate
-                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoordinate.Nord, firstCoordinate.Ost, positionModel.Koordsys);
-
-
-                    if (stednavnResponse != null)
-                    {
-                        _logger.LogInformation("Received StednavnResponse from API.");
-                        _logger.LogInformation($"Fylkesnavn: {stednavnResponse.Fylkesnavn}");
-                        _logger.LogInformation($"Fylkesnummer: {stednavnResponse.Fylkesnummer}");
-                        _logger.LogInformation($"Kommunenavn: {stednavnResponse.Kommunenavn}");
-                        _logger.LogInformation($"Kommunenummer: {stednavnResponse.Kommunenummer}");
-
-                        stednavn.Add(new StednavnViewModel
-                        {
-                            Fylkesnavn = stednavnResponse.Fylkesnavn,
-                            Fylkesnummer = stednavnResponse.Fylkesnummer,
-                            Kommunenavn = stednavnResponse.Kommunenavn,
-                            Kommunenummer = stednavnResponse.Kommunenummer
-                        });
-
-                        // Redirect to the CorrectionsOverview action to display the updated list
-                        return RedirectToAction("CorrectionsOverview");
-                    }
-                    else
-                    {
-                        ViewData["Error"] = $"No results found for coordinates: nord {firstCoordinate.Nord}, ost {firstCoordinate.Ost}, Koordsys {positionModel.Koordsys}.";
-                        return View("Index");
-                    }
-                }
-
-                _logger.LogError("Failed to retrieve location data for PositionModel: Coordinates = {Coordinates}, Koordsys = {Koordsys}", positionModel.Coordinates, positionModel.Koordsys);
-
+                // Redirect to the TakkRapport action to display the updated list
+                return RedirectToAction("TakkRapport");
             }
-            return View(positionModel);
+            
+            return View("Error");
         }
 
         public async Task<IActionResult> Saksbehandler()
         {
-            // Retrieve rapporter with related data
             var rapporter = await _context.Rapport
                 .Include(r => r.Person)
                 .Include(r => r.Kart)
@@ -160,40 +136,25 @@ namespace KartverketWebApp.Controllers
 
             var stednavnList = new List<StednavnViewModel>();
 
-            // Process coordinates for each Kart in the retrieved Rapport list
             foreach (var rapport in rapporter)
             {
                 var kart = rapport.Kart;
 
-                // Check if Kart has any coordinates
                 if (kart?.Koordinater != null && kart.Koordinater.Count > 0)
                 {
                     var firstCoordinate = kart.Koordinater.First();
-
-                    // Call the Stednavn API using the first coordinate
                     var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoordinate.Nord, firstCoordinate.Ost, kart.Koordsys);
 
                     if (stednavnResponse != null)
                     {
-                        _logger.LogInformation("Received StednavnResponse from API.");
-                        _logger.LogInformation("Fylkesnavn: {Fylkesnavn}", stednavnResponse.Fylkesnavn);
-                        _logger.LogInformation("Fylkesnummer: {Fylkesnummer}", stednavnResponse.Fylkesnummer);
-                        _logger.LogInformation("Kommunenavn: {Kommunenavn}", stednavnResponse.Kommunenavn);
-                        _logger.LogInformation("Kommunenummer: {Kommunenummer}", stednavnResponse.Kommunenummer);
-
-                        // Add Stednavn data to the list
                         stednavnList.Add(new StednavnViewModel
                         {
                             Fylkesnavn = stednavnResponse.Fylkesnavn,
                             Fylkesnummer = stednavnResponse.Fylkesnummer,
                             Kommunenavn = stednavnResponse.Kommunenavn,
-                            Kommunenummer = stednavnResponse.Kommunenummer
+                            Kommunenummer = stednavnResponse.Kommunenummer,
+                            KartEndringId = kart.KartEndringId  // Link this Stednavn to the specific Kart
                         });
-                    }
-                    else
-                    {
-                        _logger.LogWarning("No results found for coordinates: Nord = {Nord}, Ost = {Ost}, Koordsys = {Koordsys}",
-                            firstCoordinate.Nord, firstCoordinate.Ost, kart.Koordsys);
                     }
                 }
                 else
@@ -202,14 +163,12 @@ namespace KartverketWebApp.Controllers
                 }
             }
 
-            // Prepare the view model
             var combinedViewModel = new CombinedViewModel
             {
                 Rapporter = rapporter,
                 Stednavn = stednavnList
             };
 
-            // Return the view with the CombinedViewModel
             return View(combinedViewModel);
         }
 

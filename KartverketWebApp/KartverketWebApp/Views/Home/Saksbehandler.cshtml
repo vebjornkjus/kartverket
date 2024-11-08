@@ -13,23 +13,20 @@
         </tr>
     </thead>
     <tbody>
-        @{
-            int i = 0; // To keep track of the index for Stednavn
-        }
         @foreach (var rapport in Model.Rapporter)
         {
-            // Get the corresponding Stednavn if available
-            var stednavn = Model.Stednavn.Count > i ? Model.Stednavn[i] : null;
+            // Find the Stednavn entry with a matching KartEndringId
+            var stednavn = Model.Stednavn.FirstOrDefault(s => s.KartEndringId == rapport.Kart?.KartEndringId);
+
             <tr>
                 <td>@rapport.Kart?.Tittel</td>
                 <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
                 <td>@rapport.Kart?.MapType</td>
-                <td> @stednavn?.Kommunenavn</td>
+                <td>@stednavn?.Kommunenavn</td>
                 <td>@stednavn?.Fylkesnavn</td>
                 <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
                 <td>@rapport.RapportStatus</td>
             </tr>
-            i++; // Increment the index to keep in sync with Stednavn
         }
     </tbody>
 </table>
