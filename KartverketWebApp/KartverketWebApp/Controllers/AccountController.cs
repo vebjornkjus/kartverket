@@ -11,12 +11,18 @@ namespace KartverketWebApp.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ApplicationDbContext _context; // Legg til ApplicationDbContext
+        private readonly IPasswordHasher<IdentityUser> _passwordHasher; // Legg til PasswordHasher
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ApplicationDbContext context)
+        public AccountController(
+            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser> userManager,
+            ApplicationDbContext context,
+            IPasswordHasher<IdentityUser> passwordHasher) // Initialiser passwordHasher
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _context = context; // Initialiser context
+            _context = context;
+            _passwordHasher = passwordHasher; // Initialiser passwordHasher
         }
 
         [HttpGet]
@@ -47,12 +53,15 @@ namespace KartverketWebApp.Controllers
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
+                // Hash passordet
+                var hashedPassword = _passwordHasher.HashPassword(user, password);
+
                 // Opprett ny post i Bruker-tabellen
                 var bruker = new Bruker
                 {
                     Brukernavn = email,
-                    Passord = password, // OBS: Ikke lagre passord i klartekst i produksjon
-                    BrukerType = "Standard", // Angi brukerens type, eller bruk en annen logikk hvis nødvendig
+                    Passord = hashedPassword, // Lagre hashet passord
+                    BrukerType = "Standard", // Angi brukerens type
                     IdentityUserId = user.Id // Fremmednøkkel til AspNetUsers
                 };
 
