@@ -235,7 +235,6 @@ body {
     width: 100%;
 }
 
-
 #kartverket_logo {
     width: 147px;
 }
@@ -252,6 +251,21 @@ body {
     transition: all 0.5s ease;
 }
 
+#location {
+    z-index: 5;
+    background-color: white; /* Set a custom background color */
+    border: none;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    border-radius: 50%; /* Makes it a circle */
+    margin-bottom: 1vh;
+    margin-top: -2vh;
+}
+
 .map_container_hidden {
     display: none;
 }
@@ -261,11 +275,15 @@ body {
     margin-top: 0 auto;
     height: 65vh;
     border-radius: 11px;
+
 }
 #map {
+    z-index: 4;
     display: block;
     width: 100%;
     height: 100%;
+    background-color: #e0fefe;
+    border-radius: 11px;
 }
 
 .map_corrections {
@@ -400,6 +418,8 @@ body {
         align-items: flex-end;
         bottom: 5%;
     }
+
+
 
 
 

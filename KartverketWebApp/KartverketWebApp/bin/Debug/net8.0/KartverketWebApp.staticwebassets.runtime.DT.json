@@ -78,6 +78,22 @@
             },
             "Patterns": null
           },
+          "my-location - Copy.svg": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/my-location - Copy.svg"
+            },
+            "Patterns": null
+          },
+          "my-location.svg": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "images/my-location.svg"
+            },
+            "Patterns": null
+          },
           "sjokart.jpg": {
             "Children": null,
             "Asset": {

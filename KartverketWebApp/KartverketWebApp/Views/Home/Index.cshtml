@@ -149,15 +149,14 @@
         layers: [norgeKart]
     });
 
-    // Attempt to use geolocation to update map's position
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            map.setView([position.coords.latitude, position.coords.longitude], 15);
-        }, function () {
-            alert("Kunne ikke hente geolokasjon. Sentrerer kartet til Norge.");
+    function locateUser() {
+        map.locate({
+            setView: true,
+            maxZoom: 18
+        }).on('locationerror', function (e) {
+            // Display an alert with a custom error message
+            alert("Kunne ikke hente geolokasjon. Sjekk at enheten din har geolokasjon aktivert og gi tillatelse for plassering.");
         });
-    } else {
-        alert("Geolokasjon støttes ikke av nettleseren din.");
     }
     
     //bytter ut map_selection_container med map_container for å vise kartet etter et kart blir valgt
@@ -236,14 +235,28 @@
 
     });
 
+    var locateControl = L.control({ position: 'topleft' });
+
+    locateControl.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'leaflet-bar');
+        div.innerHTML = '<button id="location" title="Hvor er jeg?" onclick="locateUser()">📍</button>'; // Add icon or text for the button
+        L.DomEvent.disableClickPropagation(div);
+
+        return div;
+    };
+
+    // Add the control to the map
+    locateControl.addTo(map);
+
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
     // Creates the drawing control on the left hand side
     // The drawing control enables drawing of markers, polygons, and polylines
     var drawControl = new L.Control.Draw({
+        position: 'topleft',
         draw: {
-            polygon: false,
+            polygon: true,
             polyline: true,
             marker: false,
             circle: false,
@@ -255,6 +268,7 @@
         }
     });
     map.addControl(drawControl);
+
 
     // Event handling when a layer is drawn on the map
     map.on(L.Draw.Event.CREATED, function (e) {
