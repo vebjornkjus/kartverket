@@ -19,9 +19,6 @@
 </head>
 <body>
     <header>
-        <div class="login-button-container">
-    <a asp-controller="Account" asp-action="Login" class="btn-login">Logg inn</a>
-</div>
         <div class="nav-stedholder"> 
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                 <img src="images/standard_kartverket.png" class="kartverket_logo"/>
@@ -30,6 +27,9 @@
              <div id="saksbehandler">
                 <a asp-action="Saksbehandler" asp-controller="Home">
                     <button class="btn btn-primary">Til oversikt</button>
+                </a>
+                <a asp-action="Login" asp-controller="Account">
+                    <button class="btn btn-primary">Log inn</button>
                 </a>
             </div>
         </div>

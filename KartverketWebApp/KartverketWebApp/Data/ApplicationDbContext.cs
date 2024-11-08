@@ -47,7 +47,6 @@ namespace KartverketWebApp.Data
                 .HasForeignKey(p => p.BrukerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Other configurations can go here...
         }
     }
 }
