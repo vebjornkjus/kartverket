@@ -4,3 +4,6 @@
 
 /KartverketWebApp/KartverketWebApp/obj/Debug/net8.0/KartverketWebApp.AssemblyInfoInputs.cache
 /KartverketWebApp/KartverketWebApp/obj/Debug/net8.0/KartverketWebApp.AssemblyInfo.cs
+*.cache
+/KartverketWebApp/KartverketWebApp/obj
+KartverketWebApp/KartverketWebApp/obj/KartverketWebApp.csproj.nuget.g.props

@@ -1,20 +1,23 @@
-@{
-    ViewData["Title"] = "Login";
-}
+@model KartverketWebApp.Models.LoginViewModel
 
 <link rel="stylesheet" href="~/css/Login.css">
-
 
 <div class="login_main">
     <div class="login_container">
         <img id="kartverket_logo" src="~/images/standard_kartverket.png" alt="Kartverket Logo">
 
         <form asp-action="Login" method="post">
-            <label for="username">Brukernavn</label>
-            <input type="text" id="username" name="username" required>
+            <div asp-validation-summary="All" class="text-danger"></div> <!-- Legg til denne linjen for å vise feilmeldinger -->
 
-            <label for="password">Passord</label>
-            <input type="password" id="password" name="password" required>
+            <label asp-for="Username">Brukernavn</label>
+            <input asp-for="Username" class="form-control" required />
+
+            <label asp-for="Password">Passord</label>
+            <input asp-for="Password" type="password" class="form-control" required />
+
+            <label asp-for="RememberMe">
+                <input asp-for="RememberMe" type="checkbox" /> Husk meg
+            </label>
 
             <button type="submit" class="btn_login">Logg inn</button>
         </form>
@@ -23,3 +26,7 @@
         <a href="/Account/Register" class="btn_register">Registrer deg</a>
     </div>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

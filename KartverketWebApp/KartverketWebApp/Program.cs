@@ -19,13 +19,16 @@ builder.Services.AddHttpClient<IStednavn, StednavnService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add PasswordHasher
+builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
+
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("MariaDbConnection"),
     new MySqlServerVersion(new Version(10, 5, 9))));    // replace with your MariaDB version
 
 // Add Identity services
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Add logging configuration
