@@ -32,6 +32,14 @@
             },
             "Patterns": null
           },
+          "Saksbehandler.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/Saksbehandler.css"
+            },
+            "Patterns": null
+          },
           "site.css": {
             "Children": null,
             "Asset": {

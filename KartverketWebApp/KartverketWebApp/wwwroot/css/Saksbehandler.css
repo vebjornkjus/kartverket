@@ -1,0 +1,63 @@
+﻿body {
+    background-color: white;
+}
+
+.center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.main_rapport {
+    display: flex;
+    width: 90vw;
+    justify-content: space-between; /* Space between the two items */
+    align-items: stretch; /* Allows both children to stretch to the same height */
+    gap: 3vw;
+    margin-bottom: 3vh; /* Add some space below */
+}
+
+.info {
+    flex: 1;
+    background-color: #D0ECD6;
+    border-radius: 11px;
+    padding: 20px;
+}
+
+.rapport_map {
+    flex: 1;
+    background-color: #e0e0e0; /* Changed from green for better visibility */
+    border-radius: 11px;
+    overflow: hidden; /* To ensure the map fits within the container */
+}
+
+.info-bottom-container {
+    display: flex;
+    width: 90vw;
+    justify-content: space-between;
+    align-items: stretch; /* Ensures all info-bottoms have equal height */
+    gap: 3vw;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    margin-bottom: 3vh; /* Add some space below */
+}
+
+.info-bottom {
+    flex: 1;
+    background-color: #D0ECD6;
+    border-radius: 11px;
+    padding: 20px; /* Added for better spacing */
+    min-width: 250px; /* Ensures a minimum width for better responsiveness */
+    margin-bottom: 3vh; /* Space below each info-bottom */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main_rapport, .info-bottom-container {
+        flex-direction: column;
+    }
+
+    .info, .rapport_map, .info-bottom {
+        width: 100%;
+    }
+}
