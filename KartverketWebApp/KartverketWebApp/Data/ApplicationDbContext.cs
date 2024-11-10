@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 namespace KartverketWebApp.Data
 {
+    using System;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
@@ -48,5 +50,7 @@ namespace KartverketWebApp.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
         }
+
     }
+
 }

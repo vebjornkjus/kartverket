@@ -10,8 +10,8 @@ namespace KartverketWebApp.Controllers
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly ApplicationDbContext _context; // Legg til ApplicationDbContext
-        private readonly IPasswordHasher<IdentityUser> _passwordHasher; // Legg til PasswordHasher
+        private readonly ApplicationDbContext _context;
+        private readonly IPasswordHasher<IdentityUser> _passwordHasher;
 
         public AccountController(
             SignInManager<IdentityUser> signInManager,
@@ -65,8 +65,8 @@ namespace KartverketWebApp.Controllers
                     IdentityUserId = user.Id // Fremmednøkkel til AspNetUsers
                 };
 
-                _context.Bruker.Add(bruker);
-                await _context.SaveChangesAsync();
+                _context?.Bruker.Add(bruker);
+                await _context?.SaveChangesAsync();
 
                 return RedirectToAction("Index", "Home");
             }
