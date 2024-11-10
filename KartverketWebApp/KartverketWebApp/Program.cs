@@ -19,8 +19,6 @@ builder.Services.AddHttpClient<IStednavn, StednavnService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
-
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("MariaDbConnection"),
