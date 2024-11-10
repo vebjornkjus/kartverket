@@ -1,0 +1,116 @@
+﻿@model KartverketWebApp.Models.DetaljertViewModel
+
+<h2>Rapport Details</h2>
+
+<div>
+    <h3>Report Information</h3>
+    <p><strong>Kart Tittel:</strong> @Model.Kart?.Tittel</p>
+    <p><strong>Beskrivelse:</strong> @Model.Kart?.Beskrivelse</p>
+    <p><strong>Kart Type:</strong> @Model.Kart?.MapType</p>
+    <p><strong>Rapport Type:</strong> @Model.Kart?.RapportType</p>
+    <p><strong>Rapport Status:</strong> @Model.Rapport?.RapportStatus</p>
+    <p><strong>Opprettet:</strong> @Model.Rapport?.Opprettet.ToString("dd.MM.yyyy")</p>
+
+    <h3>Person Information</h3>
+    <p><strong>Navn:</strong> @Model.Person?.Fornavn @Model.Person?.Etternavn</p>
+    <p><strong>Email:</strong> @Model.Person?.Email</p>
+    <p><strong>Telefon:</strong> @Model.Person?.Telefon</p>
+
+    <h3>Stednavn Information</h3>
+    <p><strong>Kommune:</strong> @Model.Stednavn?.Kommunenavn</p>
+    <p><strong>Fylke:</strong> @Model.Stednavn?.Fylkesnavn</p>
+
+    <h3>Coordinates</h3>
+    @if (Model.Kart?.Koordinater != null && Model.Kart.Koordinater.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nord</th>
+                    <th>Ost</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var koordinat in Model.Kart.Koordinater)
+                {
+                    <tr>
+                        <td>@koordinat.Rekkefolge</td>
+                        <td>@koordinat.Nord</td>
+                        <td>@koordinat.Ost</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No coordinates available for this report.</p>
+    }
+</div>
+
+<div id="map_detaljert" style="height: 500px; width: 100%;"></div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Define the data required for the map, including mapType and coordinates
+        var mapData = @Html.Raw(Json.Serialize(new
+            {
+                MapType = Model.Kart?.MapType,
+                Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
+            }));
+
+        // Log the entire mapData object
+        console.log("Map Data:", mapData);
+
+        // Log the value of mapType
+        console.log("mapType:", mapData.mapType);
+
+        // Initialize the map if there are coordinates
+        if (mapData && mapData.mapType && mapData.coordinates && mapData.coordinates.length > 0) {
+            var firstCoord = mapData.coordinates[0];
+            var map = L.map('map_detaljert').setView([firstCoord.nord, firstCoord.ost], 13);
+
+            // Define the map layers
+            var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+            });
+            var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
+                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+            });
+            var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
+                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+            });
+
+            // Log the map type being used
+            console.log("Selecting map layer for mapType:", mapData.mapType);
+
+            // Add the correct map layer based on mapType
+            if (mapData.mapType === "Norge kart") {
+                map.addLayer(norgeKart);
+                console.log("Added Norge kart layer");
+            } else if (mapData.mapType === "Turkart") {
+                map.addLayer(turKart);
+                console.log("Added Turkart layer");
+            } else if (mapData.mapType === "Sjøkart") {
+                map.addLayer(sjoKart);
+                console.log("Added Sjøkart layer");
+            } else {
+                console.warn('Map type not recognized:', mapData.mapType);
+            }
+
+            // Collect coordinates and draw the polyline
+            var latlngs = mapData.coordinates.map(function (coord) {
+                return [coord.nord, coord.ost];
+            });
+            var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+            map.fitBounds(polyline.getBounds());
+        } else {
+            console.warn('No coordinates available to display on the map or mapType is missing.');
+        }
+    </script>
+}
+

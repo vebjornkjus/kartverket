@@ -72,7 +72,7 @@
                         <td>
                             <div id="form_tittel">
                                 <label for="tittel">Tittel</label><br />
-                                <input type="text" id="tittel" name="Tittel" />
+                                <input type="text" id="tittel" name="tittel" />
                             </div>
                         </td>
 
@@ -80,7 +80,7 @@
                     <tr>
                         <td>
                             <div id="form_option">
-                                <select id="rapport_type" name="rapport_type">
+                                <select id="rapport_type" name="rapportType">
                                     <option value="" disabled selected>
                                         Velg rapport kategori...
                                     </option>
@@ -101,7 +101,7 @@
                         <td>
                             <div class="form_description">
                                 <label for="description">Description</label>
-                                <textarea id="description" name="description" class="form-control"></textarea>
+                                <textarea id="description" name="beskrivelse" class="form-control"></textarea>
                             </div>
                         </td>
 
@@ -112,7 +112,7 @@
             <div class="submit_container">
                 <button type="submit" class="btn_submit" form="form_id">Rapporter</button>
             </div>
-            <input type="hidden" id="map_type" name="map_type" form="form_id"/>
+            <input type="hidden" id="mapType" name="mapType" form="form_id"/>
             <input type="hidden" name="koordsys" value="4258" form="form_id" />
         </div>
     </div>
@@ -177,7 +177,7 @@
         }, 50);
 
         //setter verdi for i kart type i form
-        document.getElementById('map_type').value = "Norge kart";
+        document.getElementById('mapType').value = "Norge kart";
     }
 
     function MapSelect2() {
@@ -194,7 +194,7 @@
         }, 50);
 
         //setter verdi for i for kart type i form
-        document.getElementById('map_type').value = "Turkart";
+        document.getElementById('mapType').value = "Turkart";
     }
 
     function MapSelect3() {
@@ -211,7 +211,7 @@
         }, 50);
 
         //setter verdi for i for kart type i form
-        document.getElementById('map_type').value = "Sjøkart";
+        document.getElementById('mapType').value = "Sjøkart";
     }
 
 
@@ -256,7 +256,7 @@
     var drawControl = new L.Control.Draw({
         position: 'topleft',
         draw: {
-            polygon: true,
+            polygon: false,
             polyline: true,
             marker: false,
             circle: false,

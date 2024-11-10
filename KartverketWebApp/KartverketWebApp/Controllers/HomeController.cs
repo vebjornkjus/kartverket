@@ -72,10 +72,18 @@ namespace KartverketWebApp.Controllers
         public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater)
         {
             _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
-            foreach (var koord in koordinater)
+            if (koordinater != null)
             {
-                _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
+                foreach (var koord in koordinater)
+                {
+                    _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
+                }
             }
+            else
+            {
+                _logger.LogWarning("Koordinater list is null.");
+            }
+
             if (ModelState.IsValid)
             {
                 // Add the Kart to the database
@@ -87,7 +95,7 @@ namespace KartverketWebApp.Controllers
                     MapType = mapType,
                     RapportType = rapportType
                 };
-               
+
                 _context.Kart.Add(newKart);
                 await _context.SaveChangesAsync();
 
@@ -122,8 +130,17 @@ namespace KartverketWebApp.Controllers
                 // Redirect to the TakkRapport action to display the updated list
                 return RedirectToAction("TakkRapport");
             }
-            
-            return View("Error");
+
+            // Log ModelState errors here before returning the view
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    _logger.LogError(error.ErrorMessage);
+                }
+            }
+
+            return View("Index");
         }
 
         public async Task<IActionResult> Saksbehandler()
@@ -170,6 +187,52 @@ namespace KartverketWebApp.Controllers
             };
 
             return View(combinedViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RapportDetaljert(int id)
+        {
+            var rapport = await _context.Rapport
+                .Include(r => r.Kart)
+                    .ThenInclude(k => k.Koordinater)
+                .Include(r => r.Person)
+                .FirstOrDefaultAsync(r => r.RapportId == id);
+
+            if (rapport == null)
+            {
+                return NotFound();
+            }
+
+            var kart = rapport.Kart;
+            StednavnViewModel stednavnViewModel = null;
+
+            if (kart?.Koordinater?.Any() == true)
+            {
+                var firstCoord = kart.Koordinater.First();
+                var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoord.Nord, firstCoord.Ost, kart.Koordsys);
+
+                if (stednavnResponse != null)
+                {
+                    stednavnViewModel = new StednavnViewModel
+                    {
+                        Fylkesnavn = stednavnResponse.Fylkesnavn,
+                        Fylkesnummer = stednavnResponse.Fylkesnummer,
+                        Kommunenavn = stednavnResponse.Kommunenavn,
+                        Kommunenummer = stednavnResponse.Kommunenummer,
+                        KartEndringId = kart.KartEndringId
+                    };
+                }
+            }
+
+            var viewModel = new DetaljertViewModel
+            {
+                Rapport = rapport,
+                Kart = rapport.Kart,
+                Person = rapport.Person,
+                Stednavn = stednavnViewModel
+            };
+
+            return View(viewModel);
         }
 
 
@@ -290,6 +353,8 @@ namespace KartverketWebApp.Controllers
                 return BadRequest("Invalid JSON format.");
             }
         }
+
+
 
     }
 }

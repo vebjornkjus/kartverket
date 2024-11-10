@@ -17,8 +17,9 @@
         {
             // Find the Stednavn entry with a matching KartEndringId
             var stednavn = Model.Stednavn.FirstOrDefault(s => s.KartEndringId == rapport.Kart?.KartEndringId);
+            var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
 
-            <tr>
+            <tr onclick="location.href='@url'" style="cursor:pointer">
                 <td>@rapport.Kart?.Tittel</td>
                 <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
                 <td>@rapport.Kart?.MapType</td>
