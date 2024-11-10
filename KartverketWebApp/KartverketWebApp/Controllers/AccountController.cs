@@ -29,40 +29,57 @@ namespace KartverketWebApp.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password, bool rememberMe = false)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            var result = await _signInManager.PasswordSignInAsync(username, password, rememberMe, lockoutOnFailure: true);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: true);
             if (result.Succeeded)
             {
                 return RedirectToAction("Index", "Home");
             }
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            return View();
+            else if (result.IsLockedOut)
+            {
+                ModelState.AddModelError(string.Empty, "Account locked out due to multiple failed attempts.");
+            }
+            else if (result.IsNotAllowed)
+            {
+                ModelState.AddModelError(string.Empty, "Login is not allowed for this account.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your username and password.");
+            }
+
+            return View(model);
         }
 
         [HttpGet]
         public IActionResult Register() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Register(string email, string password)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new IdentityUser { UserName = email, Email = email };
-            var result = await _userManager.CreateAsync(user, password);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
-                // Hash passordet
-                var hashedPassword = _passwordHasher.HashPassword(user, password);
-
-                // Opprett ny post i Bruker-tabellen
                 var bruker = new Bruker
                 {
-                    Brukernavn = email,
-                    Passord = hashedPassword, // Lagre hashet passord
-                    BrukerType = "Standard", // Angi brukerens type
-                    IdentityUserId = user.Id // Fremmednøkkel til AspNetUsers
+                    Brukernavn = model.Email,
+                    BrukerType = "Standard",
+                    IdentityUserId = user.Id
                 };
 
                 _context?.Bruker.Add(bruker);
@@ -75,7 +92,16 @@ namespace KartverketWebApp.Controllers
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-            return View();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }
