@@ -24,8 +24,12 @@ builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<Identit
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("MariaDbConnection"),
-    new MySqlServerVersion(new Version(10, 5, 9))));    // replace with your MariaDB version
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("MariaDbConnection"),
+        new MySqlServerVersion(new Version(10, 5, 9)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure() // Merk parentesene her
+    ));
+
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
