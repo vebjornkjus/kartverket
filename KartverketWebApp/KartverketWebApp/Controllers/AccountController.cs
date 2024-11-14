@@ -75,9 +75,14 @@ namespace KartverketWebApp.Controllers
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
+                // Hash passordet
+                var hashedPassword = _passwordHasher.HashPassword(user, model.Password);
+
+                // Opprett ny post i Bruker-tabellen
                 var bruker = new Bruker
                 {
                     Email = model.Email,
+                    Passord = hashedPassword, // Lagre hashet passord
                     BrukerType = "Standard",
                     IdentityUserId = user.Id
                 };
