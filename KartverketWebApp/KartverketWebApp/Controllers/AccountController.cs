@@ -77,7 +77,7 @@ namespace KartverketWebApp.Controllers
 
                 var bruker = new Bruker
                 {
-                    Brukernavn = model.Email,
+                    Email = model.Email,
                     BrukerType = "Standard",
                     IdentityUserId = user.Id
                 };

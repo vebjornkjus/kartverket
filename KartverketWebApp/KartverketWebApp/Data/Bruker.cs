@@ -9,11 +9,11 @@ namespace KartverketWebApp.Data
         [Key]
         public int BrukerId { get; set; }
 
-        public string Brukernavn { get; set; }
+        public string Email { get; set; } // Endret fra Brukernavn til Email
         public string Passord { get; set; }
         public string BrukerType { get; set; }
 
         // Navigation Property
-        public ICollection<Person> Personer { get; set; } // One-to-Many with Person
+        public ICollection<Person> Personer { get; set; } // One-to-Many med Person
     }
 }

@@ -75,7 +75,7 @@ namespace KartverketWebApp.Migrations
                 {
                     BrukerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Brukernavn = table.Column<string>(type: "longtext", nullable: false)
+                    Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Passord = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -89,24 +89,21 @@ namespace KartverketWebApp.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Kart",
+                name: "Steddata",
                 columns: table => new
                 {
-                    KartEndringId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Tittel = table.Column<string>(type: "longtext", nullable: false)
+                    Fylkenavn = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Beskrivelse = table.Column<string>(type: "longtext", nullable: false)
+                    Kommunenavn = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Koordsys = table.Column<int>(type: "int", nullable: false),
-                    MapType = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RapportType = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    Fylkenummer = table.Column<int>(type: "int", nullable: false),
+                    Kommunenummer = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Kart", x => x.KartEndringId);
+                    table.PrimaryKey("PK_Steddata", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -247,9 +244,6 @@ namespace KartverketWebApp.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Etternavn = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Telefon = table.Column<int>(type: "int", nullable: false),
                     BrukerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -260,6 +254,57 @@ namespace KartverketWebApp.Migrations
                         column: x => x.BrukerId,
                         principalTable: "Bruker",
                         principalColumn: "BrukerId",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Kart",
+                columns: table => new
+                {
+                    KartEndringId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Tittel = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Beskrivelse = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Koordsys = table.Column<int>(type: "int", nullable: false),
+                    SteddataId = table.Column<int>(type: "int", nullable: false),
+                    MapType = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RapportType = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Kart", x => x.KartEndringId);
+                    table.ForeignKey(
+                        name: "FK_Kart_Steddata_SteddataId",
+                        column: x => x.SteddataId,
+                        principalTable: "Steddata",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Ansatt",
+                columns: table => new
+                {
+                    AnsattId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    Kommunenummer = table.Column<int>(type: "int", nullable: false),
+                    AnsettelsesDato = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ansatt", x => x.AnsattId);
+                    table.ForeignKey(
+                        name: "FK_Ansatt_Person_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Person",
+                        principalColumn: "PersonId",
                         onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -296,12 +341,19 @@ namespace KartverketWebApp.Migrations
                     RapportStatus = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Opprettet = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    TildelAnsattId = table.Column<int>(type: "int", nullable: false),
                     PersonId = table.Column<int>(type: "int", nullable: false),
                     KartEndringId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rapport", x => x.RapportId);
+                    table.ForeignKey(
+                        name: "FK_Rapport_Ansatt_TildelAnsattId",
+                        column: x => x.TildelAnsattId,
+                        principalTable: "Ansatt",
+                        principalColumn: "AnsattId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Rapport_Kart_KartEndringId",
                         column: x => x.KartEndringId,
@@ -316,6 +368,50 @@ namespace KartverketWebApp.Migrations
                         onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Meldinger",
+                columns: table => new
+                {
+                    MeldingsId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RapportId = table.Column<int>(type: "int", nullable: false),
+                    SenderPersonId = table.Column<int>(type: "int", nullable: false),
+                    MottakerPersonId = table.Column<int>(type: "int", nullable: false),
+                    Innhold = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Tidsstempel = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Meldinger", x => x.MeldingsId);
+                    table.ForeignKey(
+                        name: "FK_Meldinger_Person_MottakerPersonId",
+                        column: x => x.MottakerPersonId,
+                        principalTable: "Person",
+                        principalColumn: "PersonId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Meldinger_Person_SenderPersonId",
+                        column: x => x.SenderPersonId,
+                        principalTable: "Person",
+                        principalColumn: "PersonId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Meldinger_Rapport_RapportId",
+                        column: x => x.RapportId,
+                        principalTable: "Rapport",
+                        principalColumn: "RapportId",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ansatt_PersonId",
+                table: "Ansatt",
+                column: "PersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -355,9 +451,30 @@ namespace KartverketWebApp.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Kart_SteddataId",
+                table: "Kart",
+                column: "SteddataId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Koordinater_KartEndringId",
                 table: "Koordinater",
                 column: "KartEndringId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Meldinger_MottakerPersonId",
+                table: "Meldinger",
+                column: "MottakerPersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Meldinger_RapportId",
+                table: "Meldinger",
+                column: "RapportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Meldinger_SenderPersonId",
+                table: "Meldinger",
+                column: "SenderPersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_BrukerId",
@@ -373,6 +490,11 @@ namespace KartverketWebApp.Migrations
                 name: "IX_Rapport_PersonId",
                 table: "Rapport",
                 column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rapport_TildelAnsattId",
+                table: "Rapport",
+                column: "TildelAnsattId");
         }
 
         /// <inheritdoc />
@@ -397,7 +519,7 @@ namespace KartverketWebApp.Migrations
                 name: "Koordinater");
 
             migrationBuilder.DropTable(
-                name: "Rapport");
+                name: "Meldinger");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -406,10 +528,19 @@ namespace KartverketWebApp.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Rapport");
+
+            migrationBuilder.DropTable(
+                name: "Ansatt");
+
+            migrationBuilder.DropTable(
                 name: "Kart");
 
             migrationBuilder.DropTable(
                 name: "Person");
+
+            migrationBuilder.DropTable(
+                name: "Steddata");
 
             migrationBuilder.DropTable(
                 name: "Bruker");

@@ -149,44 +149,16 @@ namespace KartverketWebApp.Controllers
                 .Include(r => r.Person)
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
+                .Include(r => r.Kart)
+                    .ThenInclude(k => k.Steddata) // Include Steddata directly with Kart
                 .ToListAsync();
-
-            var stednavnList = new List<StednavnViewModel>();
-
-            foreach (var rapport in rapporter)
-            {
-                var kart = rapport.Kart;
-
-                if (kart?.Koordinater != null && kart.Koordinater.Count > 0)
-                {
-                    var firstCoordinate = kart.Koordinater.First();
-                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoordinate.Nord, firstCoordinate.Ost, kart.Koordsys);
-
-                    if (stednavnResponse != null)
-                    {
-                        stednavnList.Add(new StednavnViewModel
-                        {
-                            Fylkesnavn = stednavnResponse.Fylkesnavn,
-                            Fylkesnummer = stednavnResponse.Fylkesnummer,
-                            Kommunenavn = stednavnResponse.Kommunenavn,
-                            Kommunenummer = stednavnResponse.Kommunenummer,
-                            KartEndringId = kart.KartEndringId  // Link this Stednavn to the specific Kart
-                        });
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Kart {KartId} has no coordinates.", kart?.KartEndringId);
-                }
-            }
 
             var combinedViewModel = new CombinedViewModel
             {
-                Rapporter = rapporter,
-                Stednavn = stednavnList
+                Rapporter = rapporter
             };
 
-            return View(combinedViewModel);
+            return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
 
         [HttpGet]
@@ -196,6 +168,7 @@ namespace KartverketWebApp.Controllers
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
                 .Include(r => r.Person)
+                    .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
                 .FirstOrDefaultAsync(r => r.RapportId == id);
 
             if (rapport == null)
@@ -204,23 +177,18 @@ namespace KartverketWebApp.Controllers
             }
 
             var kart = rapport.Kart;
-            StednavnViewModel stednavnViewModel = null;
+            Steddata steddata = null;
 
+            // If Kart and its Koordinater exist, retrieve the first coordinate and then fetch Steddata
             if (kart?.Koordinater?.Any() == true)
             {
                 var firstCoord = kart.Koordinater.First();
-                var stednavnResponse = await _stednavnService.GetStednavnAsync(firstCoord.Nord, firstCoord.Ost, kart.Koordsys);
+                steddata = await _context.Steddata
+                    .FirstOrDefaultAsync(s => s.Id == kart.SteddataId);
 
-                if (stednavnResponse != null)
+                if (steddata == null)
                 {
-                    stednavnViewModel = new StednavnViewModel
-                    {
-                        Fylkesnavn = stednavnResponse.Fylkesnavn,
-                        Fylkesnummer = stednavnResponse.Fylkesnummer,
-                        Kommunenavn = stednavnResponse.Kommunenavn,
-                        Kommunenummer = stednavnResponse.Kommunenummer,
-                        KartEndringId = kart.KartEndringId
-                    };
+                    _logger.LogWarning("Steddata for Kart {KartId} was not found.", kart.KartEndringId);
                 }
             }
 
@@ -229,10 +197,11 @@ namespace KartverketWebApp.Controllers
                 Rapport = rapport,
                 Kart = rapport.Kart,
                 Person = rapport.Person,
-                Stednavn = stednavnViewModel
+                Bruker = rapport.Person?.Bruker,
+                Steddata = steddata
             };
 
-            return View(viewModel);
+            return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
         }
 
 

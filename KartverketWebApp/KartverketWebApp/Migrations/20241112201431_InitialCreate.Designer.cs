@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartverketWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241108102737_AddIdentityUserIdToBruker")]
-    partial class AddIdentityUserIdToBruker
+    [Migration("20241112201431_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,30 @@ namespace KartverketWebApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("KartverketWebApp.Data.Ansatt", b =>
+                {
+                    b.Property<int>("AnsattId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnsattId"));
+
+                    b.Property<DateTime?>("AnsettelsesDato")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Kommunenummer")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AnsattId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Ansatt");
+                });
 
             modelBuilder.Entity("KartverketWebApp.Data.Bruker", b =>
                 {
@@ -37,7 +61,7 @@ namespace KartverketWebApp.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Brukernavn")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -73,11 +97,17 @@ namespace KartverketWebApp.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("SteddataId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Tittel")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("KartEndringId");
+
+                    b.HasIndex("SteddataId")
+                        .IsUnique();
 
                     b.ToTable("Kart");
                 });
@@ -109,6 +139,45 @@ namespace KartverketWebApp.Migrations
                     b.ToTable("Koordinater");
                 });
 
+            modelBuilder.Entity("KartverketWebApp.Data.Meldinger", b =>
+                {
+                    b.Property<int>("MeldingsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MeldingsId"));
+
+                    b.Property<string>("Innhold")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("MottakerPersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RapportId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderPersonId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Tidsstempel")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("MeldingsId");
+
+                    b.HasIndex("MottakerPersonId");
+
+                    b.HasIndex("RapportId");
+
+                    b.HasIndex("SenderPersonId");
+
+                    b.ToTable("Meldinger");
+                });
+
             modelBuilder.Entity("KartverketWebApp.Data.Person", b =>
                 {
                     b.Property<int>("PersonId")
@@ -120,10 +189,6 @@ namespace KartverketWebApp.Migrations
                     b.Property<int?>("BrukerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Etternavn")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -131,9 +196,6 @@ namespace KartverketWebApp.Migrations
                     b.Property<string>("Fornavn")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Telefon")
-                        .HasColumnType("int");
 
                     b.HasKey("PersonId");
 
@@ -163,13 +225,45 @@ namespace KartverketWebApp.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("TildelAnsattId")
+                        .HasColumnType("int");
+
                     b.HasKey("RapportId");
 
                     b.HasIndex("KartEndringId");
 
                     b.HasIndex("PersonId");
 
+                    b.HasIndex("TildelAnsattId");
+
                     b.ToTable("Rapport");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Steddata", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Fylkenavn")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Fylkenummer")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Kommunenavn")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Kommunenummer")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Steddata");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -372,6 +466,28 @@ namespace KartverketWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("KartverketWebApp.Data.Ansatt", b =>
+                {
+                    b.HasOne("KartverketWebApp.Data.Person", "Person")
+                        .WithMany("Ansatt")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Kart", b =>
+                {
+                    b.HasOne("KartverketWebApp.Data.Steddata", "Steddata")
+                        .WithOne("Kart")
+                        .HasForeignKey("KartverketWebApp.Data.Kart", "SteddataId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Steddata");
+                });
+
             modelBuilder.Entity("KartverketWebApp.Data.Koordinater", b =>
                 {
                     b.HasOne("KartverketWebApp.Data.Kart", "Kart")
@@ -381,6 +497,33 @@ namespace KartverketWebApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Kart");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Meldinger", b =>
+                {
+                    b.HasOne("KartverketWebApp.Data.Person", "Mottaker")
+                        .WithMany()
+                        .HasForeignKey("MottakerPersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("KartverketWebApp.Data.Rapport", "Rapport")
+                        .WithMany("Meldinger")
+                        .HasForeignKey("RapportId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("KartverketWebApp.Data.Person", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderPersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Mottaker");
+
+                    b.Navigation("Rapport");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("KartverketWebApp.Data.Person", b =>
@@ -407,9 +550,17 @@ namespace KartverketWebApp.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("KartverketWebApp.Data.Ansatt", "TildelAnsatt")
+                        .WithMany("Rapporter")
+                        .HasForeignKey("TildelAnsattId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Kart");
 
                     b.Navigation("Person");
+
+                    b.Navigation("TildelAnsatt");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -463,6 +614,11 @@ namespace KartverketWebApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KartverketWebApp.Data.Ansatt", b =>
+                {
+                    b.Navigation("Rapporter");
+                });
+
             modelBuilder.Entity("KartverketWebApp.Data.Bruker", b =>
                 {
                     b.Navigation("Personer");
@@ -477,7 +633,20 @@ namespace KartverketWebApp.Migrations
 
             modelBuilder.Entity("KartverketWebApp.Data.Person", b =>
                 {
+                    b.Navigation("Ansatt");
+
                     b.Navigation("Rapporter");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Rapport", b =>
+                {
+                    b.Navigation("Meldinger");
+                });
+
+            modelBuilder.Entity("KartverketWebApp.Data.Steddata", b =>
+                {
+                    b.Navigation("Kart")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

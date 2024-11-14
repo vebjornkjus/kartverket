@@ -54,7 +54,7 @@
 
     <!-- Bottom Section: Info-Bottom Elements -->
     <div class="info-bottom-container">
-        <!-- Person Informasjon -->
+        <!-- Person Information -->
         <div class="info-bottom">
             <div class="container">
                 <h2>Person Informasjon</h2>
@@ -67,11 +67,7 @@
                             </tr>
                             <tr>
                                 <th scope="row">Email</th>
-                                <td>@Model.Person?.Email</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Telefon</th>
-                                <td>@Model.Person?.Telefon</td>
+                                <td>@Model.Bruker?.Email</td>
                             </tr>
                         </tbody>
                     </table>
@@ -79,22 +75,31 @@
             </div>
         </div>
 
-        <!-- Stednavn Informasjon -->
+        <!-- Steddata Information -->
         <div class="info-bottom">
             <div class="container">
-                <h2>Stednavn Informasjon</h2>
+                <h2>Steddata Informasjon</h2>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover">
                         <tbody>
                             <tr>
                                 <th scope="row">Kommune</th>
-                                <td>@Model.Stednavn?.Kommunenavn</td>
+                                <td>@Model.Steddata?.Kommunenavn</td>
                             </tr>
                             <tr>
-                                <th scope="row">Fylke</th>
-                                <td>@Model.Stednavn?.Fylkesnavn</td>
+                                <th scope="row">Kommunenummer</th>
+                                <td>@Model.Steddata?.Kommunenummer</td>
                             </tr>
                         </tbody>
+                            <tr>
+                                <th scope="row">Fylke</th>
+                                <td>@Model.Steddata?.Fylkenavn</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Fylkesnummer</th>
+                                <td>@Model.Steddata?.Fylkenummer</td>
+                            </tr>
+
                     </table>
                 </div>
             </div>
@@ -200,4 +205,3 @@
         }
     </script>
 }
-

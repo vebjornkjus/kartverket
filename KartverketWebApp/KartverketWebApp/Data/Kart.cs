@@ -11,12 +11,14 @@ namespace KartverketWebApp.Data
         public string Tittel { get; set; }
         public string Beskrivelse { get; set; }
         public int Koordsys { get; set; }
+        public int SteddataId { get; set; } // Foreign key til Steddata
         public string MapType { get; set; }
         public string RapportType { get; set; }
 
         // Navigation Properties
-        public ICollection<Koordinater> Koordinater { get; set; } // One-to-Many with Koordinater
-        public ICollection<Rapport> Rapporter { get; set; } // One-to-Many with Rapport
+        public Steddata Steddata { get; set; }
+        public ICollection<Koordinater> Koordinater { get; set; } // One-to-Many med Koordinater
+        public ICollection<Rapport> Rapporter { get; set; } // One-to-Many med Rapport
     }
 
 }

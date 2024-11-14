@@ -15,19 +15,16 @@
     <tbody>
         @foreach (var rapport in Model.Rapporter)
         {
-            // Find the Stednavn entry with a matching KartEndringId
-            var stednavn = Model.Stednavn.FirstOrDefault(s => s.KartEndringId == rapport.Kart?.KartEndringId);
             var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
 
             <tr onclick="location.href='@url'" style="cursor:pointer">
                 <td>@rapport.Kart?.Tittel</td>
                 <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
                 <td>@rapport.Kart?.MapType</td>
-                <td>@stednavn?.Kommunenavn</td>
-                <td>@stednavn?.Fylkesnavn</td>
+                <td>@rapport.Kart?.Steddata?.Kommunenavn</td> <!-- Access Kommunenavn from Steddata -->
+                <td>@rapport.Kart?.Steddata?.Fylkenavn</td>   <!-- Access Fylkenavn from Steddata -->
                 <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
                 <td>@rapport.RapportStatus</td>
             </tr>
         }
     </tbody>
-</table>

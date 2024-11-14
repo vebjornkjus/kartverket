@@ -9,12 +9,12 @@ namespace KartverketWebApp.Data
 
         public string Fornavn { get; set; }
         public string Etternavn { get; set; }
-        public string Email { get; set; }
-        public int Telefon { get; set; }
-        public int? BrukerId { get; set; } // Nullable foreign key to Bruker
+
+        public int? BrukerId { get; set; }
 
         // Navigation Properties
         public Bruker Bruker { get; set; }
-        public ICollection<Rapport> Rapporter { get; set; } // One-to-Many with Rapport
+        public ICollection<Rapport> Rapporter { get; set; } // One-to-Many med Rapport
+        public ICollection<Ansatt> Ansatt { get; set; } // One-to-Many med Rapport
     }
 }
