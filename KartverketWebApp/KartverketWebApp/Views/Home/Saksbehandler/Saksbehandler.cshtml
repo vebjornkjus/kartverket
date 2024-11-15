@@ -1,30 +1,45 @@
 ﻿@model KartverketWebApp.Models.CombinedViewModel
+<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
+<script src="/js/Saksbehandler.js"></script>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Kart Tittel</th>
-            <th>Innsender</th>
-            <th>Kart</th>
-            <th>Kommune</th>
-            <th>Fylke</th>
-            <th>Opprettet</th>
-            <th>Rapport Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var rapport in Model.Rapporter)
-        {
-            var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
+<div class="saksbehandlerMain">
+    <div class="SaksbehandlerContainer">
+        <div class="saksbehandlerNavigering">
+            <div class="innlogetBruker">
+                <div class="brukerIkon"><i class="fa-solid fa-user fa-2xl"></i></div>
+                <div class="brukerinfo">
+                    <p>Ola Nordmann</p>
+                    <p>bruker1@example.com</p>
+                </div>
+            </div>
+            <nav class="vertical-nav">
+                <ul>
+                    <li><a href="#" class="nav-item active" data-target="#oversikt"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
+                    <li><a href="#" class="nav-item" data-target="#varslinger"><i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger</a></li>
+                    <li><a href="#" class="nav-item" data-target="#rapporter"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
+                    <li><a href="#" class="nav-item" data-target="#meldinger"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
+                    <li><a href="#" class="nav-item" data-target="#tidligereRapporter"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
+                    
+                </ul>
+            </nav>
 
-            <tr onclick="location.href='@url'" style="cursor:pointer">
-                <td>@rapport.Kart?.Tittel</td>
-                <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
-                <td>@rapport.Kart?.MapType</td>
-                <td>@rapport.Kart?.Steddata?.Kommunenavn</td> <!-- Access Kommunenavn from Steddata -->
-                <td>@rapport.Kart?.Steddata?.Fylkenavn</td>   <!-- Access Fylkenavn from Steddata -->
-                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                <td>@rapport.RapportStatus</td>
-            </tr>
-        }
-    </tbody>
+        </div>
+        <div id="overviewOmrade">
+            <div id="oversikt" class="tab-content active">
+                @Html.Partial("_Oversikt")
+            </div>
+            <div id="varslinger" class="tab-content">
+                @Html.Partial("_Oversikt")
+            </div>
+            <div id="rapporter" class="tab-content">
+                @Html.Partial("_MineRapporter")
+            </div>
+            <div id="meldinger" class="tab-content">
+                @Html.Partial("_Oversikt")
+            </div>
+            <div id="tidligereRapporter" class="tab-content">
+                @Html.Partial("_Oversikt")
+            </div>
+        </div>
+    </div>
+</div>

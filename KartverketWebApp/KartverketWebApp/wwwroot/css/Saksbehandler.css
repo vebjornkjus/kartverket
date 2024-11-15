@@ -1,21 +1,162 @@
 ﻿body {
     background-color: white;
+    height: 100vh;
 }
 
-.center-container {
+.saksbehandlerMain {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 86.41vh;
+    background-color: #d1d2d4;
+}
+
+.SaksbehandlerContainer {
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin: 2vh;
+    height: 96%;
+    background-color: #f6f7f9;
+    border-radius: 11px;
+}
+
+
+.saksbehandlerNavigering {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    z-index: 2;
+    height: 97%;
+    margin: 1.5vh;
+    background-color: #f6f7f9;
+    border-radius: 11px;
+}
+.innlogetBruker {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #ffffff; /* White background for contrast */
+    border-radius: 11px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-bottom: 20px; /* Space below the section */
+}
+
+.brukerIkon {
+    background-color: dimgray;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 20px; /* Adjust the font size for the icon */
+    margin-bottom: 8px;
+}
+
+.brukerinfo {
+    text-align: center; /* Center-align the text */
+    color: #333; /* Darker text for better readability */
+}
+
+    .brukerinfo p {
+        margin: 5px 0; /* Add space between text lines */
+        font-size: 14px; /* Adjust font size */
+    }
+
+        .brukerinfo p:first-child {
+            font-weight: bold; /* Highlight the name */
+            font-size: 16px;
+        }
+
+
+#overviewOmrade {
+    flex: 4;
+    height: 97%;
+    margin-right: 1.5vh;
+    background-color: #ffffff;
+    border-radius: 11px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Styling for the vertical navigation */
+.vertical-nav {
+    flex: 5 ;
+    width: 100%;
+    position: relative;
+}
+
+    .vertical-nav ul {
+        list-style-type: none; 
+        padding: 0;
+        margin: 0;
+    }
+
+    .vertical-nav li {
+
+    }
+
+        .vertical-nav li a {
+            display: block;
+            color: #333;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .vertical-nav li a:hover {
+                background-color: #e0e0e0; 
+                color: #000;
+            }
+
+.nav-item.active {
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    border-radius: 5px;
+}
+
+    .nav-item.active:hover {
+        background-color: white;
+    }
+
+.tab-content {
+    display: none; /* Hide all sections by default */
+}
+
+    .tab-content.active {
+        display: block; /* Show the active section */
+    }
+
+
+
+        .center-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    height: 86.41vh;
 }
 
 .main_rapport {
     display: flex;
     width: 90vw;
-    justify-content: space-between; /* Space between the two items */
-    align-items: stretch; /* Allows both children to stretch to the same height */
+    justify-content: space-between; 
+    align-items: stretch;
     gap: 3vw;
-    margin-bottom: 3vh; /* Add some space below */
+    margin-bottom: 3vh; 
 }
 
 .info {
@@ -27,31 +168,30 @@
 
 .rapport_map {
     flex: 1;
-    background-color: #e0e0e0; /* Changed from green for better visibility */
+    background-color: #e0e0e0;
     border-radius: 11px;
-    overflow: hidden; /* To ensure the map fits within the container */
+    overflow: hidden;
 }
 
 .info-bottom-container {
     display: flex;
     width: 90vw;
     justify-content: space-between;
-    align-items: stretch; /* Ensures all info-bottoms have equal height */
+    align-items: stretch;
     gap: 3vw;
-    flex-wrap: wrap; /* Allows wrapping on smaller screens */
-    margin-bottom: 3vh; /* Add some space below */
+    flex-wrap: wrap;
+    margin-bottom: 3vh; 
 }
 
 .info-bottom {
     flex: 1;
     background-color: #D0ECD6;
     border-radius: 11px;
-    padding: 20px; /* Added for better spacing */
-    min-width: 250px; /* Ensures a minimum width for better responsiveness */
-    margin-bottom: 3vh; /* Space below each info-bottom */
+    padding: 20px;
+    min-width: 250px; 
+    margin-bottom: 3vh; 
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .main_rapport, .info-bottom-container {
         flex-direction: column;
@@ -61,3 +201,45 @@
         width: 100%;
     }
 }
+
+.koordinater-scrollable {
+    max-height: calc(3 * 65px);
+    overflow-y: auto;
+}
+
+  
+    .koordinater-scrollable::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .koordinater-scrollable::-webkit-scrollbar-track {
+        background: #bcd5c0; 
+        border-radius: 4px; 
+    }
+
+    .koordinater-scrollable::-webkit-scrollbar-thumb {
+        background-color: #353a40;
+        border-radius: 4px; 
+        border: 2px solid #bcd5c0; 
+    }
+
+        .koordinater-scrollable::-webkit-scrollbar-thumb:hover {
+            background-color: #353a40;
+        }
+
+/* For Firefox */
+.koordinater-scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: #353a40 #bcd5c0; 
+}
+
+
+.unopened {
+    background-color: #d0ecd6; 
+    font-weight: bold; 
+}
+
+
+    .unopened:hover {
+        background-color: #bcd5c0; 
+    }

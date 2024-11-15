@@ -11,7 +11,7 @@ namespace KartverketWebApp.Data
         public string Tittel { get; set; }
         public string Beskrivelse { get; set; }
         public int Koordsys { get; set; }
-        public int SteddataId { get; set; } // Foreign key til Steddata
+        public int? SteddataId { get; set; } // Foreign key til Steddata
         public string MapType { get; set; }
         public string RapportType { get; set; }
 

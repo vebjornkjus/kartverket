@@ -110,18 +110,46 @@
     div4.classList.remove('btn_map');
         div4.classList.add('btn_map_transform');
 
-    // Skjul verktøylinje
-    const drawToolbar = document.querySelector('.leaflet-draw-toolbar');
-    if (drawToolbar) {
-        drawToolbar.style.display = 'none';
+        // Remove the Leaflet draw control completely from the map
+        if (drawControl) {
+            map.removeControl(drawControl);  // This will also remove the "edit" and "trash" buttons
+        }
+
+        // Skjul soke_background (Hide the background element with class 'soke_background')
+        // Skjul soke_background (Hide the background element with id 'soke_background')
+        const sokeBackground = document.getElementById('sok_background');
+        if (sokeBackground) {
+            sokeBackground.style.display = 'none';
+        }
     }
-}
+
+
+    function TrackerFerdig() {
+        // Remove the class 'btn_map_transform' and add 'btn_map'
+        div4.classList.remove('btn_map_transform');
+        div4.classList.add('btn_map');
+
+        // Set the 'lokasjonVerktoy' to hidden
+        var lokasjonVerktoy = document.getElementById("lokasjonVerktoyVisable");
+        if (lokasjonVerktoy) {
+            lokasjonVerktoy.id = "lokasjonVerktoyHidden";
+            lokasjonVerktoy.style.backgroundColor = ""; // Tilbakestill bakgrunnsfargen
+        }
+
+        // Remove the Leaflet draw control completely from the map
+        if (drawControl) {
+            map.removeControl(drawControl);  // This will also remove the "edit" and "trash" buttons
+        }
+
+    }
+
 function toggleButtonClass() {
     div4.classList.remove('btn_map_transform');
     div4.classList.add('btn_map');
 }
 
 function toggleButtonClassRemove() {
+    // Remove the 'btn_map' class and add the 'btn_map_transform' class
     div4.classList.remove('btn_map');
     div4.classList.add('btn_map_transform');
 }
@@ -176,7 +204,7 @@ function toggleButtonClassRemove() {
         </div>
         <div id="lokasjonNede">
             <button id="avbryt"><i class="fa-solid fa-trash"></i> Avbryt</button>
-            <button id="ferdig"><i class="fa-solid fa-check"></i> Ferdig</button>
+            <button id="ferdig" onclick="TrackerFerdig()"><i class="fa-solid fa-check"></i> Ferdig</button>
         </div>
     </div>
     `; // Legg til knapper med riktig syntaks
@@ -247,6 +275,7 @@ function toggleButtonClassRemove() {
                 lonInput.classList.add("coordinate-input");
 
                 document.getElementById("form_id").appendChild(latInput);
+                document.getElementById("form_id").appendChild(lonInput);
             });
 
             console.log("Alle koordinater lagt til så langt:", coordinatesList);

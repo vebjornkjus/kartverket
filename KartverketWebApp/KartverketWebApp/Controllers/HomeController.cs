@@ -39,7 +39,7 @@ namespace KartverketWebApp.Controllers
 
         public IActionResult TakkRapport()
         {
-            return View();
+            return View("~/Views/Home/Innsender/TakkRapport.cshtml");
         }
 
         public IActionResult Innlogging()
@@ -63,71 +63,100 @@ namespace KartverketWebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
-        {
-            // Return the Index view, no model passed
-            return View();
-        }
         [HttpPost]
         public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater)
         {
             _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
-            if (koordinater != null)
+            if (koordinater == null || !koordinater.Any())
             {
-                foreach (var koord in koordinater)
-                {
-                    _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Koordinater list is null.");
+                _logger.LogWarning("Koordinater list is null or empty.");
+                return View("Index");
             }
 
             if (ModelState.IsValid)
             {
-                // Add the Kart to the database
+                // Fetch Stednavn data using the first coordinate
+                var firstKoord = koordinater.First();
+                Steddata steddata = null;
+                try
+                {
+                    // Call the service to get Stednavn data
+                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
+
+                    if (stednavnResponse != null)
+                    {
+                        // Parse Fylkesnummer and Kommunenummer
+                        int fylkesnummer = 0;
+                        if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
+                        {
+                            int.TryParse(stednavnResponse.Fylkesnummer, out fylkesnummer);
+                        }
+
+                        int kommunenummer = 0;
+                        if (!string.IsNullOrEmpty(stednavnResponse.Kommunenummer))
+                        {
+                            int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
+                        }
+
+                        // Create and save Steddata first
+                        steddata = new Steddata
+                        {
+                            Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
+                            Kommunenavn = stednavnResponse.Kommunenavn ?? "N/A",
+                            Fylkenummer = fylkesnummer,
+                            Kommunenummer = kommunenummer
+                        };
+
+                        _context.Steddata.Add(steddata);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
+                    // Handle exceptions as needed
+                }
+
+                // Now create and save the Kart with SteddataId
                 var newKart = new Kart
                 {
                     Koordsys = koordsys,
                     Tittel = tittel,
                     Beskrivelse = beskrivelse,
                     MapType = mapType,
-                    RapportType = rapportType
+                    RapportType = rapportType,
+                    SteddataId = steddata?.Id, // This can be null if Steddata is null
                 };
 
                 _context.Kart.Add(newKart);
                 await _context.SaveChangesAsync();
 
+                // Add Koordinater to the database
                 var newKoordinater = koordinater.Select((koord, index) => new Koordinater
                 {
                     KartEndringId = newKart.KartEndringId,
                     Nord = koord.Nord,
                     Ost = koord.Ost,
-                    Rekkefolge = index + 1  // Order in sequence
+                    Rekkefolge = index + 1
                 }).ToList();
-
-                _logger.LogInformation("Received coordinates:");
-                foreach (var koord in koordinater)
-                {
-                    _logger.LogInformation($"Nord: {koord.Nord}, Ost: {koord.Ost}");
-                }
 
                 _context.Koordinater.AddRange(newKoordinater);
                 await _context.SaveChangesAsync();
 
+                // Add the Rapport to the database
                 var newRapport = new Rapport
                 {
                     RapportStatus = "Uåpnet",
                     Opprettet = DateTime.Now,
-                    KartEndringId = newKart.KartEndringId, // Associate the newRapport with the newKart
-                    PersonId = 1 //Setter person id som 1 MIDLERTIDIG
+                    KartEndringId = newKart.KartEndringId,
+                    PersonId = 1, // Temporary placeholder
+                    TildelAnsattId = 1
                 };
 
                 _context.Rapport.Add(newRapport);
                 await _context.SaveChangesAsync();
 
-                // Redirect to the TakkRapport action to display the updated list
+                // Redirect to the TakkRapport action
                 return RedirectToAction("TakkRapport");
             }
 
@@ -143,23 +172,37 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
-        public async Task<IActionResult> Saksbehandler()
+        public async Task<IActionResult> Saksbehandler(int page = 1, int pageSize = 10)
         {
-            var rapporter = await _context.Rapport
+            // Calculate the total number of reports for pagination
+            var totalReports = await _context.Rapport.CountAsync();
+
+            // Fetch paginated data
+            var paginatedReports = await _context.Rapport
                 .Include(r => r.Person)
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Steddata) // Include Steddata directly with Kart
+                .OrderByDescending(r => r.Opprettet) // Optional: Sort by creation date or another relevant field
+                .Skip((page - 1) * pageSize) // Skip rows for previous pages
+                .Take(pageSize) // Take rows for the current page
                 .ToListAsync();
 
+            // Create CombinedViewModel with paginated data
             var combinedViewModel = new CombinedViewModel
             {
-                Rapporter = rapporter
+                Rapporter = paginatedReports
             };
+
+            // Add pagination metadata
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalReports / (double)pageSize);
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> RapportDetaljert(int id)
@@ -321,6 +364,32 @@ namespace KartverketWebApp.Controllers
                 _logger.LogError(ex, "Error parsing JSON for kommune: {kommunenummer}", kommunenummer);
                 return BadRequest("Invalid JSON format.");
             }
+        }
+
+        public PartialViewResult Oversikt()
+        {
+            return PartialView("_Oversikt");
+        }
+
+        public PartialViewResult MineRapporter()
+        {
+            return PartialView("_MineRapporter");
+        }
+
+
+        public PartialViewResult Varslinger()
+        {
+            return PartialView("_Oversikt");
+        }
+
+        public PartialViewResult Meldinger()
+        {
+            return PartialView("_Oversikt");
+        }
+        
+        public PartialViewResult TidligereRapporter()
+        {
+            return PartialView("_Oversikt");
         }
 
 

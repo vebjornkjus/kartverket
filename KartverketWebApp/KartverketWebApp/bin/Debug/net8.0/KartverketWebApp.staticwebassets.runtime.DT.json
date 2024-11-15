@@ -124,6 +124,14 @@
       },
       "js": {
         "Children": {
+          "Saksbehandler.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/Saksbehandler.js"
+            },
+            "Patterns": null
+          },
           "site.js": {
             "Children": null,
             "Asset": {
