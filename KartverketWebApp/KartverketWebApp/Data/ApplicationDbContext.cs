@@ -91,16 +91,16 @@ namespace KartverketWebApp.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Steddata>().HasData(
-                new { Id = 1, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 301 },
-                new { Id = 2, Fylkenavn = "Vestland", Kommunenavn = "Bergen", Fylkenummer = 14, Kommunenummer = 1403 },
-                new { Id = 3, Fylkenavn = "Trøndelag", Kommunenavn = "Trondheim", Fylkenummer = 16, Kommunenummer = 1601 },
-                new { Id = 4, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4201 },
-                new { Id = 5, Fylkenavn = "Innlandet", Kommunenavn = "Vågåmo", Fylkenummer = 34, Kommunenummer = 3405 },
-                new { Id = 6, Fylkenavn = "Troms og Finnmark", Kommunenavn = "Tromsø", Fylkenummer = 54, Kommunenummer = 5401 },
-                new { Id = 7, Fylkenavn = "Nordland", Kommunenavn = "Lofoten", Fylkenummer = 18, Kommunenummer = 1802 },
-                new { Id = 8, Fylkenavn = "Oslo", Kommunenavn = "Oslo East", Fylkenummer = 3, Kommunenummer = 301 },
-                new { Id = 9, Fylkenavn = "Finnmark", Kommunenavn = "Kirkenes", Fylkenummer = 54, Kommunenummer = 5403 },
-                new { Id = 10, Fylkenavn = "Vestfold og Telemark", Kommunenavn = "Skien", Fylkenummer = 38, Kommunenummer = 3801 }
+                new { Id = 1, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 0301 },
+                new { Id = 2, Fylkenavn = "Vestland", Kommunenavn = "Bergen", Fylkenummer = 46, Kommunenummer = 4601 },
+                new { Id = 3, Fylkenavn = "Trøndelag", Kommunenavn = "Trondheim", Fylkenummer = 50, Kommunenummer = 5001 },
+                new { Id = 4, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
+                new { Id = 5, Fylkenavn = "Innlandet", Kommunenavn = "Vågå", Fylkenummer = 34, Kommunenummer = 3435 },
+                new { Id = 6, Fylkenavn = "Troms og Finnmark", Kommunenavn = "Tromsø", Fylkenummer = 55, Kommunenummer = 5401 },
+                new { Id = 7, Fylkenavn = "Nordland", Kommunenavn = "Bodø", Fylkenummer = 18, Kommunenummer = 1804 },
+                new { Id = 8, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 0301 },
+                new { Id = 9, Fylkenavn = "Finnmark", Kommunenavn = "Vadsø", Fylkenummer = 56, Kommunenummer = 5405 },
+                new { Id = 10, Fylkenavn = "Vestfold og Telemark", Kommunenavn = "Skien", Fylkenummer = 40, Kommunenummer = 3807 }
             );
 
             // Insert data into Bruker
@@ -159,17 +159,17 @@ namespace KartverketWebApp.Data
 
             // Insert data into Ansatt
             modelBuilder.Entity<Ansatt>().HasData(
-                new { AnsattId = 1, PersonId = 12, Kommunenummer = 4201, AnsettelsesDato = DateTime.Parse("2023-05-15") },
-                new { AnsattId = 2, PersonId = 14, Kommunenummer = 301, AnsettelsesDato = DateTime.Parse("2024-01-15") },
-                new { AnsattId = 3, PersonId = 15, Kommunenummer = 1403, AnsettelsesDato = DateTime.Parse("2024-02-20") },
+                new { AnsattId = 1, PersonId = 12, Kommunenummer = 0000, AnsettelsesDato = DateTime.Parse("2023-05-15") },
+                new { AnsattId = 2, PersonId = 14, Kommunenummer = 0301, AnsettelsesDato = DateTime.Parse("2024-01-15") },
+                new { AnsattId = 3, PersonId = 15, Kommunenummer = 4601, AnsettelsesDato = DateTime.Parse("2024-02-20") },
                 new { AnsattId = 4, PersonId = 16, Kommunenummer = 1101, AnsettelsesDato = DateTime.Parse("2024-03-10") },
-                new { AnsattId = 5, PersonId = 17, Kommunenummer = 1601, AnsettelsesDato = DateTime.Parse("2024-04-05") },
-                new { AnsattId = 6, PersonId = 18, Kommunenummer = 3001, AnsettelsesDato = DateTime.Parse("2024-05-12") },
-                new { AnsattId = 7, PersonId = 19, Kommunenummer = 3012, AnsettelsesDato = DateTime.Parse("2024-06-18") },
-                new { AnsattId = 8, PersonId = 20, Kommunenummer = 4201, AnsettelsesDato = DateTime.Parse("2024-07-25") },
-                new { AnsattId = 9, PersonId = 21, Kommunenummer = 1103, AnsettelsesDato = DateTime.Parse("2024-08-30") },
+                new { AnsattId = 5, PersonId = 17, Kommunenummer = 5001, AnsettelsesDato = DateTime.Parse("2024-04-05") },
+                new { AnsattId = 6, PersonId = 18, Kommunenummer = 3005, AnsettelsesDato = DateTime.Parse("2024-05-12") },
+                new { AnsattId = 7, PersonId = 19, Kommunenummer = 3004, AnsettelsesDato = DateTime.Parse("2024-06-18") },
+                new { AnsattId = 8, PersonId = 20, Kommunenummer = 4204, AnsettelsesDato = DateTime.Parse("2024-07-25") },
+                new { AnsattId = 9, PersonId = 21, Kommunenummer = 1108, AnsettelsesDato = DateTime.Parse("2024-08-30") },
                 new { AnsattId = 10, PersonId = 22, Kommunenummer = 5401, AnsettelsesDato = DateTime.Parse("2024-09-14") },
-                new { AnsattId = 11, PersonId = 23, Kommunenummer = 1801, AnsettelsesDato = DateTime.Parse("2024-10-22") }
+                new { AnsattId = 11, PersonId = 23, Kommunenummer = 1804, AnsettelsesDato = DateTime.Parse("2024-10-22") }
             );
 
             modelBuilder.Entity<Kart>().HasData(

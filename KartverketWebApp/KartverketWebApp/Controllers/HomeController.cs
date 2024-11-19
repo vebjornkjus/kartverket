@@ -12,6 +12,8 @@ using KartverketWebApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static KartverketWebApp.Models.PositionModel;
+using System.Text.Json.Serialization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KartverketWebApp.Controllers
 {
@@ -75,17 +77,14 @@ namespace KartverketWebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                // Fetch Stednavn data using the first coordinate
                 var firstKoord = koordinater.First();
                 Steddata steddata = null;
                 try
                 {
-                    // Call the service to get Stednavn data
                     var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
 
                     if (stednavnResponse != null)
                     {
-                        // Parse Fylkesnummer and Kommunenummer
                         int fylkesnummer = 0;
                         if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
                         {
@@ -98,7 +97,6 @@ namespace KartverketWebApp.Controllers
                             int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
                         }
 
-                        // Create and save Steddata first
                         steddata = new Steddata
                         {
                             Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
@@ -114,10 +112,8 @@ namespace KartverketWebApp.Controllers
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
-                    // Handle exceptions as needed
                 }
 
-                // Now create and save the Kart with SteddataId
                 var newKart = new Kart
                 {
                     Koordsys = koordsys,
@@ -125,13 +121,12 @@ namespace KartverketWebApp.Controllers
                     Beskrivelse = beskrivelse,
                     MapType = mapType,
                     RapportType = rapportType,
-                    SteddataId = steddata?.Id, // This can be null if Steddata is null
+                    SteddataId = steddata?.Id
                 };
 
                 _context.Kart.Add(newKart);
                 await _context.SaveChangesAsync();
 
-                // Add Koordinater to the database
                 var newKoordinater = koordinater.Select((koord, index) => new Koordinater
                 {
                     KartEndringId = newKart.KartEndringId,
@@ -143,24 +138,24 @@ namespace KartverketWebApp.Controllers
                 _context.Koordinater.AddRange(newKoordinater);
                 await _context.SaveChangesAsync();
 
-                // Add the Rapport to the database
+                // Determine TildelAnsattId
+                var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
+
                 var newRapport = new Rapport
                 {
                     RapportStatus = "Uåpnet",
                     Opprettet = DateTime.Now,
                     KartEndringId = newKart.KartEndringId,
                     PersonId = 1, // Temporary placeholder
-                    TildelAnsattId = 1
+                    TildelAnsattId = tildelAnsattId
                 };
 
                 _context.Rapport.Add(newRapport);
                 await _context.SaveChangesAsync();
 
-                // Redirect to the TakkRapport action
                 return RedirectToAction("TakkRapport");
             }
 
-            // Log ModelState errors here before returning the view
             foreach (var modelState in ModelState.Values)
             {
                 foreach (var error in modelState.Errors)
@@ -172,35 +167,109 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
+
+        private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)
+        {
+            // Log the incoming kommunenummer
+            _logger.LogInformation($"Finding Ansatt for Kommunenummer: {kommunenummer}");
+
+            // Check for a match in Ansatt by Kommunenummer
+            var matchingAnsatt = await _context.Ansatt
+                .Where(a => a.Kommunenummer == kommunenummer)
+                .OrderBy(a => _context.Rapport.Count(r => r.TildelAnsattId == a.AnsattId))
+                .ThenBy(a => a.AnsattId)
+                .FirstOrDefaultAsync();
+
+            if (matchingAnsatt != null)
+            {
+                // Log the Ansatt details
+                _logger.LogInformation($"Assigned to AnsattId: {matchingAnsatt.AnsattId}, Kommunenummer: {matchingAnsatt.Kommunenummer}");
+                return matchingAnsatt.AnsattId;
+            }
+
+            // Log the fallback to AnsattId = 1
+            _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
+            return 1; // Default AnsattId
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> Saksbehandler(int page = 1, int pageSize = 10)
         {
-            // Calculate the total number of reports for pagination
-            var totalReports = await _context.Rapport.CountAsync();
+            var ansattId = 8; // Replace with your logic for fetching Ansatt ID
 
-            // Fetch paginated data
-            var paginatedReports = await _context.Rapport
-                .Include(r => r.Person)
+            // Get the Ansatt to fetch the corresponding kommunenummer
+            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.AnsattId == ansattId);
+            if (ansatt == null || string.IsNullOrEmpty(ansatt.Kommunenummer.ToString()))
+            {
+                _logger.LogWarning($"No valid Ansatt or Kommunenummer found for Ansatt ID: {ansattId}");
+                return NotFound("Ansatt or Kommunenummer not found.");
+            }
+
+            // Fetch polygon data from API based on kommunenummer
+            string polygonCoordinates = null;
+            try
+            {
+                var polygonResponse = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{ansatt.Kommunenummer}/omrade");
+                polygonResponse.EnsureSuccessStatusCode();
+
+                var content = await polygonResponse.Content.ReadAsStringAsync();
+
+                // Parse polygon coordinates from the API response
+                var jsonDoc = JsonDocument.Parse(content);
+                if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
+                    omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
+                {
+                    polygonCoordinates = coordinatesElement.GetRawText();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
+            }
+
+            // Fetch reports assigned to the Ansatt
+            var reports = await _context.Rapport
+                .Where(r => r.TildelAnsattId == ansattId)
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
-                .Include(r => r.Kart)
-                    .ThenInclude(k => k.Steddata) // Include Steddata directly with Kart
-                .OrderByDescending(r => r.Opprettet) // Optional: Sort by creation date or another relevant field
-                .Skip((page - 1) * pageSize) // Skip rows for previous pages
-                .Take(pageSize) // Take rows for the current page
+                .OrderByDescending(r => r.Opprettet)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            // Create CombinedViewModel with paginated data
-            var combinedViewModel = new CombinedViewModel
-            {
-                Rapporter = paginatedReports
-            };
+            // Extract markers from the reports
+            var markers = reports
+                .Where(r => r.Kart != null && r.Kart.Koordinater.Any())
+                .Select(r => new
+                {
+                    RapportId = r.RapportId,
+                    Nord = r.Kart.Koordinater.First().Nord, // First coordinate for marker
+                    Ost = r.Kart.Koordinater.First().Ost,
+                    Tittel = r.Kart.Tittel
+                }).ToList();
 
-            // Add pagination metadata
+            // Serialize data to ViewBag
+            ViewBag.MarkersJson = JsonSerializer.Serialize(markers);
+            ViewBag.PolygonJson = polygonCoordinates;
+
+            // Set pagination data
+            var totalReports = await _context.Rapport.CountAsync(r => r.TildelAnsattId == ansattId);
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalReports / (double)pageSize);
 
+            // Prepare CombinedViewModel
+            var combinedViewModel = new CombinedViewModel
+            {
+                Rapporter = reports
+            };
+
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
+
+
+
+
 
 
 

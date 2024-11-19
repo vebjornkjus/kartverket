@@ -1,41 +1,54 @@
 ﻿@model KartverketWebApp.Models.CombinedViewModel
 <link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
 
+<script>
+    // Pass serialized JSON from the backend to JavaScript
+    window.coordinatesJson = '@Html.Raw(ViewBag.PolygonJson ?? "[]")'; // Pass polygon coordinates
+    window.markersJson = '@Html.Raw(ViewBag.MarkersJson ?? "[]")'; // Pass markers
+</script>
 
 <div class="nav-beside">
     <div class="beside-topp">
-        <p>Monday</p>    
+        <h1 id="hei">Hei, Ola</h1>
+        <p id="date-container"></p>
+        <script>
+            // Function to display date and weekday
+            function displayDateAndWeekday() {
+                const container = document.getElementById("date-container");
+                const now = new Date();
+                const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                container.textContent = now.toLocaleDateString("en-US", options);
+            }
+            displayDateAndWeekday();
+        </script>
     </div>
-        <div class="beside-main">
-            <div class="main-container">
-            
-            
+    <div class="beside-main">
+        <div class="main-container">
             <div class="overview-left">
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Kart Tittel</th>
-                            <th>Kart</th>
-                            <th>Opprettet</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var rapport in Model.Rapporter)
-                        {
-                            var rowClass = !string.IsNullOrEmpty(rapport?.RapportStatus) && rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "";
-                            var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
-
-
-                            <tr class="@rowClass" onclick="location.href='@url'" style="cursor:pointer">
-                                <td>@rapport.Kart?.Tittel</td>
-                                <td>@rapport.Kart?.MapType</td>
-                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Kart Tittel</th>
+                                <th>Kart</th>
+                                <th>Opprettet</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach (var rapport in Model.Rapporter)
+                            {
+                                var rowClass = !string.IsNullOrEmpty(rapport?.RapportStatus) && rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "";
+                                var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
+
+                                <tr class="@rowClass" onclick="location.href='@url'" style="cursor:pointer">
+                                    <td>@rapport.Kart?.Tittel</td>
+                                    <td>@rapport.Kart?.MapType</td>
+                                    <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- Pagination Controls -->
                 <nav aria-label="Page navigation">
@@ -68,25 +81,9 @@
                     <div class="data-left"></div>
                     <div class="data-right"></div>
                 </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
-<script>
-    // Create the map instance
-    const map = L.map('map').setView([59.9139, 10.7522], 13); // Coordinates for Oslo
-
-    // Add a tile layer (map background)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // Add a marker to the map
-    const marker = L.marker([59.9139, 10.7522]).addTo(map);
-    marker.bindPopup("<b>Hello!</b><br>This is Oslo.").openPopup();
-
-</script>
-
+<script src="~/js/Overview.js"></script>
