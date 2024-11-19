@@ -8,8 +8,9 @@ a.navbar-brand {
 }
 
 .kartverket_logo {
-    height: 47px;
-
+    max-height: 47px; /* Maintain a maximum height without forcing it */
+    width: auto; /* Automatically adjusts width to maintain aspect ratio */
+    object-fit: contain; /* Prevent distortion */
 }
 
 .nav-stedholder {

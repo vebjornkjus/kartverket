@@ -27,7 +27,8 @@
 <header>
     <div class="nav-stedholder"> 
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-            <img src="images/standard_kartverket.png" class="kartverket_logo"/>
+                <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
+
         </a>
         <div id="saksbehandler">
                 <a asp-action="Saksbehandler" asp-controller="Home">

@@ -1,8 +1,10 @@
-﻿body {
+﻿/* General Styles */
+body {
     background-color: white;
     height: 100vh;
 }
 
+/* Main Container */
 .saksbehandlerMain {
     position: absolute;
     display: flex;
@@ -24,7 +26,7 @@
     border-radius: 11px;
 }
 
-
+/* Navigation Section */
 .saksbehandlerNavigering {
     flex: 1;
     display: flex;
@@ -37,94 +39,85 @@
     background-color: #f6f7f9;
     border-radius: 11px;
 }
+
 .innlogetBruker {
     flex: 1;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
     padding: 10px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    background-color: #ffffff; /* White background for contrast */
-    border-radius: 11px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    margin-bottom: 20px; /* Space below the section */
+    gap: 10px;
 }
 
 .brukerIkon {
     background-color: dimgray;
     border-radius: 50%;
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 20px; /* Adjust the font size for the icon */
-    margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .brukerinfo {
-    text-align: center; /* Center-align the text */
-    color: #333; /* Darker text for better readability */
+    text-align: left;
+    color: #333;
 }
 
     .brukerinfo p {
-        margin: 5px 0; /* Add space between text lines */
-        font-size: 14px; /* Adjust font size */
+        margin: 3px 0;
+        font-size: 12px;
     }
 
         .brukerinfo p:first-child {
-            font-weight: bold; /* Highlight the name */
-            font-size: 16px;
+            font-weight: bold;
+            font-size: 14px;
         }
 
-
+/* Overview Area */
 #overviewOmrade {
     flex: 4;
     height: 97%;
     margin-right: 1.5vh;
-    background-color: #ffffff;
-    border-radius: 11px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Styling for the vertical navigation */
+/* Vertical Navigation */
 .vertical-nav {
-    flex: 5 ;
+    flex: 6;
     width: 100%;
+    padding-top: 1.5vh;
+    padding-bottom: 1.5vh;
     position: relative;
 }
 
     .vertical-nav ul {
-        list-style-type: none; 
+        list-style-type: none;
         padding: 0;
         margin: 0;
     }
 
-    .vertical-nav li {
-
+    .vertical-nav li a {
+        display: block;
+        color: #333;
+        padding: 15px 20px;
+        text-decoration: none;
+        font-size: 16px;
     }
 
-        .vertical-nav li a {
-            display: block;
-            color: #333;
-            padding: 15px 20px;
-            text-decoration: none;
-            font-size: 16px;
+        .vertical-nav li a:hover {
+            background-color: #e0e0e0;
+            color: #000;
         }
-
-            .vertical-nav li a:hover {
-                background-color: #e0e0e0; 
-                color: #000;
-            }
 
 .nav-item.active {
     background-color: white;
     width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
 }
 
@@ -133,94 +126,131 @@
     }
 
 .tab-content {
-    display: none; /* Hide all sections by default */
+    display: none;
 }
 
     .tab-content.active {
-        display: block; /* Show the active section */
+        display: block;
     }
 
-
-
-        .center-container {
+/* Main Content Area */
+.nav-beside {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
     width: 100%;
-    height: 86.41vh;
+    background-color: #f6f7f9;
 }
 
-.main_rapport {
-    display: flex;
-    width: 90vw;
-    justify-content: space-between; 
-    align-items: stretch;
-    gap: 3vw;
-    margin-bottom: 3vh; 
-}
-
-.info {
+.beside-topp {
     flex: 1;
-    background-color: #D0ECD6;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.beside-main {
+    flex: 6;
+    width: 100%;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling if not needed */
+}
+
+.main-container {
+    display: flex;
+    gap: 1.5vh;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-top: 1.5vh;
+    padding-bottom: 1.5vh;
+    min-height: 100%; /* Ensure it fills the viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    width: 100%;
+}
+
+/* Table Section */
+.overview-left {
+    flex: 1;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 11px;
     padding: 20px;
+    height: 100vh;
 }
 
-.rapport_map {
+.table-container {
     flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 100%; /* Begrenser høyden til foreldreelementet */
+    width: 100%; /* Sørger for at bredden holder seg innenfor */
+    box-sizing: border-box; /* Tar padding med i størrelseberegningen */
+}
+
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+    .table th,
+    .table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .table th {
+        background-color: #f5f5f5;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+/* Pagination */
+.pagination {
+    justify-content: center;
+    margin-top: 10px;
+}
+
+    .pagination .page-link {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+
+#map {
+    height: 100%;
     background-color: #e0e0e0;
     border-radius: 11px;
-    overflow: hidden;
 }
 
-.info-bottom-container {
-    display: flex;
-    width: 90vw;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 3vw;
-    flex-wrap: wrap;
-    margin-bottom: 3vh; 
-}
-
-.info-bottom {
-    flex: 1;
-    background-color: #D0ECD6;
-    border-radius: 11px;
-    padding: 20px;
-    min-width: 250px; 
-    margin-bottom: 3vh; 
-}
-
-@media (max-width: 768px) {
-    .main_rapport, .info-bottom-container {
-        flex-direction: column;
-    }
-
-    .info, .rapport_map, .info-bottom {
-        width: 100%;
-    }
-}
-
+/* Scrollbar Styling */
 .koordinater-scrollable {
     max-height: calc(3 * 65px);
     overflow-y: auto;
 }
 
-  
     .koordinater-scrollable::-webkit-scrollbar {
         width: 8px;
     }
 
     .koordinater-scrollable::-webkit-scrollbar-track {
-        background: #bcd5c0; 
-        border-radius: 4px; 
+        background: #bcd5c0;
+        border-radius: 4px;
     }
 
     .koordinater-scrollable::-webkit-scrollbar-thumb {
         background-color: #353a40;
-        border-radius: 4px; 
-        border: 2px solid #bcd5c0; 
+        border-radius: 4px;
+        border: 2px solid #bcd5c0;
     }
 
         .koordinater-scrollable::-webkit-scrollbar-thumb:hover {
@@ -230,16 +260,54 @@
 /* For Firefox */
 .koordinater-scrollable {
     scrollbar-width: thin;
-    scrollbar-color: #353a40 #bcd5c0; 
+    scrollbar-color: #353a40 #bcd5c0;
 }
 
-
+/* Row Styling */
 .unopened {
-    background-color: #d0ecd6; 
-    font-weight: bold; 
+    background-color: #d0ecd6;
+    font-weight: bold;
 }
-
 
     .unopened:hover {
-        background-color: #bcd5c0; 
+        background-color: #bcd5c0;
     }
+
+.tab-content active{
+    height: 100%;
+}
+
+.overview-right {
+    flex: 1; /* Proportional space in its parent */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    gap: 1.5vh; /* Space between children */
+    width: 100%; /* Full width of parent */
+    min-height: 100vh;
+    box-sizing: border-box; /* Include padding in size calculations */
+}
+
+.map {
+    flex: 2; /* Occupy 2/3 of the height */
+    width: 100%; /* Full width of parent */
+    height: 0; /* Allow flexbox to control height */
+    background-color: white;
+    border-radius: 11px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-container {
+    flex: 1; /* Occupy 1/3 of the height */
+    display: flex; /* Allows flex children within, if necessary */
+    width: 100%; /* Full width of parent */
+    height: 0; /* Allow flexbox to control height */
+    background-color: white;
+    border-radius: 11px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#oversikt {
+    height: 100%;
+}

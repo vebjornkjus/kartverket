@@ -543,6 +543,11 @@ body {
     color: black;
     border-radius: 50%;
 }
+.kartverket_logo {
+    max-height: 47px; /* Maintain a maximum height without forcing it */
+    width: auto; /* Automatically adjusts width to maintain aspect ratio */
+    object-fit: contain; /* Prevent distortion */
+}
 
 
 
