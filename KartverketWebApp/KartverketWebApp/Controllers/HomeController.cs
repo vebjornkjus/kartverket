@@ -146,6 +146,18 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
         }
 
+                // Determine TildelAnsattId
+                var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
+
+                var newRapport = new Rapport
+                {
+                    RapportStatus = "U�pnet",
+                    Opprettet = DateTime.Now,
+                    KartEndringId = newKart.KartEndringId,
+                    PersonId = 1, // Temporary placeholder
+                    TildelAnsattId = tildelAnsattId
+                };
+
         var newKart = new Kart
         {
             Koordsys = koordsys,
