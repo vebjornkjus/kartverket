@@ -65,7 +65,7 @@
     </div>
     <div class="form_area">
         <div class="form_container">
-            <form asp-action="Index" method="post" id="form_id">
+            <form asp-action="Index" method="post" id="form_id" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <table id="form_table">
                     <tr>
@@ -104,7 +104,14 @@
                                 <textarea id="description" name="beskrivelse" class="form-control"></textarea>
                             </div>
                         </td>
-
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form_file_upload">
+                                <label for="fileUpload">Last opp fil:</label><br />
+                                <input type="file" id="fileUpload" name="file" accept="image/*" />
+                            </div>
+                        </td>
                     </tr>
                 </table>
 

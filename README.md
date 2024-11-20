@@ -47,6 +47,7 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth√
 
 - **Arkitektur**: MVC (Model-View-Controller)
 - **Database**: MariaDB
+- **Visualisert database**: https://drive.google.com/file/d/138KNbuhLaRDdX2dy3fIppUxjwNX8oaid/view?usp=sharing 
 - **Hovedklasser**:
   - `Rapport`
   - `Steddata`
