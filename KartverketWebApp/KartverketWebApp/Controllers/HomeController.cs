@@ -66,106 +66,130 @@ namespace KartverketWebApp.Controllers
 
         [HttpGet]
         [HttpPost]
-        public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater)
+        [HttpPost]
+public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile file)
+{
+    _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
+    if (koordinater == null || !koordinater.Any())
+    {
+        _logger.LogWarning("Koordinater list is null or empty.");
+        return View("Index");
+    }
+
+    if (ModelState.IsValid)
+    {
+        string filePath = null;
+
+        // Håndter filopplasting
+        if (file != null && file.Length > 0)
         {
-            _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
-            if (koordinater == null || !koordinater.Any())
+            try
             {
-                _logger.LogWarning("Koordinater list is null or empty.");
-                return View("Index");
-            }
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                filePath = Path.Combine("uploads", uniqueFileName);
+                var serverFilePath = Path.Combine("wwwroot", filePath);
 
-            if (ModelState.IsValid)
-            {
-                var firstKoord = koordinater.First();
-                Steddata steddata = null;
-                try
+                using (var stream = new FileStream(serverFilePath, FileMode.Create))
                 {
-                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
-
-                    if (stednavnResponse != null)
-                    {
-                        int fylkesnummer = 0;
-                        if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
-                        {
-                            int.TryParse(stednavnResponse.Fylkesnummer, out fylkesnummer);
-                        }
-
-                        int kommunenummer = 0;
-                        if (!string.IsNullOrEmpty(stednavnResponse.Kommunenummer))
-                        {
-                            int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
-                        }
-
-                        steddata = new Steddata
-                        {
-                            Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
-                            Kommunenavn = stednavnResponse.Kommunenavn ?? "N/A",
-                            Fylkenummer = fylkesnummer,
-                            Kommunenummer = kommunenummer
-                        };
-
-                        _context.Steddata.Add(steddata);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
-                }
-
-                var newKart = new Kart
-                {
-                    Koordsys = koordsys,
-                    Tittel = tittel,
-                    Beskrivelse = beskrivelse,
-                    MapType = mapType,
-                    RapportType = rapportType,
-                    SteddataId = steddata?.Id
-                };
-
-                _context.Kart.Add(newKart);
-                await _context.SaveChangesAsync();
-
-                var newKoordinater = koordinater.Select((koord, index) => new Koordinater
-                {
-                    KartEndringId = newKart.KartEndringId,
-                    Nord = koord.Nord,
-                    Ost = koord.Ost,
-                    Rekkefolge = index + 1
-                }).ToList();
-
-                _context.Koordinater.AddRange(newKoordinater);
-                await _context.SaveChangesAsync();
-
-                // Determine TildelAnsattId
-                var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
-
-                var newRapport = new Rapport
-                {
-                    RapportStatus = "U�pnet",
-                    Opprettet = DateTime.Now,
-                    KartEndringId = newKart.KartEndringId,
-                    PersonId = 1, // Temporary placeholder
-                    TildelAnsattId = tildelAnsattId
-                };
-
-                _context.Rapport.Add(newRapport);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("TakkRapport");
-            }
-
-            foreach (var modelState in ModelState.Values)
-            {
-                foreach (var error in modelState.Errors)
-                {
-                    _logger.LogError(error.ErrorMessage);
+                    await file.CopyToAsync(stream);
                 }
             }
-
-            return View("Index");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while uploading the file.");
+            }
         }
+
+        var firstKoord = koordinater.First();
+        Steddata steddata = null;
+        try
+        {
+            var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
+
+            if (stednavnResponse != null)
+            {
+                int fylkesnummer = 0;
+                if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
+                {
+                    int.TryParse(stednavnResponse.Fylkesnummer, out fylkesnummer);
+                }
+
+                int kommunenummer = 0;
+                if (!string.IsNullOrEmpty(stednavnResponse.Kommunenummer))
+                {
+                    int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
+                }
+
+                steddata = new Steddata
+                {
+                    Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
+                    Kommunenavn = stednavnResponse.Kommunenavn ?? "N/A",
+                    Fylkenummer = fylkesnummer,
+                    Kommunenummer = kommunenummer
+                };
+
+                _context.Steddata.Add(steddata);
+                await _context.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
+        }
+
+        var newKart = new Kart
+        {
+            Koordsys = koordsys,
+            Tittel = tittel,
+            Beskrivelse = beskrivelse,
+            MapType = mapType,
+            RapportType = rapportType,
+            SteddataId = steddata?.Id,
+            FilePath = filePath // Legger til filsti
+        };
+
+        _context.Kart.Add(newKart);
+        await _context.SaveChangesAsync();
+
+        var newKoordinater = koordinater.Select((koord, index) => new Koordinater
+        {
+            KartEndringId = newKart.KartEndringId,
+            Nord = koord.Nord,
+            Ost = koord.Ost,
+            Rekkefolge = index + 1
+        }).ToList();
+
+        _context.Koordinater.AddRange(newKoordinater);
+        await _context.SaveChangesAsync();
+
+        var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
+
+        var newRapport = new Rapport
+        {
+            RapportStatus = "Uåpnet",
+            Opprettet = DateTime.Now,
+            KartEndringId = newKart.KartEndringId,
+            PersonId = 1, // Temporary placeholder
+            TildelAnsattId = tildelAnsattId,
+            
+        };
+
+        _context.Rapport.Add(newRapport);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("TakkRapport");
+    }
+
+    foreach (var modelState in ModelState.Values)
+    {
+        foreach (var error in modelState.Errors)
+        {
+            _logger.LogError(error.ErrorMessage);
+        }
+    }
+
+    return View("Index");
+}
 
 
         private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)

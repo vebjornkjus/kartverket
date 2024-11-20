@@ -21,7 +21,7 @@ namespace KartverketWebApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Sikre at Identity-konfigurasjonen blir kjørt først
+            // Sikre at Identity-konfigurasjonen blir kjï¿½rt fï¿½rst
             base.OnModelCreating(modelBuilder);
 
             // Bruker konfigurasjoner
@@ -60,7 +60,7 @@ namespace KartverketWebApp.Data
             // Ansatt konfigurasjoner
             modelBuilder.Entity<Ansatt>()
                 .HasOne(a => a.Person)
-                .WithMany(p => p.Ansatt) // Legg til ICollection<Ansatt> i Person-klassen hvis nødvendig
+                .WithMany(p => p.Ansatt) // Legg til ICollection<Ansatt> i Person-klassen hvis nï¿½dvendig
                 .HasForeignKey(a => a.PersonId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -93,13 +93,13 @@ namespace KartverketWebApp.Data
             modelBuilder.Entity<Steddata>().HasData(
                 new { Id = 1, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 0301 },
                 new { Id = 2, Fylkenavn = "Vestland", Kommunenavn = "Bergen", Fylkenummer = 46, Kommunenummer = 4601 },
-                new { Id = 3, Fylkenavn = "Trøndelag", Kommunenavn = "Trondheim", Fylkenummer = 50, Kommunenummer = 5001 },
+                new { Id = 3, Fylkenavn = "Trï¿½ndelag", Kommunenavn = "Trondheim", Fylkenummer = 50, Kommunenummer = 5001 },
                 new { Id = 4, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
-                new { Id = 5, Fylkenavn = "Innlandet", Kommunenavn = "Vågå", Fylkenummer = 34, Kommunenummer = 3435 },
-                new { Id = 6, Fylkenavn = "Troms og Finnmark", Kommunenavn = "Tromsø", Fylkenummer = 55, Kommunenummer = 5401 },
-                new { Id = 7, Fylkenavn = "Nordland", Kommunenavn = "Bodø", Fylkenummer = 18, Kommunenummer = 1804 },
+                new { Id = 5, Fylkenavn = "Innlandet", Kommunenavn = "Vï¿½gï¿½", Fylkenummer = 34, Kommunenummer = 3435 },
+                new { Id = 6, Fylkenavn = "Troms og Finnmark", Kommunenavn = "Tromsï¿½", Fylkenummer = 55, Kommunenummer = 5401 },
+                new { Id = 7, Fylkenavn = "Nordland", Kommunenavn = "Bodï¿½", Fylkenummer = 18, Kommunenummer = 1804 },
                 new { Id = 8, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 0301 },
-                new { Id = 9, Fylkenavn = "Finnmark", Kommunenavn = "Vadsø", Fylkenummer = 56, Kommunenummer = 5405 },
+                new { Id = 9, Fylkenavn = "Finnmark", Kommunenavn = "Vadsï¿½", Fylkenummer = 56, Kommunenummer = 5405 },
                 new { Id = 10, Fylkenavn = "Vestfold og Telemark", Kommunenavn = "Skien", Fylkenummer = 40, Kommunenummer = 3807 }
             );
 
@@ -121,13 +121,13 @@ namespace KartverketWebApp.Data
                 new { BrukerId = 14, Email = "OsloOslo@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 15, Email = "VestlandBergen@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 16, Email = "RogalandStavanger@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
-                new { BrukerId = 17, Email = "TrøndelagTrondheim@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
+                new { BrukerId = 17, Email = "Trï¿½ndelagTrondheim@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 18, Email = "VikenDrammen@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 19, Email = "VikenFredrikstad@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 20, Email = "AgderKristiansand@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 21, Email = "RogalandSandnes@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
-                new { BrukerId = 22, Email = "TromsOgFinnmarkTromsø@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
-                new { BrukerId = 23, Email = "NordlandBodø@example.com", Passord = "passord123", BrukerType = "saksbehandler" }
+                new { BrukerId = 22, Email = "TromsOgFinnmarkTromsï¿½@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
+                new { BrukerId = 23, Email = "NordlandBodï¿½@example.com", Passord = "passord123", BrukerType = "saksbehandler" }
             );
 
             // Insert data into Person
@@ -146,15 +146,15 @@ namespace KartverketWebApp.Data
                 new { PersonId = 12, Fornavn = "Saks", Etternavn = "Behandler", BrukerId = 12 },
                 new { PersonId = 13, Fornavn = "Adam", Etternavn = "Minh", BrukerId = 13 },
                 new { PersonId = 14, Fornavn = "Ole", Etternavn = "Oslo", BrukerId = 14 },
-                new { PersonId = 15, Fornavn = "Bjørn", Etternavn = "Bergen", BrukerId = 15 },
+                new { PersonId = 15, Fornavn = "Bjï¿½rn", Etternavn = "Bergen", BrukerId = 15 },
                 new { PersonId = 16, Fornavn = "Siri", Etternavn = "Stavanger", BrukerId = 16 },
                 new { PersonId = 17, Fornavn = "Knut", Etternavn = "Trondheim", BrukerId = 17 },
                 new { PersonId = 18, Fornavn = "Lena", Etternavn = "Drammen", BrukerId = 18 },
                 new { PersonId = 19, Fornavn = "Marta", Etternavn = "Fredrikstad", BrukerId = 19 },
                 new { PersonId = 20, Fornavn = "Nils", Etternavn = "Kristiansand", BrukerId = 20 },
                 new { PersonId = 21, Fornavn = "Eva", Etternavn = "Sandnes", BrukerId = 21 },
-                new { PersonId = 22, Fornavn = "Per", Etternavn = "Tromsø", BrukerId = 22 },
-                new { PersonId = 23, Fornavn = "Ingrid", Etternavn = "Bodø", BrukerId = 23 }
+                new { PersonId = 22, Fornavn = "Per", Etternavn = "Tromsï¿½", BrukerId = 22 },
+                new { PersonId = 23, Fornavn = "Ingrid", Etternavn = "Bodï¿½", BrukerId = 23 }
             );
 
             // Insert data into Ansatt
@@ -172,31 +172,31 @@ namespace KartverketWebApp.Data
                 new { AnsattId = 11, PersonId = 23, Kommunenummer = 1804, AnsettelsesDato = DateTime.Parse("2024-10-22") }
             );
 
-            modelBuilder.Entity<Kart>().HasData(
-                new { KartEndringId = 1, Koordsys = 4258, Tittel = "Veiskade", Beskrivelse = "Hull i veien på hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", MapType = "Norge kart", RapportType = "Veiskade", SteddataId = 1 },
-                new { KartEndringId = 2, Koordsys = 4258, Tittel = "Oversvømt område", Beskrivelse = "Området ved elvebredden har vært oversvømt i flere dager, og vannstanden ser ut til å fortsette å stige.", MapType = "Norge kart", RapportType = "Oversvømmelse", SteddataId = 2 },
-                new { KartEndringId = 3, Koordsys = 4258, Tittel = "Fjellskred", Beskrivelse = "Steinras som blokkerer en viktig sti i fjellområdet, og dette skaper en stor risiko for turgåere og fjellklatrere.", MapType = "Turkart", RapportType = "Skredfare", SteddataId = 3 },
-                new { KartEndringId = 4, Koordsys = 4258, Tittel = "Skadet sti", Beskrivelse = "Stien er kraftig overgrodd med planter, og det er tydelige tegn på erosjon langs hele strekningen.", MapType = "Turkart", RapportType = "Stivedlikehold", SteddataId = 4 },
-                new { KartEndringId = 5, Koordsys = 4258, Tittel = "Båtvrak", Beskrivelse = "Flere gamle båtvrak har samlet seg langs kystlinjen. Dette kan være farlig for mindre båter og svømmere.", MapType = "Sjøkart", RapportType = "Ryddeaksjon", SteddataId = 5 },
-                new { KartEndringId = 6, Koordsys = 4258, Tittel = "Trafikkulykke", Beskrivelse = "Alvorlig trafikkulykke på motorveien med flere kjøretøy involvert. Krever umiddelbar rydding for å unngå kø.", MapType = "Norge kart", RapportType = "Trafikkulykke", SteddataId = 6 },
-                new { KartEndringId = 7, Koordsys = 4258, Tittel = "Snøras", Beskrivelse = "Snøras i fjellområdet som har blokkert veien og kan utgjøre en fare for kommende trafikk.", MapType = "Turkart", RapportType = "Snørasfare", SteddataId = 7 },
-                new { KartEndringId = 8, Koordsys = 4258, Tittel = "Sykkelsti skadet", Beskrivelse = "Sykkelstien har store sprekker og hull som gjør det vanskelig for syklister å bruke den trygt.", MapType = "Norge kart", RapportType = "Sykkelsti reparasjon", SteddataId = 8 },
-                new { KartEndringId = 9, Koordsys = 4258, Tittel = "Båthavn", Beskrivelse = "Båthavnen er overfylt med båter, noe som gjør det vanskelig for nye båter å legge til kai eller parkere.", MapType = "Sjøkart", RapportType = "Overfylte båtplasser", SteddataId = 9 },
-                new { KartEndringId = 10, Koordsys = 4258, Tittel = "Fiskefelt", Beskrivelse = "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for å bevare fiskebestanden.", MapType = "Sjøkart", RapportType = "Fiskeriforvaltning", SteddataId = 10 }
-            );
+modelBuilder.Entity<Kart>().HasData(
+    new { KartEndringId = 1, Koordsys = 4258, Tittel = "Veiskade", Beskrivelse = "Hull i veien pÃ¥ hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", MapType = "Norge kart", RapportType = "Veiskade", SteddataId = 1, FilePath = (string?)null },
+    new { KartEndringId = 2, Koordsys = 4258, Tittel = "OversvÃ¸mt omrÃ¥de", Beskrivelse = "OmrÃ¥det ved elvebredden har vÃ¦rt oversvÃ¸mt i flere dager, og vannstanden ser ut til Ã¥ fortsette Ã¥ stige.", MapType = "Norge kart", RapportType = "OversvÃ¸mmelse", SteddataId = 2, FilePath = (string?)null },
+    new { KartEndringId = 3, Koordsys = 4258, Tittel = "Fjellskred", Beskrivelse = "Steinras som blokkerer en viktig sti i fjellomrÃ¥det, og dette skaper en stor risiko for turgÃ¥ere og fjellklatrere.", MapType = "Turkart", RapportType = "Skredfare", SteddataId = 3, FilePath = (string?)null },
+    new { KartEndringId = 4, Koordsys = 4258, Tittel = "Skadet sti", Beskrivelse = "Stien er kraftig overgrodd med planter, og det er tydelige tegn pÃ¥ erosjon langs hele strekningen.", MapType = "Turkart", RapportType = "Stivedlikehold", SteddataId = 4, FilePath = (string?)null },
+    new { KartEndringId = 5, Koordsys = 4258, Tittel = "BÃ¥tvrak", Beskrivelse = "Flere gamle bÃ¥tvrak har samlet seg langs kystlinjen. Dette kan vÃ¦re farlig for mindre bÃ¥ter og svÃ¸mmere.", MapType = "SjÃ¸kart", RapportType = "Ryddeaksjon", SteddataId = 5, FilePath = (string?)null },
+    new { KartEndringId = 6, Koordsys = 4258, Tittel = "Trafikkulykke", Beskrivelse = "Alvorlig trafikkulykke pÃ¥ motorveien med flere kjÃ¸retÃ¸y involvert. Krever umiddelbar rydding for Ã¥ unngÃ¥ kÃ¸.", MapType = "Norge kart", RapportType = "Trafikkulykke", SteddataId = 6, FilePath = (string?)null },
+    new { KartEndringId = 7, Koordsys = 4258, Tittel = "SnÃ¸ras", Beskrivelse = "SnÃ¸ras i fjellomrÃ¥det som har blokkert veien og kan utgjÃ¸re en fare for kommende trafikk.", MapType = "Turkart", RapportType = "SnÃ¸rasfare", SteddataId = 7, FilePath = (string?)null },
+    new { KartEndringId = 8, Koordsys = 4258, Tittel = "Sykkelsti skadet", Beskrivelse = "Sykkelstien har store sprekker og hull som gjÃ¸r det vanskelig for syklister Ã¥ bruke den trygt.", MapType = "Norge kart", RapportType = "Sykkelsti reparasjon", SteddataId = 8, FilePath = (string?)null },
+    new { KartEndringId = 9, Koordsys = 4258, Tittel = "BÃ¥thavn", Beskrivelse = "BÃ¥thavnen er overfylt med bÃ¥ter, noe som gjÃ¸r det vanskelig for nye bÃ¥ter Ã¥ legge til kai eller parkere.", MapType = "SjÃ¸kart", RapportType = "Overfylte bÃ¥tplasser", SteddataId = 9, FilePath = (string?)null },
+    new { KartEndringId = 10, Koordsys = 4258, Tittel = "Fiskefelt", Beskrivelse = "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for Ã¥ bevare fiskebestanden.", MapType = "SjÃ¸kart", RapportType = "Fiskeriforvaltning", SteddataId = 10, FilePath = (string?)null }
+);
 
             // Insert data into Rapport
             modelBuilder.Entity<Rapport>().HasData(
-                new { RapportId = 1, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 1, KartEndringId = 1 },
+                new { RapportId = 1, RapportStatus = "Uï¿½pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 1, KartEndringId = 1 },
                 new { RapportId = 2, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 2, KartEndringId = 2 },
                 new { RapportId = 3, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 3, KartEndringId = 3 },
-                new { RapportId = 4, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 4, KartEndringId = 4 },
+                new { RapportId = 4, RapportStatus = "Uï¿½pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 4, KartEndringId = 4 },
                 new { RapportId = 5, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 5, KartEndringId = 5 },
                 new { RapportId = 6, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 6, KartEndringId = 6 },
-                new { RapportId = 7, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 7, KartEndringId = 7 },
+                new { RapportId = 7, RapportStatus = "Uï¿½pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 7, KartEndringId = 7 },
                 new { RapportId = 8, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 8, KartEndringId = 8 },
                 new { RapportId = 9, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 9, KartEndringId = 9 },
-                new { RapportId = 10, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 10, KartEndringId = 10 }
+                new { RapportId = 10, RapportStatus = "Uï¿½pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 10, KartEndringId = 10 }
             );
 
             // Insert data into Koordinater
@@ -209,7 +209,7 @@ namespace KartverketWebApp.Data
                 new { KoordinatId = 4, KartEndringId = 2, Rekkefolge = 2, Nord = 60.3915, Ost = 5.3224 },
                 new { KoordinatId = 5, KartEndringId = 2, Rekkefolge = 3, Nord = 60.3914, Ost = 5.3223 },
 
-                // Coordinates for KartEndringId 3 (Trøndelag - Trondheim)
+                // Coordinates for KartEndringId 3 (Trï¿½ndelag - Trondheim)
                 new { KoordinatId = 6, KartEndringId = 3, Rekkefolge = 1, Nord = 63.4305, Ost = 10.3951 },
                 new { KoordinatId = 7, KartEndringId = 3, Rekkefolge = 2, Nord = 63.4306, Ost = 10.3952 },
                 new { KoordinatId = 8, KartEndringId = 3, Rekkefolge = 3, Nord = 63.4307, Ost = 10.3953 },
@@ -219,7 +219,7 @@ namespace KartverketWebApp.Data
                 new { KoordinatId = 10, KartEndringId = 4, Rekkefolge = 1, Nord = 58.1467, Ost = 7.9946 },
                 new { KoordinatId = 11, KartEndringId = 4, Rekkefolge = 2, Nord = 58.1468, Ost = 7.9947 },
 
-                // Coordinates for KartEndringId 5 (Innlandet - Vågåmo)
+                // Coordinates for KartEndringId 5 (Innlandet - Vï¿½gï¿½mo)
                 new { KoordinatId = 12, KartEndringId = 5, Rekkefolge = 1, Nord = 61.8735, Ost = 9.0946 },
                 new { KoordinatId = 13, KartEndringId = 5, Rekkefolge = 2, Nord = 61.8736, Ost = 9.0947 },
                 new { KoordinatId = 14, KartEndringId = 5, Rekkefolge = 3, Nord = 61.8737, Ost = 9.0948 },
@@ -227,7 +227,7 @@ namespace KartverketWebApp.Data
                 new { KoordinatId = 16, KartEndringId = 5, Rekkefolge = 5, Nord = 61.8739, Ost = 9.0950 },
                 new { KoordinatId = 17, KartEndringId = 5, Rekkefolge = 6, Nord = 61.8740, Ost = 9.0951 },
 
-                // Coordinates for KartEndringId 6 (Troms og Finnmark - Tromsø)
+                // Coordinates for KartEndringId 6 (Troms og Finnmark - Tromsï¿½)
                 new { KoordinatId = 18, KartEndringId = 6, Rekkefolge = 1, Nord = 69.6492, Ost = 18.9553 },
                 new { KoordinatId = 19, KartEndringId = 6, Rekkefolge = 2, Nord = 69.6493, Ost = 18.9554 },
                 new { KoordinatId = 20, KartEndringId = 6, Rekkefolge = 3, Nord = 69.6494, Ost = 18.9555 },
@@ -258,19 +258,19 @@ namespace KartverketWebApp.Data
                 new { MeldingsId = 2, RapportId = 1, SenderPersonId = 1, MottakerPersonId = 12, Innhold = "Hei, her er de detaljerte opplysningene om veiskaden.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 2
-                new { MeldingsId = 3, RapportId = 2, SenderPersonId = 12, MottakerPersonId = 2, Innhold = "Kari, kan du bekrefte oversvømmelsen i området du rapporterte?", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 4, RapportId = 2, SenderPersonId = 2, MottakerPersonId = 12, Innhold = "Bekreftet, området er fortsatt oversvømt.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 3, RapportId = 2, SenderPersonId = 12, MottakerPersonId = 2, Innhold = "Kari, kan du bekrefte oversvï¿½mmelsen i omrï¿½det du rapporterte?", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 4, RapportId = 2, SenderPersonId = 2, MottakerPersonId = 12, Innhold = "Bekreftet, omrï¿½det er fortsatt oversvï¿½mt.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 3
                 new { MeldingsId = 5, RapportId = 3, SenderPersonId = 12, MottakerPersonId = 3, Innhold = "Per, vi trenger oppdateringer om fjellskredet.", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 6, RapportId = 3, SenderPersonId = 3, MottakerPersonId = 12, Innhold = "Fjellskredet er nå under overvåking.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 6, RapportId = 3, SenderPersonId = 3, MottakerPersonId = 12, Innhold = "Fjellskredet er nï¿½ under overvï¿½king.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 4
                 new { MeldingsId = 7, RapportId = 4, SenderPersonId = 12, MottakerPersonId = 4, Innhold = "Anne, kan du sende bilder av den skadede stien?", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 8, RapportId = 4, SenderPersonId = 4, MottakerPersonId = 12, Innhold = "Selvfølgelig, her er bildene.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 8, RapportId = 4, SenderPersonId = 4, MottakerPersonId = 12, Innhold = "Selvfï¿½lgelig, her er bildene.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 5
-                new { MeldingsId = 9, RapportId = 5, SenderPersonId = 12, MottakerPersonId = 5, Innhold = "Nina, har du innsikt i båtvrakene?", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 9, RapportId = 5, SenderPersonId = 12, MottakerPersonId = 5, Innhold = "Nina, har du innsikt i bï¿½tvrakene?", Tidsstempel = DateTime.Now, Status = "sendt" },
                 new { MeldingsId = 10, RapportId = 5, SenderPersonId = 5, MottakerPersonId = 12, Innhold = "Ja, vi trenger assistanse for rydding.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 6
@@ -278,16 +278,16 @@ namespace KartverketWebApp.Data
                 new { MeldingsId = 12, RapportId = 6, SenderPersonId = 6, MottakerPersonId = 12, Innhold = "Rapportene er under arbeid og vil bli levert snart.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 7
-                new { MeldingsId = 13, RapportId = 7, SenderPersonId = 12, MottakerPersonId = 7, Innhold = "Lise, snørasen er kritisk, kan du igangsette tiltak?", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 14, RapportId = 7, SenderPersonId = 7, MottakerPersonId = 12, Innhold = "Tiltak er iverksatt for å håndtere snørasen.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 13, RapportId = 7, SenderPersonId = 12, MottakerPersonId = 7, Innhold = "Lise, snï¿½rasen er kritisk, kan du igangsette tiltak?", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 14, RapportId = 7, SenderPersonId = 7, MottakerPersonId = 12, Innhold = "Tiltak er iverksatt for ï¿½ hï¿½ndtere snï¿½rasen.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 8
                 new { MeldingsId = 15, RapportId = 8, SenderPersonId = 12, MottakerPersonId = 8, Innhold = "Hans, vi trenger mer informasjon om sykkelsti-skaden.", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 16, RapportId = 8, SenderPersonId = 8, MottakerPersonId = 12, Innhold = "Her er de nødvendige detaljene.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 16, RapportId = 8, SenderPersonId = 8, MottakerPersonId = 12, Innhold = "Her er de nï¿½dvendige detaljene.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 9
-                new { MeldingsId = 17, RapportId = 9, SenderPersonId = 12, MottakerPersonId = 9, Innhold = "Mona, kan du overvåke fiskefeltet?", Tidsstempel = DateTime.Now, Status = "sendt" },
-                new { MeldingsId = 18, RapportId = 9, SenderPersonId = 9, MottakerPersonId = 12, Innhold = "Fiskefeltet overvåkes kontinuerlig.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 17, RapportId = 9, SenderPersonId = 12, MottakerPersonId = 9, Innhold = "Mona, kan du overvï¿½ke fiskefeltet?", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 18, RapportId = 9, SenderPersonId = 9, MottakerPersonId = 12, Innhold = "Fiskefeltet overvï¿½kes kontinuerlig.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 10
                 new { MeldingsId = 19, RapportId = 10, SenderPersonId = 12, MottakerPersonId = 10, Innhold = "Tom, vi trenger data om fiskeriforvaltningen.", Tidsstempel = DateTime.Now, Status = "sendt" },

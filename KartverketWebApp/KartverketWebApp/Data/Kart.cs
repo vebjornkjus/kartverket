@@ -10,6 +10,7 @@ namespace KartverketWebApp.Data
 
         public string Tittel { get; set; }
         public string Beskrivelse { get; set; }
+        public string? FilePath { get; set; } // Ny egenskap for lagring av filsti
         public int Koordsys { get; set; }
         public int? SteddataId { get; set; } // Foreign key til Steddata
         public string MapType { get; set; }
