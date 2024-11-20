@@ -27,7 +27,7 @@
             <div class="overview-left">
                 <div class="table-container">
                     <form id="updateStatusForm" method="post" asp-action="UpdateStatusAndRedirect">
-                        @Html.AntiForgeryToken() <!-- Add Anti-forgery token for security -->
+                        @Html.AntiForgeryToken() <!-- Add anti-forgery token for security -->
                         <table class="table">
                             <thead>
                                 <tr>
@@ -39,7 +39,8 @@
                             <tbody>
                                 @foreach (var rapport in Model.ActiveRapporter)
                                 {
-                                    <tr class="@(rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "")"
+                                    <tr id="rapport-row-@rapport.RapportId"
+                                        class="@(rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "")"
                                         style="cursor:pointer"
                                         onclick="submitFormWithId(@rapport.RapportId)">
                                         <td>@rapport.Kart?.Tittel</td>
@@ -52,6 +53,29 @@
                         <input type="hidden" id="rapportIdInput" name="id" value="" />
                     </form>
                 </div>
+                <!-- Pagination Controls for Active Reports -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        @if (ViewBag.ActiveCurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Saksbehandler", new { activePage = ViewBag.ActiveCurrentPage - 1 })">Previous</a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= ViewBag.ActiveTotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.ActiveCurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Saksbehandler", new { activePage = i })">@i</a>
+                            </li>
+                        }
+                        @if (ViewBag.ActiveCurrentPage < ViewBag.ActiveTotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Saksbehandler", new { activePage = ViewBag.ActiveCurrentPage + 1 })">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
             </div>
 
             <div class="overview-right">

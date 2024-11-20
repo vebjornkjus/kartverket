@@ -21,18 +21,28 @@ namespace KartverketWebApp.Controllers
 {
     public class HomeController : Controller
     {
+        // Private fields for dependencies
         private readonly ILogger<HomeController> _logger;
         private readonly IStednavn _stednavnService;
         private readonly ISokeService _sokeService;
-        private static List<PositionModel> positions = new List<PositionModel>();
-        private static List<StednavnViewModel> stednavn = new List<StednavnViewModel>();
         private readonly HttpClient _httpClient;
         private readonly ApiSettings _apiSettings;
         private readonly ApplicationDbContext _context;
         private readonly IDbConnection _dbConnection;
 
+        // Static lists for temporary data storage
+        private static List<PositionModel> positions = new List<PositionModel>();
+        private static List<StednavnViewModel> stednavn = new List<StednavnViewModel>();
 
-        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings, ApplicationDbContext context, IDbConnection dbConnection)
+        // Constructor
+        public HomeController(
+            ILogger<HomeController> logger,
+            IStednavn stedsnavnService,
+            ISokeService sokeService,
+            HttpClient httpClient,
+            IOptions<ApiSettings> apiSettings,
+            ApplicationDbContext context,
+            IDbConnection dbConnection)
         {
             _logger = logger;
             _stednavnService = stedsnavnService;
@@ -43,41 +53,24 @@ namespace KartverketWebApp.Controllers
             _dbConnection = dbConnection;
         }
 
-        public IActionResult TakkRapport()
-        {
-            return View("~/Views/Home/Innsender/TakkRapport.cshtml");
-        }
+        // SECTION: Static Views
+        public IActionResult TakkRapport() => View("~/Views/Home/Innsender/TakkRapport.cshtml");
+        public IActionResult Innlogging() => View();
+        public IActionResult Admin() => View();
+        public IActionResult soke() => View();
+        public IActionResult Privacy() => View();
 
-        public IActionResult Innlogging()
-        {
-            return View();
-        }
-
-        public IActionResult Admin()
-        {
-            return View();
-        }
-
-        public IActionResult soke()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
+        // SECTION: CRUD Operations
         [HttpGet]
         [HttpPost]
-public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile? file)
-{
-    _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
-    if (koordinater == null || !koordinater.Any())
-    {
-        _logger.LogWarning("Koordinater list is null or empty.");
-        return View("Index");
-    }
+        public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile? file)
+        {
+            _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
+            if (koordinater == null || !koordinater.Any())
+            {
+                _logger.LogWarning("Koordinater list is null or empty.");
+                return View("Index");
+            }
 
             if (ModelState.ContainsKey("file"))
             {
@@ -85,151 +78,143 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             }
 
             if (ModelState.IsValid)
-    {
-        string filePath = null;
-
-        // Handle file upload (optional)
-        if (file != null && file.Length > 0)
-        {
-            try
             {
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                filePath = Path.Combine("uploads", uniqueFileName);
-                var serverFilePath = Path.Combine("wwwroot", filePath);
+                string filePath = null;
 
-                using (var stream = new FileStream(serverFilePath, FileMode.Create))
+                // Handle file upload (optional)
+                if (file != null && file.Length > 0)
                 {
-                    await file.CopyToAsync(stream);
+                    try
+                    {
+                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        filePath = Path.Combine("uploads", uniqueFileName);
+                        var serverFilePath = Path.Combine("wwwroot", filePath);
+
+                        using (var stream = new FileStream(serverFilePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                        _logger.LogInformation("File uploaded successfully: {FilePath}", filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred while uploading the file.");
+                    }
                 }
-                _logger.LogInformation("File uploaded successfully: {FilePath}", filePath);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while uploading the file.");
-            }
-        }
-        else
-        {
-            _logger.LogInformation("No file uploaded. Proceeding without a file.");
-        }
-
-        var firstKoord = koordinater.First();
-        Steddata steddata = null;
-        try
-        {
-            var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
-
-            if (stednavnResponse != null)
-            {
-                int fylkesnummer = 0;
-                if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
+                else
                 {
-                    int.TryParse(stednavnResponse.Fylkesnummer, out fylkesnummer);
+                    _logger.LogInformation("No file uploaded. Proceeding without a file.");
                 }
 
-                int kommunenummer = 0;
-                if (!string.IsNullOrEmpty(stednavnResponse.Kommunenummer))
+                var firstKoord = koordinater.First();
+                Steddata steddata = null;
+                try
                 {
-                    int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
+                    var stednavnResponse = await _stednavnService.GetStednavnAsync(firstKoord.Nord, firstKoord.Ost, koordsys);
+
+                    if (stednavnResponse != null)
+                    {
+                        int fylkesnummer = 0;
+                        if (!string.IsNullOrEmpty(stednavnResponse.Fylkesnummer))
+                        {
+                            int.TryParse(stednavnResponse.Fylkesnummer, out fylkesnummer);
+                        }
+
+                        int kommunenummer = 0;
+                        if (!string.IsNullOrEmpty(stednavnResponse.Kommunenummer))
+                        {
+                            int.TryParse(stednavnResponse.Kommunenummer, out kommunenummer);
+                        }
+
+                        steddata = new Steddata
+                        {
+                            Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
+                            Kommunenavn = stednavnResponse.Kommunenavn ?? "N/A",
+                            Fylkenummer = fylkesnummer,
+                            Kommunenummer = kommunenummer
+                        };
+
+                        _context.Steddata.Add(steddata);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
                 }
 
-                steddata = new Steddata
+                var newKart = new Kart
                 {
-                    Fylkenavn = stednavnResponse.Fylkesnavn ?? "N/A",
-                    Kommunenavn = stednavnResponse.Kommunenavn ?? "N/A",
-                    Fylkenummer = fylkesnummer,
-                    Kommunenummer = kommunenummer
+                    Koordsys = koordsys,
+                    Tittel = tittel,
+                    Beskrivelse = beskrivelse,
+                    MapType = mapType,
+                    RapportType = rapportType,
+                    SteddataId = steddata?.Id,
+                    FilePath = filePath
                 };
 
-                _context.Steddata.Add(steddata);
+                _context.Kart.Add(newKart);
                 await _context.SaveChangesAsync();
+
+                var newKoordinater = koordinater.Select((koord, index) => new Koordinater
+                {
+                    KartEndringId = newKart.KartEndringId,
+                    Nord = koord.Nord,
+                    Ost = koord.Ost,
+                    Rekkefolge = index + 1
+                }).ToList();
+
+                _context.Koordinater.AddRange(newKoordinater);
+                await _context.SaveChangesAsync();
+
+                var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
+
+                var newRapport = new Rapport
+                {
+                    RapportStatus = "Uåpnet",
+                    Opprettet = DateTime.Now,
+                    KartEndringId = newKart.KartEndringId,
+                    PersonId = 1, // Temporary placeholder
+                    TildelAnsattId = tildelAnsattId,
+
+                };
+
+                _context.Rapport.Add(newRapport);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("TakkRapport");
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
-        }
 
-        var newKart = new Kart
-        {
-            Koordsys = koordsys,
-            Tittel = tittel,
-            Beskrivelse = beskrivelse,
-            MapType = mapType,
-            RapportType = rapportType,
-            SteddataId = steddata?.Id,
-            FilePath = filePath
-        };
-
-        _context.Kart.Add(newKart);
-        await _context.SaveChangesAsync();
-
-        var newKoordinater = koordinater.Select((koord, index) => new Koordinater
-        {
-            KartEndringId = newKart.KartEndringId,
-            Nord = koord.Nord,
-            Ost = koord.Ost,
-            Rekkefolge = index + 1
-        }).ToList();
-
-        _context.Koordinater.AddRange(newKoordinater);
-        await _context.SaveChangesAsync();
-
-        var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
-
-        var newRapport = new Rapport
-        {
-            RapportStatus = "Uåpnet",
-            Opprettet = DateTime.Now,
-            KartEndringId = newKart.KartEndringId,
-            PersonId = 1, // Temporary placeholder
-            TildelAnsattId = tildelAnsattId,
-            
-        };
-
-        _context.Rapport.Add(newRapport);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction("TakkRapport");
-    }
-
-    foreach (var modelState in ModelState.Values)
-    {
-        foreach (var error in modelState.Errors)
-        {
-            _logger.LogError(error.ErrorMessage);
-        }
-    }
-
-    return View("Index");
-}
-
-
-        private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)
-        {
-            // Log the incoming kommunenummer
-            _logger.LogInformation($"Finding Ansatt for Kommunenummer: {kommunenummer}");
-
-            // Check for a match in Ansatt by Kommunenummer
-            var matchingAnsatt = await _context.Ansatt
-                .Where(a => a.Kommunenummer == kommunenummer)
-                .OrderBy(a => _context.Rapport.Count(r => r.TildelAnsattId == a.AnsattId))
-                .ThenBy(a => a.AnsattId)
-                .FirstOrDefaultAsync();
-
-            if (matchingAnsatt != null)
+            foreach (var modelState in ModelState.Values)
             {
-                // Log the Ansatt details
-                _logger.LogInformation($"Assigned to AnsattId: {matchingAnsatt.AnsattId}, Kommunenummer: {matchingAnsatt.Kommunenummer}");
-                return matchingAnsatt.AnsattId;
+                foreach (var error in modelState.Errors)
+                {
+                    _logger.LogError(error.ErrorMessage);
+                }
             }
 
-            // Log the fallback to AnsattId = 1
-            _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
-            return 1; // Default AnsattId
+            return View("Index");
         }
 
+        [HttpPost]
+        public IActionResult UpdateStatusAndRedirect(int id)
+        {
+            // SQL query to update status
+            string query = @"
+        UPDATE Rapport
+        SET RapportStatus = 'Under behandling'
+        WHERE RapportId = @RapportId AND RapportStatus = 'Uåpnet';
+    ";
 
+            // Execute the query
+            var rowsAffected = _dbConnection.Execute(query, new { RapportId = id });
+
+            // Redirect to the detailed view, regardless of whether the status was updated
+            return RedirectToAction("RapportDetaljert", "Home", new { id });
+        }
+
+        // SECTION: Fetching and Processing Reports
         [HttpGet]
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
@@ -332,40 +317,15 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
 
-        [HttpPost]
-        public IActionResult UpdateStatusAndRedirect(int id)
-        {
-            // Define the SQL query
-            string query = @"
-                UPDATE Rapport
-                SET RapportStatus = 'Under behandling'
-                WHERE RapportId = @RapportId AND RapportStatus = 'Uåpnet';
-            ";
-
-            // Execute the query
-            var rowsAffected = _dbConnection.Execute(query, new { RapportId = id });
-
-            // Check if no rows were updated
-            if (rowsAffected == 0)
-            {
-                return BadRequest("Report status was not 'Uåpnet', or the report does not exist.");
-            }
-
-            // Redirect to the detailed view
-            return RedirectToAction("RapportDetaljert", "Home", new { id });
-        }
-
-
-
         [HttpGet]
         public async Task<IActionResult> RapportDetaljert(int id)
         {
             var rapport = await _context.Rapport
-                .Include(r => r.Kart)
-                    .ThenInclude(k => k.Koordinater)
-                .Include(r => r.Person)
-                    .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
-                .FirstOrDefaultAsync(r => r.RapportId == id);
+    .Include(r => r.Kart)
+        .ThenInclude(k => k.Koordinater)
+    .Include(r => r.Person)
+        .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
+    .FirstOrDefaultAsync(r => r.RapportId == id);
 
             if (rapport == null)
             {
@@ -400,8 +360,6 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
         }
 
-
-
         public IActionResult CorrectionsOverview()
         {
             // Prepare the CombinedViewModel to be passed to the view
@@ -429,6 +387,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             return View(viewModel); // Return the view with CombinedViewModel
         }
 
+        // SECTION: Search Functionality
         [HttpPost]
         public async Task<IActionResult> Sok(string kommuneName)
         {
@@ -519,33 +478,37 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             }
         }
 
-        public PartialViewResult Oversikt()
+        // SECTION: Partial Views
+        public PartialViewResult Oversikt() => PartialView("_Oversikt");
+        public PartialViewResult MineRapporter() => PartialView("_MineRapporter");
+        public PartialViewResult Varslinger() => PartialView("_Oversikt");
+        public PartialViewResult Meldinger() => PartialView("_Oversikt");
+        public PartialViewResult TidligereRapporter() => PartialView("_Oversikt");
+
+        // SECTION: Helper Methods
+        private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)
         {
-            return PartialView("_Oversikt");
+            // Log the incoming kommunenummer
+            _logger.LogInformation($"Finding Ansatt for Kommunenummer: {kommunenummer}");
+
+            // Check for a match in Ansatt by Kommunenummer
+            var matchingAnsatt = await _context.Ansatt
+                .Where(a => a.Kommunenummer == kommunenummer)
+                .OrderBy(a => _context.Rapport.Count(r => r.TildelAnsattId == a.AnsattId))
+                .ThenBy(a => a.AnsattId)
+                .FirstOrDefaultAsync();
+
+            if (matchingAnsatt != null)
+            {
+                // Log the Ansatt details
+                _logger.LogInformation($"Assigned to AnsattId: {matchingAnsatt.AnsattId}, Kommunenummer: {matchingAnsatt.Kommunenummer}");
+                return matchingAnsatt.AnsattId;
+            }
+
+            // Log the fallback to AnsattId = 1
+            _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
+            return 1; // Default AnsattId
         }
-
-        public PartialViewResult MineRapporter()
-        {
-            return PartialView("_MineRapporter");
-        }
-
-
-        public PartialViewResult Varslinger()
-        {
-            return PartialView("_Oversikt");
-        }
-
-        public PartialViewResult Meldinger()
-        {
-            return PartialView("_Oversikt");
-        }
-        
-        public PartialViewResult TidligereRapporter()
-        {
-            return PartialView("_Oversikt");
-        }
-
-
-
     }
 }
+

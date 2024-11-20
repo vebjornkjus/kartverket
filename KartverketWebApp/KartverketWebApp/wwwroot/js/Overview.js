@@ -4,8 +4,8 @@ if (window.coordinatesJson && window.markersJson) {
     console.log("Markers JSON:", window.markersJson);
 
     // Parse the JSON to ensure correct data structure
-    const coordinates = JSON.parse(window.coordinatesJson);
-    const markers = JSON.parse(window.markersJson);
+    const coordinates = parseJsonSafely(window.coordinatesJson);
+    const markers = parseJsonSafely(window.markersJson);
 
     // Initialize the map
     initializeMap(coordinates, markers);
@@ -13,7 +13,25 @@ if (window.coordinatesJson && window.markersJson) {
     console.warn("Coordinates or Markers JSON is missing.");
 }
 
-// Function to initialize the map
+/**
+ * Safely parse JSON and handle errors.
+ * @param {string} jsonString - JSON string to parse.
+ * @returns {object} Parsed JSON or an empty array.
+ */
+function parseJsonSafely(jsonString) {
+    try {
+        return JSON.parse(jsonString) || [];
+    } catch (error) {
+        console.error("Error parsing JSON:", error.message);
+        return [];
+    }
+}
+
+/**
+ * Initialize the map with polygons and markers.
+ * @param {Array} coordinatesJson - Polygons data.
+ * @param {Array} markersJson - Markers data.
+ */
 function initializeMap(coordinatesJson, markersJson) {
     // Define the map tile layer
     var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
@@ -27,10 +45,12 @@ function initializeMap(coordinatesJson, markersJson) {
         layers: [norgeKart]
     });
 
-    // Process the coordinates JSON to draw polygons
+    // Store marker references for interaction
+    const markerMap = {};
+
+    // Draw polygons if coordinatesJson is available
     if (coordinatesJson && coordinatesJson.length > 0) {
         try {
-            // Assuming coordinatesJson contains MultiPolygon coordinates
             coordinatesJson.forEach((polygonCoords) => {
                 const latlngs = polygonCoords[0].map(coord => [coord[1], coord[0]]); // Convert [lng, lat] to [lat, lng]
                 L.polygon(latlngs, {
@@ -42,31 +62,78 @@ function initializeMap(coordinatesJson, markersJson) {
         } catch (error) {
             console.error("Error processing polygon coordinates:", error);
         }
-    } else {
-        console.warn("Coordinates JSON is empty or invalid.");
     }
 
-    // Define a custom invisible icon
-    var invisibleIcon = L.divIcon({
-        className: 'invisible-marker', // Use a custom CSS class to make the marker invisible
+    // Define a default and large marker icon
+    const defaultIcon = L.divIcon({
+        className: 'default-marker',
         html: '<div class="LokasjonpunktIkon"></div>',
-        iconSize: [20, 20] // Set size to 0 to ensure it doesn't render
+        iconSize: [20, 20]
     });
 
-    // Process the markers JSON to place invisible markers on the map
+    const largeIcon = L.divIcon({
+        className: 'large-marker',
+        html: '<div class="LokasjonpunktIkon"></div>',
+        iconSize: [25, 25]
+    });
+
+    // Add markers with hover and click functionality
     if (markersJson && Array.isArray(markersJson)) {
         try {
             markersJson.forEach(marker => {
                 if (marker.Nord && marker.Ost) {
-                    L.marker([marker.Nord, marker.Ost], { icon: invisibleIcon })
+                    const mapMarker = L.marker([marker.Nord, marker.Ost], { icon: defaultIcon })
                         .bindPopup(`Tittel: ${marker.Tittel}`)
-                        .addTo(map);
+                        .on('click', function () {
+                            submitFormWithId(marker.RapportId); // Trigger the form submission
+                        })
+                        .on('mouseover', function () {
+                            // Highlight corresponding table row
+                            const tableRow = document.getElementById(`rapport-row-${marker.RapportId}`);
+                            if (tableRow) {
+                                tableRow.classList.add('highlight');
+                            }
+
+                            // Enlarge the marker
+                            mapMarker.setIcon(largeIcon);
+                        })
+                        .on('mouseout', function () {
+                            // Remove highlight from table row
+                            const tableRow = document.getElementById(`rapport-row-${marker.RapportId}`);
+                            if (tableRow) {
+                                tableRow.classList.remove('highlight');
+                            }
+
+                            // Revert marker to default size
+                            mapMarker.setIcon(defaultIcon);
+                        });
+
+                    // Store the marker for interaction with the table
+                    markerMap[marker.RapportId] = mapMarker;
+
+                    mapMarker.addTo(map);
                 }
             });
         } catch (error) {
             console.error("Error processing markers JSON:", error);
         }
-    } else {
-        console.warn("Markers JSON is empty or invalid.");
     }
+
+    // Add hover events to the table rows
+    document.querySelectorAll('tr[id^="rapport-row-"]').forEach(row => {
+        const rapportId = row.id.replace('rapport-row-', '');
+
+        row.addEventListener('mouseover', () => {
+            if (markerMap[rapportId]) {
+                markerMap[rapportId].setIcon(largeIcon); // Enlarge the marker
+            }
+        });
+
+        row.addEventListener('mouseout', () => {
+            if (markerMap[rapportId]) {
+                markerMap[rapportId].setIcon(defaultIcon); // Revert marker to default size
+            }
+        });
+    });
 }
+

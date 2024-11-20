@@ -300,7 +300,7 @@ body {
 }
 
     .unopened:hover {
-        background-color: #bcd5c0;
+        filter: brightness(85%);
     }
 
 .tab-content active{
@@ -331,3 +331,20 @@ body {
 #oversikt {
     height: 100%;  
 }
+
+/* Hover-effekt for tabellrader */
+.highlight {
+    background-color: #fff;
+    filter: brightness(85%);
+    transition: background-color 0.2s ease;
+}
+
+
+/* Default row hover effect */
+table tr:hover {
+    background-color: #fff;
+    filter: brightness(85%);
+    color: #000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
