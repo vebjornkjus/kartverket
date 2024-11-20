@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using static KartverketWebApp.Models.PositionModel;
 using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
+using Dapper;
 
 namespace KartverketWebApp.Controllers
 {
@@ -27,9 +29,10 @@ namespace KartverketWebApp.Controllers
         private readonly HttpClient _httpClient;
         private readonly ApiSettings _apiSettings;
         private readonly ApplicationDbContext _context;
+        private readonly IDbConnection _dbConnection;
 
 
-        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, IStednavn stedsnavnService, ISokeService sokeService, HttpClient httpClient, IOptions<ApiSettings> apiSettings, ApplicationDbContext context, IDbConnection dbConnection)
         {
             _logger = logger;
             _stednavnService = stedsnavnService;
@@ -37,6 +40,7 @@ namespace KartverketWebApp.Controllers
             _httpClient = httpClient;
             _apiSettings = apiSettings.Value;
             _context = context;
+            _dbConnection = dbConnection;
         }
 
         public IActionResult TakkRapport()
@@ -146,18 +150,6 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             _logger.LogError(ex, "Error occurred while fetching Stednavn data.");
         }
 
-                // Determine TildelAnsattId
-                var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
-
-                var newRapport = new Rapport
-                {
-                    RapportStatus = "U�pnet",
-                    Opprettet = DateTime.Now,
-                    KartEndringId = newKart.KartEndringId,
-                    PersonId = 1, // Temporary placeholder
-                    TildelAnsattId = tildelAnsattId
-                };
-
         var newKart = new Kart
         {
             Koordsys = koordsys,
@@ -187,7 +179,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
         var newRapport = new Rapport
         {
-            RapportStatus = "Uapnet",
+            RapportStatus = "Uåpnet",
             Opprettet = DateTime.Now,
             KartEndringId = newKart.KartEndringId,
             PersonId = 1, // Temporary placeholder
@@ -239,7 +231,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
 
         [HttpGet]
-        public async Task<IActionResult> Saksbehandler(int ansattId = 1, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
             // Fetch the associated `Ansatt` entity
             var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.AnsattId == ansattId);
@@ -249,16 +241,9 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 return NotFound("Ansatt or Kommunenummer not found.");
             }
 
-            // Fetch the associated `Person` entity
+            // Fetch the associated `Person` and `Bruker` entities
             var person = await _context.Person.FirstOrDefaultAsync(p => p.PersonId == ansatt.PersonId);
-            if (person == null)
-            {
-                _logger.LogWarning($"No Person found for PersonId: {ansatt.PersonId}");
-                return NotFound("Person not found.");
-            }
-
-            // Fetch the associated `Bruker` entity
-            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == person.BrukerId);
+            var bruker = person != null ? await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == person.BrukerId) : null;
             string email = bruker?.Email ?? "Unknown";
 
             // Fetch polygon data
@@ -269,7 +254,6 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 polygonResponse.EnsureSuccessStatusCode();
 
                 var content = await polygonResponse.Content.ReadAsStringAsync();
-
                 var jsonDoc = JsonDocument.Parse(content);
                 if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
                     omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
@@ -282,18 +266,38 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
             }
 
-            // Fetch reports assigned to the Ansatt
-            var reports = await _context.Rapport
-                .Where(r => r.TildelAnsattId == ansatt.AnsattId)
+            // Fetch total counts
+            var totalActiveReports = await _context.Rapport
+                .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
+                                 (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"));
+
+            var totalResolvedReports = await _context.Rapport
+                .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
+                                 (r.RapportStatus == "Avklart" || r.RapportStatus == "Avvist"));
+
+            // Fetch paginated reports
+            var activeReports = await _context.Rapport
+                .Where(r => r.TildelAnsattId == ansatt.AnsattId &&
+                            (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"))
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
                 .OrderByDescending(r => r.Opprettet)
-                .Skip((page - 1) * pageSize)
+                .Skip((activePage - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Extract markers from the reports
-            var markers = reports
+            var resolvedReports = await _context.Rapport
+                .Where(r => r.TildelAnsattId == ansatt.AnsattId &&
+                            (r.RapportStatus == "Avklart" || r.RapportStatus == "Avvist"))
+                .Include(r => r.Kart)
+                    .ThenInclude(k => k.Koordinater)
+                .OrderByDescending(r => r.Opprettet)
+                .Skip((resolvedPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Serialize data to ViewBag
+            var markers = activeReports
                 .Where(r => r.Kart != null && r.Kart.Koordinater.Any())
                 .Select(r => new
                 {
@@ -303,33 +307,53 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                     Tittel = r.Kart.Tittel
                 }).ToList();
 
-            // Serialize data to ViewBag
             ViewBag.MarkersJson = JsonSerializer.Serialize(markers);
             ViewBag.PolygonJson = polygonCoordinates;
 
             // Set pagination data
-            var totalReports = await _context.Rapport.CountAsync(r => r.TildelAnsattId == ansatt.AnsattId);
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalReports / (double)pageSize);
+            ViewBag.ActiveCurrentPage = activePage;
+            ViewBag.ActiveTotalPages = (int)Math.Ceiling(totalActiveReports / (double)pageSize);
+
+            ViewBag.ResolvedCurrentPage = resolvedPage;
+            ViewBag.ResolvedTotalPages = (int)Math.Ceiling(totalResolvedReports / (double)pageSize);
 
             // Pass user info to ViewBag
-            ViewBag.UserName = person.Fornavn;
-            ViewBag.UserLastName = person.Etternavn;
+            ViewBag.UserName = person?.Fornavn;
+            ViewBag.UserLastName = person?.Etternavn;
             ViewBag.UserEmail = email;
 
             // Prepare CombinedViewModel
             var combinedViewModel = new CombinedViewModel
             {
-                Rapporter = reports
+                ActiveRapporter = activeReports, // Active reports
+                ResolvedRapporter = resolvedReports // Resolved reports
             };
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
 
+        [HttpPost]
+        public IActionResult UpdateStatusAndRedirect(int id)
+        {
+            // Define the SQL query
+            string query = @"
+                UPDATE Rapport
+                SET RapportStatus = 'Under behandling'
+                WHERE RapportId = @RapportId AND RapportStatus = 'Uåpnet';
+            ";
 
+            // Execute the query
+            var rowsAffected = _dbConnection.Execute(query, new { RapportId = id });
 
+            // Check if no rows were updated
+            if (rowsAffected == 0)
+            {
+                return BadRequest("Report status was not 'Uåpnet', or the report does not exist.");
+            }
 
-
+            // Redirect to the detailed view
+            return RedirectToAction("RapportDetaljert", "Home", new { id });
+        }
 
 
 

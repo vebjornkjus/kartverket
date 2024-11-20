@@ -199,7 +199,17 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 11px;
     padding: 20px;
-    height: 100vh;
+    height: 75vh;
+}
+
+.overview-right {
+    flex: 1; /* Proportional space in its parent */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    gap: 1.5vh; /* Space between children */
+    width: 100%; /* Full width of parent */
+    min-height: 75vh;
+    box-sizing: border-box; /* Include padding in size calculations */
 }
 
 .table-container {
@@ -297,16 +307,6 @@ body {
     height: 100%;
 }
 
-.overview-right {
-    flex: 1; /* Proportional space in its parent */
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    gap: 1.5vh; /* Space between children */
-    width: 100%; /* Full width of parent */
-    min-height: 100vh;
-    box-sizing: border-box; /* Include padding in size calculations */
-}
-
 .map {
     flex: 2; /* Occupy 2/3 of the height */
     width: 100%; /* Full width of parent */
@@ -329,5 +329,5 @@ body {
 
 
 #oversikt {
-    height: 100%;
+    height: 100%;  
 }

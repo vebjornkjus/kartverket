@@ -10,6 +10,9 @@ namespace KartverketWebApp.Models
         public List<Kart> KartData { get; set; }
         public List<Koordinater> KoordinatData { get; set; }
 
+        public List<Rapport> ActiveRapporter { get; set; }
+        public List<Rapport> ResolvedRapporter { get; set; }
+
         public CombinedViewModel()
         {
             Positions = new List<PositionModel>();

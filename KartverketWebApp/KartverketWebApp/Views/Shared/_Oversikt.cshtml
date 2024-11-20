@@ -26,53 +26,32 @@
         <div class="main-container">
             <div class="overview-left">
                 <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Kart Tittel</th>
-                                <th>Kart</th>
-                                <th>Opprettet</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var rapport in Model.Rapporter)
-                            {
-                                var rowClass = !string.IsNullOrEmpty(rapport?.RapportStatus) && rapport.RapportStatus.Trim() == "Uåpnet" ? "Unnamed" : "";
-                                var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
-
-                                <tr class="@rowClass" onclick="location.href='@url'" style="cursor:pointer">
-                                    <td>@rapport.Kart?.Tittel</td>
-                                    <td>@rapport.Kart?.MapType</td>
-                                    <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                    <form id="updateStatusForm" method="post" asp-action="UpdateStatusAndRedirect">
+                        @Html.AntiForgeryToken() <!-- Add Anti-forgery token for security -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Kart Tittel</th>
+                                    <th>Kart</th>
+                                    <th>Opprettet</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var rapport in Model.ActiveRapporter)
+                                {
+                                    <tr class="@(rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "")"
+                                        style="cursor:pointer"
+                                        onclick="submitFormWithId(@rapport.RapportId)">
+                                        <td>@rapport.Kart?.Tittel</td>
+                                        <td>@rapport.Kart?.MapType</td>
+                                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <input type="hidden" id="rapportIdInput" name="id" value="" />
+                    </form>
                 </div>
-
-                <!-- Pagination Controls -->
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        @if (ViewBag.CurrentPage > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Saksbehandler", new { page = ViewBag.CurrentPage - 1 })">Previous</a>
-                            </li>
-                        }
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Saksbehandler", new { page = i })">@i</a>
-                            </li>
-                        }
-                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Saksbehandler", new { page = ViewBag.CurrentPage + 1 })">Next</a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
             </div>
 
             <div class="overview-right">
@@ -85,5 +64,62 @@
         </div>
     </div>
 </div>
+
+<script>
+    function submitFormWithId(rapportId) {
+        // Set the hidden input value
+        document.getElementById("rapportIdInput").value = rapportId;
+        // Submit the form
+        document.getElementById("updateStatusForm").submit();
+    }
+</script>
+
+
+@*     <h2>Avsluttede Rapporter</h2>
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Kart Tittel</th>
+                    <th>Kart</th>
+                    <th>Opprettet</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rapport in Model.ResolvedRapporter)
+                {
+                    var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
+
+                    <tr onclick="location.href='@url'" style="cursor:pointer">
+                        <td>@rapport.Kart?.Tittel</td>
+                        <td>@rapport.Kart?.MapType</td>
+                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (ViewBag.ResolvedCurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Saksbehandler", new { resolvedPage = ViewBag.ResolvedCurrentPage - 1 })">Previous</a>
+                    </li>
+                }
+                @for (int i = 1; i <= ViewBag.ResolvedTotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.ResolvedCurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Saksbehandler", new { resolvedPage = i })">@i</a>
+                    </li>
+                }
+                @if (ViewBag.ResolvedCurrentPage < ViewBag.ResolvedTotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Saksbehandler", new { resolvedPage = ViewBag.ResolvedCurrentPage + 1 })">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div> *@
 
 <script src="~/js/Overview.js"></script>

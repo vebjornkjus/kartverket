@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using KartverketWebApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using System.Data;
+using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         new MySqlServerVersion(new Version(10, 5, 9)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure()
     ));
+
+// Add this line to register IDbConnection
+builder.Services.AddTransient<IDbConnection>(sp =>
+    new MySqlConnection(builder.Configuration.GetConnectionString("MariaDbConnection")));
+
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
