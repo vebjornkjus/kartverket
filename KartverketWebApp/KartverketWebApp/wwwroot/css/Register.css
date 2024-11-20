@@ -1,73 +1,87 @@
+/* Generell styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+/* Hovedkonteiner */
 .register_main {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background-color: #f2f2f2;
+    height: 100vh;
+    background-color: #e6e6e6;
 }
 
 .register_container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 400px;
-    padding: 2rem;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
     text-align: center;
 }
 
-.register_container h2 {
-    margin-bottom: 1rem;
-    font-size: 24px;
-    color: #333;
-}
-
-.register_container label {
-    display: block;
-    margin-top: 1rem;
-    font-weight: bold;
-    color: #666;
-}
-
-.register_container input[type="email"],
-.register_container input[type="password"] {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.register_container button[type="submit"] {
-    margin-top: 1.5rem;
-    width: 100%;
-    padding: 0.7rem;
-    background-color: #28a745;
-    color: #fff;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.register_container button[type="submit"]:hover {
-    background-color: #218838;
-}
-
-.register_container a.btn_login {
-    display: block;
-    margin-top: 1rem;
-    padding: 0.7rem;
-    color: #007bff;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.register_container a.btn_login:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
+/* Logo */
 #kartverket_logo {
-    width: 147px;
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+/* Input felter */
+form div {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Validering */
+input:invalid {
+    border-color: #e74c3c;
+}
+
+/* Knapp for registrering */
+.btn_register {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn_register:hover {
+    background-color: #45a049;
+}
+
+/* Lenke til login */
+.btn_login {
+    display: inline-block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn_login:hover {
+    text-decoration: underline;
 }
