@@ -4,29 +4,33 @@
 
 <div class="login_main">
     <div class="login_container">
+        
+        <!-- Logo -->
         <img id="kartverket_logo" src="~/images/standard_kartverket.png" alt="Kartverket Logo">
 
+        <!-- Innloggingsskjema -->
         <form asp-action="Login" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div> <!-- Legg til denne linjen for å vise feilmeldinger -->
+            <div asp-validation-summary="All" class="validation-errors"></div>
 
-            <label asp-for="Username">Brukernavn</label>
-            <input asp-for="Username" class="form-control" required />
+            <div class="form-group">
+                <label asp-for="Username">E-postadresse</label>
+                <input asp-for="Username" type="email" placeholder="Din e-post" required />
+            </div>
 
-            <label asp-for="Password">Passord</label>
-            <input asp-for="Password" type="password" class="form-control" required />
+            <div class="form-group">
+                <label asp-for="Password">Passord</label>
+                <input asp-for="Password" type="password" placeholder="Ditt passord" required />
+            </div>
 
-            <label asp-for="RememberMe">
-                <input asp-for="RememberMe" type="checkbox" /> Husk meg
-            </label>
+            <div class="form-group">
+                <input asp-for="RememberMe" type="checkbox" />
+                <label asp-for="RememberMe">Husk meg</label>
+            </div>
 
             <button type="submit" class="btn_login">Logg inn</button>
         </form>
 
-        <p>Har du ikke en konto?</p>
-        <a href="/Account/Register" class="btn_register">Registrer deg</a>
+        <!-- Lenke til registrering -->
+        <a href="/Account/Register" class="register-link">Ny bruker? Registrer deg her</a>
     </div>
 </div>
-
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

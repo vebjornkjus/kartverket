@@ -4,13 +4,16 @@ namespace KartverketWebApp.Models
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Brukernavn er påkrevd.")]
+        [Required]
+        [EmailAddress]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Passord er påkrevd.")]
+        [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
     }
+
+
 }

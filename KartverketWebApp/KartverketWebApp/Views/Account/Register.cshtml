@@ -9,7 +9,17 @@
 
         <form asp-action="Register" method="post">
             <div asp-validation-summary="All"></div>
-            
+
+            <div>
+                <label asp-for="Fornavn"></label>
+                <input asp-for="Fornavn" type="text" required />
+            </div>
+
+            <div>
+                <label asp-for="Etternavn"></label>
+                <input asp-for="Etternavn" type="text" required />
+            </div>
+
             <div>
                 <label asp-for="Email"></label>
                 <input asp-for="Email" type="email" required />

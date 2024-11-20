@@ -143,7 +143,7 @@ namespace KartverketWebApp.Controllers
 
                 var newRapport = new Rapport
                 {
-                    RapportStatus = "Uåpnet",
+                    RapportStatus = "Uï¿½pnet",
                     Opprettet = DateTime.Now,
                     KartEndringId = newKart.KartEndringId,
                     PersonId = 1, // Temporary placeholder

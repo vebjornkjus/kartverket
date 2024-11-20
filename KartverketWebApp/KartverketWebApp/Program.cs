@@ -27,18 +27,36 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("MariaDbConnection"),
         new MySqlServerVersion(new Version(10, 5, 9)),
-        mySqlOptions => mySqlOptions.EnableRetryOnFailure() // Merk parentesene her
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure()
     ));
-
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Cookies for Autentisering
+builder.Services.AddAuthentication("AuthCookie")
+    .AddCookie("AuthCookie", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.Cookie.Name = "KartverketAuth";
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.SlidingExpiration = true;
+    });
+
+// Use AddAuthorizationBuilder for policies
+var authorizationBuilder = builder.Services.AddAuthorizationBuilder();
+authorizationBuilder.AddPolicy("SaksbehandlerPolicy", policy =>
+    policy.RequireClaim("BrukerType", "saksbehandler"));
+
+authorizationBuilder.AddPolicy("AdminPolicy", policy =>
+    policy.RequireClaim("BrukerType", "admin"));
+
 // Add logging configuration
-builder.Logging.ClearProviders();  // Clear any default logging providers
-builder.Logging.AddConsole();      // Add console logging so logs show up in the terminal
-builder.Logging.SetMinimumLevel(LogLevel.Information);  // Set minimum log level to Information
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var app = builder.Build();
 
