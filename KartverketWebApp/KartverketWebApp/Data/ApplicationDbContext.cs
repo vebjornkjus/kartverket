@@ -160,7 +160,7 @@ namespace KartverketWebApp.Data
             // Insert data into Ansatt
             modelBuilder.Entity<Ansatt>().HasData(
                 new { AnsattId = 1, PersonId = 12, Kommunenummer = 0000, AnsettelsesDato = DateTime.Parse("2023-05-15") },
-                new { AnsattId = 2, PersonId = 14, Kommunenummer = 0301, AnsettelsesDato = DateTime.Parse("2024-01-15") },
+                new { AnsattId = 2, PersonId = 14, Kommunenummer = 301, AnsettelsesDato = DateTime.Parse("2024-01-15") },
                 new { AnsattId = 3, PersonId = 15, Kommunenummer = 4601, AnsettelsesDato = DateTime.Parse("2024-02-20") },
                 new { AnsattId = 4, PersonId = 16, Kommunenummer = 1101, AnsettelsesDato = DateTime.Parse("2024-03-10") },
                 new { AnsattId = 5, PersonId = 17, Kommunenummer = 5001, AnsettelsesDato = DateTime.Parse("2024-04-05") },
