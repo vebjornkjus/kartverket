@@ -9,15 +9,15 @@
 
 <div class="nav-beside">
     <div class="beside-topp">
-        <h1 id="hei">Hei, Ola</h1>
+        <h1 id="hei">Hei, @ViewBag.UserName</h1>
         <p id="date-container"></p>
         <script>
-            // Function to display date and weekday
+            // Function to display date and weekday in Norwegian
             function displayDateAndWeekday() {
                 const container = document.getElementById("date-container");
                 const now = new Date();
                 const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-                container.textContent = now.toLocaleDateString("en-US", options);
+                container.textContent = now.toLocaleDateString("no-NO", options); // Change locale to 'no-NO'
             }
             displayDateAndWeekday();
         </script>
@@ -37,7 +37,7 @@
                         <tbody>
                             @foreach (var rapport in Model.Rapporter)
                             {
-                                var rowClass = !string.IsNullOrEmpty(rapport?.RapportStatus) && rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "";
+                                var rowClass = !string.IsNullOrEmpty(rapport?.RapportStatus) && rapport.RapportStatus.Trim() == "Uåpnet" ? "Unnamed" : "";
                                 var url = Url.Action("RapportDetaljert", "Home", new { id = rapport.RapportId });
 
                                 <tr class="@rowClass" onclick="location.href='@url'" style="cursor:pointer">

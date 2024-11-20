@@ -172,31 +172,31 @@ namespace KartverketWebApp.Data
                 new { AnsattId = 11, PersonId = 23, Kommunenummer = 1804, AnsettelsesDato = DateTime.Parse("2024-10-22") }
             );
 
-modelBuilder.Entity<Kart>().HasData(
-    new { KartEndringId = 1, Koordsys = 4258, Tittel = "Veiskade", Beskrivelse = "Hull i veien på hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", MapType = "Norge kart", RapportType = "Veiskade", SteddataId = 1, FilePath = (string?)null },
-    new { KartEndringId = 2, Koordsys = 4258, Tittel = "Oversvømt område", Beskrivelse = "Området ved elvebredden har vært oversvømt i flere dager, og vannstanden ser ut til å fortsette å stige.", MapType = "Norge kart", RapportType = "Oversvømmelse", SteddataId = 2, FilePath = (string?)null },
-    new { KartEndringId = 3, Koordsys = 4258, Tittel = "Fjellskred", Beskrivelse = "Steinras som blokkerer en viktig sti i fjellområdet, og dette skaper en stor risiko for turgåere og fjellklatrere.", MapType = "Turkart", RapportType = "Skredfare", SteddataId = 3, FilePath = (string?)null },
-    new { KartEndringId = 4, Koordsys = 4258, Tittel = "Skadet sti", Beskrivelse = "Stien er kraftig overgrodd med planter, og det er tydelige tegn på erosjon langs hele strekningen.", MapType = "Turkart", RapportType = "Stivedlikehold", SteddataId = 4, FilePath = (string?)null },
-    new { KartEndringId = 5, Koordsys = 4258, Tittel = "Båtvrak", Beskrivelse = "Flere gamle båtvrak har samlet seg langs kystlinjen. Dette kan være farlig for mindre båter og svømmere.", MapType = "Sjøkart", RapportType = "Ryddeaksjon", SteddataId = 5, FilePath = (string?)null },
-    new { KartEndringId = 6, Koordsys = 4258, Tittel = "Trafikkulykke", Beskrivelse = "Alvorlig trafikkulykke på motorveien med flere kjøretøy involvert. Krever umiddelbar rydding for å unngå kø.", MapType = "Norge kart", RapportType = "Trafikkulykke", SteddataId = 6, FilePath = (string?)null },
-    new { KartEndringId = 7, Koordsys = 4258, Tittel = "Snøras", Beskrivelse = "Snøras i fjellområdet som har blokkert veien og kan utgjøre en fare for kommende trafikk.", MapType = "Turkart", RapportType = "Snørasfare", SteddataId = 7, FilePath = (string?)null },
-    new { KartEndringId = 8, Koordsys = 4258, Tittel = "Sykkelsti skadet", Beskrivelse = "Sykkelstien har store sprekker og hull som gjør det vanskelig for syklister å bruke den trygt.", MapType = "Norge kart", RapportType = "Sykkelsti reparasjon", SteddataId = 8, FilePath = (string?)null },
-    new { KartEndringId = 9, Koordsys = 4258, Tittel = "Båthavn", Beskrivelse = "Båthavnen er overfylt med båter, noe som gjør det vanskelig for nye båter å legge til kai eller parkere.", MapType = "Sjøkart", RapportType = "Overfylte båtplasser", SteddataId = 9, FilePath = (string?)null },
-    new { KartEndringId = 10, Koordsys = 4258, Tittel = "Fiskefelt", Beskrivelse = "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for å bevare fiskebestanden.", MapType = "Sjøkart", RapportType = "Fiskeriforvaltning", SteddataId = 10, FilePath = (string?)null }
+                modelBuilder.Entity<Kart>().HasData(
+                    new { KartEndringId = 1, Koordsys = 4258, Tittel = "Veiskade", Beskrivelse = "Hull i veien på hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", MapType = "Norge kart", RapportType = "Veiskade", SteddataId = 1, FilePath = (string?)null },
+                    new { KartEndringId = 2, Koordsys = 4258, Tittel = "Oversvømt område", Beskrivelse = "Området ved elvebredden har vært oversvømt i flere dager, og vannstanden ser ut til å fortsette å stige.", MapType = "Norge kart", RapportType = "Oversvømmelse", SteddataId = 2, FilePath = (string?)null },
+                    new { KartEndringId = 3, Koordsys = 4258, Tittel = "Fjellskred", Beskrivelse = "Steinras som blokkerer en viktig sti i fjellområdet, og dette skaper en stor risiko for turgåere og fjellklatrere.", MapType = "Turkart", RapportType = "Skredfare", SteddataId = 3, FilePath = (string?)null },
+                    new { KartEndringId = 4, Koordsys = 4258, Tittel = "Skadet sti", Beskrivelse = "Stien er kraftig overgrodd med planter, og det er tydelige tegn på erosjon langs hele strekningen.", MapType = "Turkart", RapportType = "Stivedlikehold", SteddataId = 4, FilePath = (string?)null },
+                    new { KartEndringId = 5, Koordsys = 4258, Tittel = "Båtvrak", Beskrivelse = "Flere gamle båtvrak har samlet seg langs kystlinjen. Dette kan være farlig for mindre båter og svømmere.", MapType = "Sjøkart", RapportType = "Ryddeaksjon", SteddataId = 5, FilePath = (string?)null },
+                    new { KartEndringId = 6, Koordsys = 4258, Tittel = "Trafikkulykke", Beskrivelse = "Alvorlig trafikkulykke på motorveien med flere kjøretøy involvert. Krever umiddelbar rydding for å unngå kø.", MapType = "Norge kart", RapportType = "Trafikkulykke", SteddataId = 6, FilePath = (string?)null },
+                    new { KartEndringId = 7, Koordsys = 4258, Tittel = "Snøras", Beskrivelse = "Snøras i fjellområdet som har blokkert veien og kan utgjøre en fare for kommende trafikk.", MapType = "Turkart", RapportType = "Snørasfare", SteddataId = 7, FilePath = (string?)null },
+                    new { KartEndringId = 8, Koordsys = 4258, Tittel = "Sykkelsti skadet", Beskrivelse = "Sykkelstien har store sprekker og hull som gjør det vanskelig for syklister å bruke den trygt.", MapType = "Norge kart", RapportType = "Sykkelsti reparasjon", SteddataId = 8, FilePath = (string?)null },
+                    new { KartEndringId = 9, Koordsys = 4258, Tittel = "Båthavn", Beskrivelse = "Båthavnen er overfylt med båter, noe som gjør det vanskelig for nye båter å legge til kai eller parkere.", MapType = "Sjøkart", RapportType = "Overfylte båtplasser", SteddataId = 9, FilePath = (string?)null },
+                    new { KartEndringId = 10, Koordsys = 4258, Tittel = "Fiskefelt", Beskrivelse = "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for å bevare fiskebestanden.", MapType = "Sjøkart", RapportType = "Fiskeriforvaltning", SteddataId = 10, FilePath = (string?)null }
 );
 
             // Insert data into Rapport
             modelBuilder.Entity<Rapport>().HasData(
-                new { RapportId = 1, RapportStatus = "U�pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 1, KartEndringId = 1 },
-                new { RapportId = 2, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 2, KartEndringId = 2 },
-                new { RapportId = 3, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 3, KartEndringId = 3 },
-                new { RapportId = 4, RapportStatus = "U�pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 4, KartEndringId = 4 },
-                new { RapportId = 5, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 5, KartEndringId = 5 },
-                new { RapportId = 6, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 6, KartEndringId = 6 },
-                new { RapportId = 7, RapportStatus = "U�pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 7, KartEndringId = 7 },
-                new { RapportId = 8, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 8, KartEndringId = 8 },
-                new { RapportId = 9, RapportStatus = "Avklart", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 9, KartEndringId = 9 },
-                new { RapportId = 10, RapportStatus = "U�pnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 10, KartEndringId = 10 }
+                new { RapportId = 1, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 1, KartEndringId = 1, BehandletDato = (DateTime?)null },
+                new { RapportId = 2, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 2, KartEndringId = 2, BehandletDato = (DateTime?)null },
+                new { RapportId = 3, RapportStatus = "Avklart", Opprettet = new DateTime(2022, 3, 13, 10, 0, 0), TildelAnsattId = 1, PersonId = 3, KartEndringId = 3, BehandletDato = new DateTime(2022, 3, 15, 10, 0, 0) },
+                new { RapportId = 4, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 4, KartEndringId = 4, BehandletDato = (DateTime?)null },
+                new { RapportId = 5, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 5, KartEndringId = 5, BehandletDato = (DateTime?)null },
+                new { RapportId = 6, RapportStatus = "Avklart", Opprettet = new DateTime(2022, 8, 20, 14, 30, 0), TildelAnsattId = 1, PersonId = 6, KartEndringId = 6, BehandletDato = new DateTime(2022, 8, 22, 14, 30, 0) },
+                new { RapportId = 7, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 7, KartEndringId = 7, BehandletDato = (DateTime?)null },
+                new { RapportId = 8, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 8, KartEndringId = 8, BehandletDato = (DateTime?)null },
+                new { RapportId = 9, RapportStatus = "Avklart", Opprettet = new DateTime(2023, 1, 8, 9, 15, 0), TildelAnsattId = 1, PersonId = 9, KartEndringId = 9, BehandletDato = new DateTime(2023, 1, 10, 9, 15, 0) },
+                new { RapportId = 10, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 10, KartEndringId = 10, BehandletDato = (DateTime?)null }
             );
 
             // Insert data into Koordinater

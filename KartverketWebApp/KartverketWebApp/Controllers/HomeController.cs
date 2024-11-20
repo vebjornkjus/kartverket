@@ -66,8 +66,7 @@ namespace KartverketWebApp.Controllers
 
         [HttpGet]
         [HttpPost]
-        [HttpPost]
-public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile file)
+public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile? file)
 {
     _logger.LogInformation($"Total coordinates received: {koordinater?.Count}");
     if (koordinater == null || !koordinater.Any())
@@ -76,11 +75,16 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
         return View("Index");
     }
 
-    if (ModelState.IsValid)
+            if (ModelState.ContainsKey("file"))
+            {
+                ModelState["file"].Errors.Clear(); // Exclude file validation errors
+            }
+
+            if (ModelState.IsValid)
     {
         string filePath = null;
 
-        // Håndter filopplasting
+        // Handle file upload (optional)
         if (file != null && file.Length > 0)
         {
             try
@@ -93,11 +97,16 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 {
                     await file.CopyToAsync(stream);
                 }
+                _logger.LogInformation("File uploaded successfully: {FilePath}", filePath);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while uploading the file.");
             }
+        }
+        else
+        {
+            _logger.LogInformation("No file uploaded. Proceeding without a file.");
         }
 
         var firstKoord = koordinater.First();
@@ -145,7 +154,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             MapType = mapType,
             RapportType = rapportType,
             SteddataId = steddata?.Id,
-            FilePath = filePath // Legger til filsti
+            FilePath = filePath
         };
 
         _context.Kart.Add(newKart);
@@ -166,7 +175,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
         var newRapport = new Rapport
         {
-            RapportStatus = "Uåpnet",
+            RapportStatus = "Uapnet",
             Opprettet = DateTime.Now,
             KartEndringId = newKart.KartEndringId,
             PersonId = 1, // Temporary placeholder
@@ -218,11 +227,9 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
 
         [HttpGet]
-        public async Task<IActionResult> Saksbehandler(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Saksbehandler(int ansattId = 1, int page = 1, int pageSize = 10)
         {
-            var ansattId = 8; // Replace with your logic for fetching Ansatt ID
-
-            // Get the Ansatt to fetch the corresponding kommunenummer
+            // Fetch the associated `Ansatt` entity
             var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.AnsattId == ansattId);
             if (ansatt == null || string.IsNullOrEmpty(ansatt.Kommunenummer.ToString()))
             {
@@ -230,7 +237,19 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 return NotFound("Ansatt or Kommunenummer not found.");
             }
 
-            // Fetch polygon data from API based on kommunenummer
+            // Fetch the associated `Person` entity
+            var person = await _context.Person.FirstOrDefaultAsync(p => p.PersonId == ansatt.PersonId);
+            if (person == null)
+            {
+                _logger.LogWarning($"No Person found for PersonId: {ansatt.PersonId}");
+                return NotFound("Person not found.");
+            }
+
+            // Fetch the associated `Bruker` entity
+            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == person.BrukerId);
+            string email = bruker?.Email ?? "Unknown";
+
+            // Fetch polygon data
             string polygonCoordinates = null;
             try
             {
@@ -239,7 +258,6 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
                 var content = await polygonResponse.Content.ReadAsStringAsync();
 
-                // Parse polygon coordinates from the API response
                 var jsonDoc = JsonDocument.Parse(content);
                 if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
                     omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
@@ -254,7 +272,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
             // Fetch reports assigned to the Ansatt
             var reports = await _context.Rapport
-                .Where(r => r.TildelAnsattId == ansattId)
+                .Where(r => r.TildelAnsattId == ansatt.AnsattId)
                 .Include(r => r.Kart)
                     .ThenInclude(k => k.Koordinater)
                 .OrderByDescending(r => r.Opprettet)
@@ -268,7 +286,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
                 .Select(r => new
                 {
                     RapportId = r.RapportId,
-                    Nord = r.Kart.Koordinater.First().Nord, // First coordinate for marker
+                    Nord = r.Kart.Koordinater.First().Nord,
                     Ost = r.Kart.Koordinater.First().Ost,
                     Tittel = r.Kart.Tittel
                 }).ToList();
@@ -278,9 +296,14 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
             ViewBag.PolygonJson = polygonCoordinates;
 
             // Set pagination data
-            var totalReports = await _context.Rapport.CountAsync(r => r.TildelAnsattId == ansattId);
+            var totalReports = await _context.Rapport.CountAsync(r => r.TildelAnsattId == ansatt.AnsattId);
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalReports / (double)pageSize);
+
+            // Pass user info to ViewBag
+            ViewBag.UserName = person.Fornavn;
+            ViewBag.UserLastName = person.Etternavn;
+            ViewBag.UserEmail = email;
 
             // Prepare CombinedViewModel
             var combinedViewModel = new CombinedViewModel
@@ -290,6 +313,7 @@ public async Task<IActionResult> Index(int koordsys, string tittel, string beskr
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
+
 
 
 

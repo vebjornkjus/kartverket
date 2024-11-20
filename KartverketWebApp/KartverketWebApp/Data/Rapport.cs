@@ -10,9 +10,11 @@ namespace KartverketWebApp.Data
         public string RapportStatus { get; set; }
         public DateTime Opprettet { get; set; }
 
-        public int TildelAnsattId { get; set; } // Foreign key til Ansatt
-        public int PersonId { get; set; } // Foreign key til Person
-        public int KartEndringId { get; set; } // Foreign key til Kart
+        public int TildelAnsattId { get; set; } 
+        public int PersonId { get; set; }
+        public int KartEndringId { get; set; } 
+
+        public DateTime? BehandletDato { get; set; } 
 
         // Navigation Properties
         public Ansatt TildelAnsatt { get; set; }

@@ -124,6 +124,14 @@
       },
       "js": {
         "Children": {
+          "Overview.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/Overview.js"
+            },
+            "Patterns": null
+          },
           "Saksbehandler.js": {
             "Children": null,
             "Asset": {

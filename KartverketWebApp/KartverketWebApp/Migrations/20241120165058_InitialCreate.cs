@@ -270,6 +270,8 @@ namespace KartverketWebApp.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Beskrivelse = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    FilePath = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Koordsys = table.Column<int>(type: "int", nullable: false),
                     SteddataId = table.Column<int>(type: "int", nullable: true),
                     MapType = table.Column<string>(type: "longtext", nullable: false)
@@ -345,7 +347,8 @@ namespace KartverketWebApp.Migrations
                     Opprettet = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     TildelAnsattId = table.Column<int>(type: "int", nullable: false),
                     PersonId = table.Column<int>(type: "int", nullable: false),
-                    KartEndringId = table.Column<int>(type: "int", nullable: false)
+                    KartEndringId = table.Column<int>(type: "int", nullable: false),
+                    BehandletDato = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -431,13 +434,13 @@ namespace KartverketWebApp.Migrations
                     { 14, "saksbehandler", "OsloOslo@example.com", "passord123" },
                     { 15, "saksbehandler", "VestlandBergen@example.com", "passord123" },
                     { 16, "saksbehandler", "RogalandStavanger@example.com", "passord123" },
-                    { 17, "saksbehandler", "TrøndelagTrondheim@example.com", "passord123" },
+                    { 17, "saksbehandler", "Tr�ndelagTrondheim@example.com", "passord123" },
                     { 18, "saksbehandler", "VikenDrammen@example.com", "passord123" },
                     { 19, "saksbehandler", "VikenFredrikstad@example.com", "passord123" },
                     { 20, "saksbehandler", "AgderKristiansand@example.com", "passord123" },
                     { 21, "saksbehandler", "RogalandSandnes@example.com", "passord123" },
-                    { 22, "saksbehandler", "TromsOgFinnmarkTromsø@example.com", "passord123" },
-                    { 23, "saksbehandler", "NordlandBodø@example.com", "passord123" }
+                    { 22, "saksbehandler", "TromsOgFinnmarkTroms�@example.com", "passord123" },
+                    { 23, "saksbehandler", "NordlandBod�@example.com", "passord123" }
                 });
 
             migrationBuilder.InsertData(
@@ -447,31 +450,31 @@ namespace KartverketWebApp.Migrations
                 {
                     { 1, "Oslo", 3, "Oslo", 301 },
                     { 2, "Vestland", 46, "Bergen", 4601 },
-                    { 3, "Trøndelag", 50, "Trondheim", 5001 },
+                    { 3, "Tr�ndelag", 50, "Trondheim", 5001 },
                     { 4, "Agder", 42, "Kristiansand", 4204 },
-                    { 5, "Innlandet", 34, "Vågå", 3435 },
-                    { 6, "Troms og Finnmark", 55, "Tromsø", 5401 },
-                    { 7, "Nordland", 18, "Bodø", 1804 },
+                    { 5, "Innlandet", 34, "V�g�", 3435 },
+                    { 6, "Troms og Finnmark", 55, "Troms�", 5401 },
+                    { 7, "Nordland", 18, "Bod�", 1804 },
                     { 8, "Oslo", 3, "Oslo", 301 },
-                    { 9, "Finnmark", 56, "Vadsø", 5405 },
+                    { 9, "Finnmark", 56, "Vads�", 5405 },
                     { 10, "Vestfold og Telemark", 40, "Skien", 3807 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Kart",
-                columns: new[] { "KartEndringId", "Beskrivelse", "Koordsys", "MapType", "RapportType", "SteddataId", "Tittel" },
+                columns: new[] { "KartEndringId", "Beskrivelse", "FilePath", "Koordsys", "MapType", "RapportType", "SteddataId", "Tittel" },
                 values: new object[,]
                 {
-                    { 1, "Hull i veien på hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", 4258, "Norge kart", "Veiskade", 1, "Veiskade" },
-                    { 2, "Området ved elvebredden har vært oversvømt i flere dager, og vannstanden ser ut til å fortsette å stige.", 4258, "Norge kart", "Oversvømmelse", 2, "Oversvømt område" },
-                    { 3, "Steinras som blokkerer en viktig sti i fjellområdet, og dette skaper en stor risiko for turgåere og fjellklatrere.", 4258, "Turkart", "Skredfare", 3, "Fjellskred" },
-                    { 4, "Stien er kraftig overgrodd med planter, og det er tydelige tegn på erosjon langs hele strekningen.", 4258, "Turkart", "Stivedlikehold", 4, "Skadet sti" },
-                    { 5, "Flere gamle båtvrak har samlet seg langs kystlinjen. Dette kan være farlig for mindre båter og svømmere.", 4258, "Sjøkart", "Ryddeaksjon", 5, "Båtvrak" },
-                    { 6, "Alvorlig trafikkulykke på motorveien med flere kjøretøy involvert. Krever umiddelbar rydding for å unngå kø.", 4258, "Norge kart", "Trafikkulykke", 6, "Trafikkulykke" },
-                    { 7, "Snøras i fjellområdet som har blokkert veien og kan utgjøre en fare for kommende trafikk.", 4258, "Turkart", "Snørasfare", 7, "Snøras" },
-                    { 8, "Sykkelstien har store sprekker og hull som gjør det vanskelig for syklister å bruke den trygt.", 4258, "Norge kart", "Sykkelsti reparasjon", 8, "Sykkelsti skadet" },
-                    { 9, "Båthavnen er overfylt med båter, noe som gjør det vanskelig for nye båter å legge til kai eller parkere.", 4258, "Sjøkart", "Overfylte båtplasser", 9, "Båthavn" },
-                    { 10, "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for å bevare fiskebestanden.", 4258, "Sjøkart", "Fiskeriforvaltning", 10, "Fiskefelt" }
+                    { 1, "Hull i veien på hovedgata. Dette hullet har blitt rapportert flere ganger og trenger umiddelbar oppmerksomhet fra vedlikeholdsteamet.", null, 4258, "Norge kart", "Veiskade", 1, "Veiskade" },
+                    { 2, "Området ved elvebredden har vært oversvømt i flere dager, og vannstanden ser ut til å fortsette å stige.", null, 4258, "Norge kart", "Oversvømmelse", 2, "Oversvømt område" },
+                    { 3, "Steinras som blokkerer en viktig sti i fjellområdet, og dette skaper en stor risiko for turgåere og fjellklatrere.", null, 4258, "Turkart", "Skredfare", 3, "Fjellskred" },
+                    { 4, "Stien er kraftig overgrodd med planter, og det er tydelige tegn på erosjon langs hele strekningen.", null, 4258, "Turkart", "Stivedlikehold", 4, "Skadet sti" },
+                    { 5, "Flere gamle båtvrak har samlet seg langs kystlinjen. Dette kan være farlig for mindre båter og svømmere.", null, 4258, "Sjøkart", "Ryddeaksjon", 5, "Båtvrak" },
+                    { 6, "Alvorlig trafikkulykke på motorveien med flere kjøretøy involvert. Krever umiddelbar rydding for å unngå kø.", null, 4258, "Norge kart", "Trafikkulykke", 6, "Trafikkulykke" },
+                    { 7, "Snøras i fjellområdet som har blokkert veien og kan utgjøre en fare for kommende trafikk.", null, 4258, "Turkart", "Snørasfare", 7, "Snøras" },
+                    { 8, "Sykkelstien har store sprekker og hull som gjør det vanskelig for syklister å bruke den trygt.", null, 4258, "Norge kart", "Sykkelsti reparasjon", 8, "Sykkelsti skadet" },
+                    { 9, "Båthavnen er overfylt med båter, noe som gjør det vanskelig for nye båter å legge til kai eller parkere.", null, 4258, "Sjøkart", "Overfylte båtplasser", 9, "Båthavn" },
+                    { 10, "Fiskefeltet er overbeskattet, og det er behov for strengere regulering for å bevare fiskebestanden.", null, 4258, "Sjøkart", "Fiskeriforvaltning", 10, "Fiskefelt" }
                 });
 
             migrationBuilder.InsertData(
@@ -493,15 +496,15 @@ namespace KartverketWebApp.Migrations
                     { 12, 12, "Behandler", "Saks" },
                     { 13, 13, "Minh", "Adam" },
                     { 14, 14, "Oslo", "Ole" },
-                    { 15, 15, "Bergen", "Bjørn" },
+                    { 15, 15, "Bergen", "Bj�rn" },
                     { 16, 16, "Stavanger", "Siri" },
                     { 17, 17, "Trondheim", "Knut" },
                     { 18, 18, "Drammen", "Lena" },
                     { 19, 19, "Fredrikstad", "Marta" },
                     { 20, 20, "Kristiansand", "Nils" },
                     { 21, 21, "Sandnes", "Eva" },
-                    { 22, 22, "Tromsø", "Per" },
-                    { 23, 23, "Bodø", "Ingrid" }
+                    { 22, 22, "Troms�", "Per" },
+                    { 23, 23, "Bod�", "Ingrid" }
                 });
 
             migrationBuilder.InsertData(
@@ -561,19 +564,19 @@ namespace KartverketWebApp.Migrations
 
             migrationBuilder.InsertData(
                 table: "Rapport",
-                columns: new[] { "RapportId", "KartEndringId", "Opprettet", "PersonId", "RapportStatus", "TildelAnsattId" },
+                columns: new[] { "RapportId", "BehandletDato", "KartEndringId", "Opprettet", "PersonId", "RapportStatus", "TildelAnsattId" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3764), 1, "Uåpnet", 1 },
-                    { 2, 2, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3822), 2, "Under behandling", 1 },
-                    { 3, 3, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3827), 3, "Avklart", 1 },
-                    { 4, 4, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3829), 4, "Uåpnet", 1 },
-                    { 5, 5, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3831), 5, "Under behandling", 1 },
-                    { 6, 6, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3833), 6, "Avklart", 1 },
-                    { 7, 7, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3835), 7, "Uåpnet", 1 },
-                    { 8, 8, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3837), 8, "Under behandling", 1 },
-                    { 9, 9, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3839), 9, "Avklart", 1 },
-                    { 10, 10, new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3841), 10, "Uåpnet", 1 }
+                    { 1, null, 1, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(3949), 1, "Uåpnet", 1 },
+                    { 2, null, 2, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4001), 2, "Under behandling", 1 },
+                    { 3, new DateTime(2022, 3, 15, 10, 0, 0, 0, DateTimeKind.Unspecified), 3, new DateTime(2022, 3, 13, 10, 0, 0, 0, DateTimeKind.Unspecified), 3, "Avklart", 1 },
+                    { 4, null, 4, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4007), 4, "Uåpnet", 1 },
+                    { 5, null, 5, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4008), 5, "Under behandling", 1 },
+                    { 6, new DateTime(2022, 8, 22, 14, 30, 0, 0, DateTimeKind.Unspecified), 6, new DateTime(2022, 8, 20, 14, 30, 0, 0, DateTimeKind.Unspecified), 6, "Avklart", 1 },
+                    { 7, null, 7, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4010), 7, "Uåpnet", 1 },
+                    { 8, null, 8, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4011), 8, "Under behandling", 1 },
+                    { 9, new DateTime(2023, 1, 10, 9, 15, 0, 0, DateTimeKind.Unspecified), 9, new DateTime(2023, 1, 8, 9, 15, 0, 0, DateTimeKind.Unspecified), 9, "Avklart", 1 },
+                    { 10, null, 10, new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4013), 10, "Uåpnet", 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -581,26 +584,26 @@ namespace KartverketWebApp.Migrations
                 columns: new[] { "MeldingsId", "Innhold", "MottakerPersonId", "RapportId", "SenderPersonId", "Status", "Tidsstempel" },
                 values: new object[,]
                 {
-                    { 1, "Hei Ola, vi trenger mer informasjon om veiskaden du rapporterte.", 1, 1, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3989) },
-                    { 2, "Hei, her er de detaljerte opplysningene om veiskaden.", 12, 1, 1, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3992) },
-                    { 3, "Kari, kan du bekrefte oversvømmelsen i området du rapporterte?", 2, 2, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3993) },
-                    { 4, "Bekreftet, området er fortsatt oversvømt.", 12, 2, 2, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3995) },
-                    { 5, "Per, vi trenger oppdateringer om fjellskredet.", 3, 3, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3996) },
-                    { 6, "Fjellskredet er nå under overvåking.", 12, 3, 3, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3998) },
-                    { 7, "Anne, kan du sende bilder av den skadede stien?", 4, 4, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(3999) },
-                    { 8, "Selvfølgelig, her er bildene.", 12, 4, 4, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4001) },
-                    { 9, "Nina, har du innsikt i båtvrakene?", 5, 5, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4002) },
-                    { 10, "Ja, vi trenger assistanse for rydding.", 12, 5, 5, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4003) },
-                    { 11, "Erik, vi har behov for rapporter om trafikkulykken.", 6, 6, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4005) },
-                    { 12, "Rapportene er under arbeid og vil bli levert snart.", 12, 6, 6, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4006) },
-                    { 13, "Lise, snørasen er kritisk, kan du igangsette tiltak?", 7, 7, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4007) },
-                    { 14, "Tiltak er iverksatt for å håndtere snørasen.", 12, 7, 7, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4009) },
-                    { 15, "Hans, vi trenger mer informasjon om sykkelsti-skaden.", 8, 8, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4010) },
-                    { 16, "Her er de nødvendige detaljene.", 12, 8, 8, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4011) },
-                    { 17, "Mona, kan du overvåke fiskefeltet?", 9, 9, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4013) },
-                    { 18, "Fiskefeltet overvåkes kontinuerlig.", 12, 9, 9, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4015) },
-                    { 19, "Tom, vi trenger data om fiskeriforvaltningen.", 10, 10, 12, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4016) },
-                    { 20, "Dataene er samlet og kan sendes.", 12, 10, 10, "sendt", new DateTime(2024, 11, 19, 19, 16, 22, 347, DateTimeKind.Local).AddTicks(4017) }
+                    { 1, "Hei Ola, vi trenger mer informasjon om veiskaden du rapporterte.", 1, 1, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4107) },
+                    { 2, "Hei, her er de detaljerte opplysningene om veiskaden.", 12, 1, 1, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4109) },
+                    { 3, "Kari, kan du bekrefte oversv�mmelsen i omr�det du rapporterte?", 2, 2, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4111) },
+                    { 4, "Bekreftet, omr�det er fortsatt oversv�mt.", 12, 2, 2, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4112) },
+                    { 5, "Per, vi trenger oppdateringer om fjellskredet.", 3, 3, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4113) },
+                    { 6, "Fjellskredet er n� under overv�king.", 12, 3, 3, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4115) },
+                    { 7, "Anne, kan du sende bilder av den skadede stien?", 4, 4, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4116) },
+                    { 8, "Selvf�lgelig, her er bildene.", 12, 4, 4, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4117) },
+                    { 9, "Nina, har du innsikt i b�tvrakene?", 5, 5, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4118) },
+                    { 10, "Ja, vi trenger assistanse for rydding.", 12, 5, 5, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4119) },
+                    { 11, "Erik, vi har behov for rapporter om trafikkulykken.", 6, 6, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4121) },
+                    { 12, "Rapportene er under arbeid og vil bli levert snart.", 12, 6, 6, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4122) },
+                    { 13, "Lise, sn�rasen er kritisk, kan du igangsette tiltak?", 7, 7, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4123) },
+                    { 14, "Tiltak er iverksatt for � h�ndtere sn�rasen.", 12, 7, 7, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4125) },
+                    { 15, "Hans, vi trenger mer informasjon om sykkelsti-skaden.", 8, 8, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4126) },
+                    { 16, "Her er de n�dvendige detaljene.", 12, 8, 8, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4127) },
+                    { 17, "Mona, kan du overv�ke fiskefeltet?", 9, 9, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4128) },
+                    { 18, "Fiskefeltet overv�kes kontinuerlig.", 12, 9, 9, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4130) },
+                    { 19, "Tom, vi trenger data om fiskeriforvaltningen.", 10, 10, 12, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4131) },
+                    { 20, "Dataene er samlet og kan sendes.", 12, 10, 10, "sendt", new DateTime(2024, 11, 20, 17, 50, 58, 506, DateTimeKind.Local).AddTicks(4132) }
                 });
 
             migrationBuilder.CreateIndex(
