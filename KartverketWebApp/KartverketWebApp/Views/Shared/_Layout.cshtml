@@ -35,7 +35,7 @@
                 <a asp-action="Saksbehandler" asp-controller="Home">
                     <button class="btn btn-primary">Til oversikt</button>
                 </a>
-                @inject ApplicationDbContext _context // Injiser databasekonteksten
+                @inject ApplicationDbContext _context
 
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -43,15 +43,23 @@
                         <button type="submit" class="btn btn-primary">Logg ut</button>
                     </form>
                     <span class="nav-link">
-                        <i class="bi bi-person-circle"></i> <!-- Symbol som indikerer innlogget bruker -->
+                        <i class="bi bi-person-circle"></i>
                         @{
-                            var email = User.Identity.Name; // Hent e-post fra innlogget bruker
+                            // Hent e-post fra User.Identity.Name
+                            var email = User.Identity.Name;
+
+                            // Slå opp fornavnet i databasen
                             var fornavn = (from bruker in _context.Bruker
                                         join person in _context.Person on bruker.BrukerId equals person.BrukerId
                                         where bruker.Email == email
-                                        select person.Fornavn).FirstOrDefault() ?? "Bruker";
+                                        select person.Fornavn).FirstOrDefault();
+
+                            // Gjør fornavnet penere
+                            var formattedFornavn = string.IsNullOrWhiteSpace(fornavn)
+                                ? "Bruker"
+                                : char.ToUpper(fornavn[0]) + fornavn.Substring(1).ToLower();
                         }
-                        @fornavn
+                        @formattedFornavn
                     </span>
                 }
                 else
