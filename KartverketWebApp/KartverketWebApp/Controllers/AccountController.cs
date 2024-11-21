@@ -31,7 +31,7 @@ namespace KartverketWebApp.Controllers
         [HttpGet]
         public IActionResult Login() => View();
 
-      [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -39,83 +39,63 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
-            try
+            // Sjekk e-post i Bruker-tabellen
+            var bruker = _context.Bruker.FirstOrDefault(b => b.Email == model.Username);
+            if (bruker == null)
             {
-                // Finn brukeren i databasen
-                var bruker = _context.Bruker.FirstOrDefault(b => b.Email == model.Username);
-                if (bruker == null)
-                {
-                    ModelState.AddModelError(string.Empty, "Feil e-postadresse eller passord.");
-                    return View(model);
-                }
+                ModelState.AddModelError(string.Empty, "Feil e-postadresse eller passord.");
+                return View(model);
+            }
 
-                // Start validering av passord
-                var isPasswordValid = false;
-
-                // Prøv å validere som hashet passord
-                if (!string.IsNullOrEmpty(bruker.Passord))
-                {
-                    try
-                    {
-                        var hashedValidationResult = _passwordHasher.VerifyHashedPassword(null, bruker.Passord, model.Password);
-                        if (hashedValidationResult == PasswordVerificationResult.Success)
-                        {
-                            isPasswordValid = true;
-                        }
-                    }
-                    catch
-                    {
-                        // Ikke en hashet passord - fortsett til uhashet sjekk
-                    }
-                }
-
-                // Hvis hashet validering feiler, prøv uhashet validering
-                if (!isPasswordValid && bruker.Passord == model.Password)
+            // Verifiser passord
+            var isPasswordValid = false;
+            if (bruker.Passord == model.Password) // Sjekk klartekst (kun for testing)
+            {
+                isPasswordValid = true;
+            }
+            else
+            {
+                var hashedValidationResult = _passwordHasher.VerifyHashedPassword(null, bruker.Passord, model.Password);
+                if (hashedValidationResult == PasswordVerificationResult.Success)
                 {
                     isPasswordValid = true;
                 }
-
-                if (!isPasswordValid)
-                {
-                    ModelState.AddModelError(string.Empty, "Feil e-postadresse eller passord.");
-                    return View(model);
-                }
-
-                // Opprett claims for brukeren
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, bruker.Email),
-                    new Claim("BrukerType", bruker.BrukerType),
-                    new Claim("BrukerId", bruker.BrukerId.ToString())
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
-
-                // Sett cookie for autentisering
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = model.RememberMe,
-                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
-                };
-
-                await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                return RedirectToAction("Index", "Home");
             }
-            catch (Exception ex)
+
+            if (!isPasswordValid)
             {
-                Console.WriteLine($"Feil under innlogging: {ex.Message}");
-                ModelState.AddModelError(string.Empty, "Det oppstod en feil under innloggingen. Prøv igjen senere.");
+                ModelState.AddModelError(string.Empty, "Feil e-postadresse eller passord.");
+                return View(model);
             }
 
-            return View(model);
+            // Hent fornavn fra Person-tabellen
+            var person = _context.Person.FirstOrDefault(p => p.BrukerId == bruker.BrukerId);
+
+            // Legg til e-post og fornavn i claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, bruker.Email), // Bruk e-post som identifikator
+                new Claim("Fornavn", person?.Fornavn ?? "Ukjent"), // Legg til fornavnet
+                new Claim("BrukerType", bruker.BrukerType) // Valgfritt: Brukerrollen
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
+
+            // Sett opp autentisering med claims
+            await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
+            {
+                IsPersistent = model.RememberMe,
+                ExpiresUtc = DateTime.UtcNow.AddHours(1)
+            });
+
+            return RedirectToAction("Index", "Home");
         }
 
 
-        [HttpGet]
-        public IActionResult Register() => View();
+      [HttpGet]
+       public IActionResult Register() => View();
 
-        [HttpPost]
+      [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -129,6 +109,7 @@ namespace KartverketWebApp.Controllers
 
             if (result.Succeeded)
             {
+                // Logg inn brukeren etter vellykket registrering
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
                 // Hash passordet
@@ -139,13 +120,13 @@ namespace KartverketWebApp.Controllers
                 {
                     Email = model.Email,
                     Passord = hashedPassword,
-                    BrukerType = "Standard",
-                    IdentityUserId = user.Id // Knytter til IdentityUser
+                    BrukerType = "Standard", // Standard brukerrolle
+                    IdentityUserId = user.Id // Knytter IdentityUser med Bruker
                 };
 
                 // Legg til Bruker i databasen
                 _context.Bruker.Add(bruker);
-                await _context.SaveChangesAsync(); // Spar databasen for å generere BrukerId
+                await _context.SaveChangesAsync();
 
                 // Opprett Person-objektet
                 var person = new Person
@@ -159,10 +140,11 @@ namespace KartverketWebApp.Controllers
                 _context.Person.Add(person);
                 await _context.SaveChangesAsync();
 
+                // Videresend til en velkomstside eller hjem
                 return RedirectToAction("Index", "Home");
             }
 
-            // Håndter feil
+            // Håndter feil under oppretting av brukeren
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
@@ -171,7 +153,7 @@ namespace KartverketWebApp.Controllers
             return View(model);
         }
 
-      [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("AuthCookie");

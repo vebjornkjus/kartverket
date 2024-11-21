@@ -28,41 +28,55 @@
 <header>
     <div class="nav-stedholder"> 
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
-
+            <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
         </a>
-        <div id="saksbehandler">
-                <a asp-action="Saksbehandler" asp-controller="Home">
-                    <button class="btn btn-primary">Til oversikt</button>
-                </a>
-                @inject ApplicationDbContext _context // Injiser databasekonteksten
 
-                @if (User.Identity.IsAuthenticated)
+        <div id="saksbehandler">
+            @inject ApplicationDbContext _context
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                // Kun vis knappen hvis brukeren er admin eller saksbehandler
+                if (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler")))
                 {
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-primary">Logg ut</button>
-                    </form>
-                    <span class="nav-link">
-                        <i class="bi bi-person-circle"></i> <!-- Symbol som indikerer innlogget bruker -->
-                        @{
-                            var email = User.Identity.Name; // Hent e-post fra innlogget bruker
-                            var fornavn = (from bruker in _context.Bruker
-                                        join person in _context.Person on bruker.BrukerId equals person.BrukerId
-                                        where bruker.Email == email
-                                        select person.Fornavn).FirstOrDefault() ?? "Bruker";
-                        }
-                        @fornavn
-                    </span>
-                }
-                else
-                {
-                    <a asp-action="Login" asp-controller="Account">
-                        <button class="btn btn-primary">Logg inn</button>
+                    <a asp-action="Saksbehandler" asp-controller="Home">
+                        <button class="btn btn-primary">Til oversikt</button>
                     </a>
                 }
+
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary">Logg ut</button>
+                </form>
+                <span class="nav-link">
+                    <i class="bi bi-person-circle"></i>
+                    @{
+                        // Hent e-post fra User.Identity.Name
+                        var email = User.Identity.Name;
+
+                        // Slå opp fornavnet i databasen
+                        var fornavn = (from bruker in _context.Bruker
+                                       join person in _context.Person on bruker.BrukerId equals person.BrukerId
+                                       where bruker.Email == email
+                                       select person.Fornavn).FirstOrDefault();
+
+                        // Gjør fornavnet penere
+                        var formattedFornavn = string.IsNullOrWhiteSpace(fornavn)
+                            ? "Bruker"
+                            : char.ToUpper(fornavn[0]) + fornavn.Substring(1).ToLower();
+                    }
+                    @formattedFornavn
+                </span>
+            }
+            else
+            {
+                <a asp-action="Login" asp-controller="Account">
+                    <button class="btn btn-primary">Logg inn</button>
+                </a>
+            }
         </div>
     </div>
 </header>
+
 
 
     <div>
