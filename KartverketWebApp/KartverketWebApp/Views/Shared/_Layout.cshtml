@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using KartverketWebApp.Data
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -34,27 +35,31 @@
                 <a asp-action="Saksbehandler" asp-controller="Home">
                     <button class="btn btn-primary">Til oversikt</button>
                 </a>
-            @if (User.Identity.IsAuthenticated)
-            {
-                
-                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-primary">Logg ut</button>
-                </form>
-            <span class="nav-link">
-    <i class="bi bi-person-circle"></i> <!-- Symbol som indikerer innlogget bruker -->
-    @{
-        var username = User.Identity.Name?.Split('@')[0]; // Hent delen før '@'
-    }
-    @username
-</span>
+                @inject ApplicationDbContext _context // Injiser databasekonteksten
 
-            }
-            else
-            {
-                <a asp-action="Login" asp-controller="Account">
-                    <button class="btn btn-primary">Logg inn</button>
-                </a>
-            }
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-primary">Logg ut</button>
+                    </form>
+                    <span class="nav-link">
+                        <i class="bi bi-person-circle"></i> <!-- Symbol som indikerer innlogget bruker -->
+                        @{
+                            var email = User.Identity.Name; // Hent e-post fra innlogget bruker
+                            var fornavn = (from bruker in _context.Bruker
+                                        join person in _context.Person on bruker.BrukerId equals person.BrukerId
+                                        where bruker.Email == email
+                                        select person.Fornavn).FirstOrDefault() ?? "Bruker";
+                        }
+                        @fornavn
+                    </span>
+                }
+                else
+                {
+                    <a asp-action="Login" asp-controller="Account">
+                        <button class="btn btn-primary">Logg inn</button>
+                    </a>
+                }
         </div>
     </div>
 </header>
