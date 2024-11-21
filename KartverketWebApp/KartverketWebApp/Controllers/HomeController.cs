@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using Dapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KartverketWebApp.Controllers
 {
@@ -215,6 +216,7 @@ namespace KartverketWebApp.Controllers
         }
 
         // SECTION: Fetching and Processing Reports
+        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         [HttpGet]
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
