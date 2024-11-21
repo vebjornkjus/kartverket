@@ -7,3 +7,8 @@
 *.cache
 /KartverketWebApp/KartverketWebApp/obj
 KartverketWebApp/KartverketWebApp/obj/KartverketWebApp.csproj.nuget.g.props
+KartverketWebApp/KartverketWebApp/obj/Debug/net8.0/KartverketWebApp.assets.cache
+KartverketWebApp/KartverketWebApp/obj/KartverketWebApp.csproj.nuget.dgspec.json
+KartverketWebApp/KartverketWebApp/obj/KartverketWebApp.csproj.nuget.g.props
+KartverketWebApp/KartverketWebApp/obj/KartverketWebApp.csproj.nuget.g.targets
+KartverketWebApp/KartverketWebApp/obj/project.assets.json
