@@ -266,7 +266,7 @@ namespace KartverketWebApp.Data
                 new { MeldingsId = 6, RapportId = 3, SenderPersonId = 3, MottakerPersonId = 12, Innhold = "Fjellskredet er n� under overv�king.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 4
-                new { MeldingsId = 7, RapportId = 4, SenderPersonId = 12, MottakerPersonId = 4, Innhold = "Anne, kan du sende bilder av den skadede stien?", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 7, RapportId = 4, SenderPersonId = 12, MottakerPersonId = 4, Innhold = "Anne, kan du sende bilder av den skadede stien?", Tidsstempel = DateTime.Now.AddDays(-1), Status = "sendt" },
                 new { MeldingsId = 8, RapportId = 4, SenderPersonId = 4, MottakerPersonId = 12, Innhold = "Selvf�lgelig, her er bildene.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 5

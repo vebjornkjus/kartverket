@@ -211,8 +211,13 @@ namespace KartverketWebApp.Controllers
                 }
             }
 
+
+
             return View("Index");
         }
+
+
+
 
         [HttpPost]
         public IActionResult UpdateStatusAndRedirect(int id)
@@ -236,6 +241,8 @@ namespace KartverketWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
+
+                
             // Fetch the logged-in user's email
             var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
             if (string.IsNullOrEmpty(userEmail))

@@ -1,0 +1,100 @@
+﻿@model KartverketWebApp.Models.CombinedViewModel
+
+<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
+<script src="~/js/Overview.js"></script>
+
+<script>
+    // Pass serialized JSON from the backend to JavaScript
+    window.coordinatesJson = '@Html.Raw(ViewBag.PolygonJson ?? "[]")'; // Pass polygon coordinates
+    window.markersJson = '@Html.Raw(ViewBag.MarkersJson ?? "[]")'; // Pass markers
+    console.log("Markers JSON:", '@Html.Raw(ViewBag.MarkersJson ?? "[]")');
+    console.log("Polygon JSON:", '@Html.Raw(ViewBag.PolygonJson ?? "[]")');
+</script>
+
+
+
+<div class="saksbehandlerMain">
+    <div class="SaksbehandlerContainer">
+        <div class="saksbehandlerNavigering">
+            <div class="innlogetBruker">
+                <div class="brukerIkon"><i class="fa-solid fa-user fa-2xl"></i></div>
+                <div class="brukerinfo">
+                    <p>@ViewBag.UserName @ViewBag.UserLastName</p>
+                    <p>@ViewBag.UserEmail</p>
+                </div>
+            </div>
+            <nav class="vertical-nav">
+                <ul>
+                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item active"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
+                    <li><a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
+
+
+                    
+                </ul>
+            </nav>
+
+        </div>
+        <div id="overviewOmrade">
+            <div class="nav-beside">
+                <div class="beside-topp">
+                    <h1 id="hei">Hei, @ViewBag.UserName</h1>
+                    <p id="date-container"></p>
+                    <script>
+                        // Function to display date and weekday in Norwegian
+                        function displayDateAndWeekday() {
+                            const container = document.getElementById("date-container");
+                            const now = new Date();
+                            const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                            container.textContent = now.toLocaleDateString("no-NO", options); // Change locale to 'no-NO'
+                        }
+                        displayDateAndWeekday();
+                    </script>
+                </div>
+                <div class="beside-main">
+                    <div class="main-container">
+                                <form id="updateStatusForm" method="post" asp-action="UpdateStatusAndRedirect">
+                                    @Html.AntiForgeryToken() <!-- Add anti-forgery token for security -->
+                                    <input type="hidden" id="rapportIdInput" name="id" value="" />
+                                </form>
+                                <div class="melding-left">
+                                    <div class="conversation-list">
+                                        @foreach (var conversation in Model.SammtaleModel)
+                                        {
+                                        <div class="conversation">
+                                            <h4>@conversation.Tittel av @conversation.SenderName</h4>
+                                            <p>@conversation.LastSenderName: @conversation.LastMessage</p>
+                                            <a asp-action="Meldinger" asp-route-rapportId="@conversation.RapportId">View All Messages</a>
+                                        </div>
+                                         <hr />
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function submitFormWithId(rapportId) {
+                    // Set the hidden input value
+                    document.getElementById("rapportIdInput").value = rapportId;
+                    // Submit the form
+                    document.getElementById("updateStatusForm").submit();
+                }
+            </script>
+            </div>
+
+
+
+
+
+
+
+
+

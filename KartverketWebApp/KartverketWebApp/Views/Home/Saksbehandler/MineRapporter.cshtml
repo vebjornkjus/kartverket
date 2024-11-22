@@ -14,7 +14,7 @@
             <nav class="vertical-nav">
                 <ul>
                     <li>
-                        <a asp-controller="Home" asp-action="Saksbehandler" class="nav-item active">
+                        <a asp-controller="Home" asp-action="Saksbehandler" class="nav-item">
                             <i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt
                         </a>
                     </li>
@@ -24,8 +24,8 @@
                         </a>
                     </li>
                     <li>
-                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
-                            <i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item active">
+                            <i class="fa-solid fa-envelope" style="color: #166633;"></i> Mine Rapporter
                         </a>
                     </li>
                     <li>
@@ -86,8 +86,8 @@
                                                     <td>@rapport.Kart?.RapportType</td>
                                                     <td>@rapport.Kart?.MapType</td>
                                                     <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                                                    <td>@rapport.Kart?.Beskrivelse</td>
-                                                    <td>@ViewBag.UserName @ViewBag.UserLastName</td>
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">@rapport.Kart?.Beskrivelse</td>
+                                                    <td>@rapport.Person?.Fornavn @rapport.Person?.Etternavn</td>
                                                 </tr>
                                             }
                                         }
