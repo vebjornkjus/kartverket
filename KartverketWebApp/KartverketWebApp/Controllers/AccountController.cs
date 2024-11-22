@@ -32,7 +32,6 @@ namespace KartverketWebApp.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -97,7 +96,6 @@ namespace KartverketWebApp.Controllers
        public IActionResult Register() => View();
 
       [HttpPost]
-      [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)

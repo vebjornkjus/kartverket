@@ -28,10 +28,10 @@ builder.Services.AddHttpClient<IStednavn, StednavnService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// A
+// Aktiver CSRF-beskyttelse globalt
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute()); // Aktiver CSRF-beskyttelse globalt
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute()); 
 });
 
 // Add PasswordHasher
