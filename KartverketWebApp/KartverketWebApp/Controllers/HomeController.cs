@@ -217,14 +217,17 @@ namespace KartverketWebApp.Controllers
         [HttpPost]
         public IActionResult UpdateStatusAndRedirect(int id)
         {
+            // SQL query to update status
             string query = @"
         UPDATE Rapport
         SET RapportStatus = 'Under behandling'
         WHERE RapportId = @RapportId AND RapportStatus = 'Uåpnet';
     ";
 
+            // Execute the query
             var rowsAffected = _dbConnection.Execute(query, new { RapportId = id });
 
+            // Redirect to the detailed view, regardless of whether the status was updated
             return RedirectToAction("RapportDetaljert", "Home", new { id });
         }
 
@@ -233,73 +236,40 @@ namespace KartverketWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
-            // Fetch the logged-in user's email
-            var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
-            if (string.IsNullOrEmpty(userEmail))
+            // Fetch the associated `Ansatt` entity
+            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.AnsattId == ansattId);
+            if (ansatt == null || string.IsNullOrEmpty(ansatt.Kommunenummer.ToString()))
             {
-                _logger.LogWarning("User email not found in claims.");
-                return Unauthorized("User not logged in.");
+                _logger.LogWarning($"No valid Ansatt or Kommunenummer found for Ansatt ID: {ansattId}");
+                return NotFound("Ansatt or Kommunenummer not found.");
             }
 
-            _logger.LogInformation($"Fetching data for user email: {userEmail}");
-
-            // Find the user in the database
-            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.Email == userEmail);
-            if (bruker == null)
-            {
-                _logger.LogWarning($"No Bruker found for email: {userEmail}");
-                return NotFound("User not found.");
-            }
-
-            // Fetch the associated Person and Ansatt entities
-            var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == bruker.BrukerId);
-            if (person == null)
-            {
-                _logger.LogWarning($"No Person found for BrukerId: {bruker.BrukerId}");
-                return NotFound("Person not found.");
-            }
-
-            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.PersonId == person.PersonId);
-            if (ansatt == null || ansatt.Kommunenummer == 0)
-            {
-                _logger.LogWarning($"Ansatt not found or invalid kommunenummer for PersonId: {person.PersonId}");
-                return NotFound("Ansatt or kommunenummer not found.");
-            }
-
-            // Add user information to ViewBag
-            ViewBag.UserName = person.Fornavn;
-            ViewBag.UserLastName = person.Etternavn;
-            ViewBag.UserEmail = userEmail;
+            // Fetch the associated `Person` and `Bruker` entities
+            var person = await _context.Person.FirstOrDefaultAsync(p => p.PersonId == ansatt.PersonId);
+            var bruker = person != null ? await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == person.BrukerId) : null;
+            string email = bruker?.Email ?? "Unknown";
 
             // Fetch polygon data
             string polygonCoordinates = null;
-            if (ansatt.Kommunenummer == 0)
+            try
             {
-                _logger.LogWarning("Invalid kommunenummer: 0");
-                polygonCoordinates = "[]"; // Fallback to empty polygons
-            }
-            else
-            {
-                try
-                {
-                    var polygonResponse = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{ansatt.Kommunenummer}/omrade");
-                    polygonResponse.EnsureSuccessStatusCode();
+                var polygonResponse = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{ansatt.Kommunenummer}/omrade");
+                polygonResponse.EnsureSuccessStatusCode();
 
-                    var content = await polygonResponse.Content.ReadAsStringAsync();
-                    var jsonDoc = JsonDocument.Parse(content);
-                    if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
-                        omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
-                    {
-                        polygonCoordinates = coordinatesElement.GetRawText();
-                    }
-                }
-                catch (Exception ex)
+                var content = await polygonResponse.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(content);
+                if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
+                    omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
                 {
-                    _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
+                    polygonCoordinates = coordinatesElement.GetRawText();
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
+            }
 
-            // Fetch total counts for active and resolved reports
+            // Fetch total counts
             var totalActiveReports = await _context.Rapport
                 .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
                                  (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"));
@@ -308,7 +278,7 @@ namespace KartverketWebApp.Controllers
                 .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
                                  (r.RapportStatus == "Avklart" || r.RapportStatus == "Avvist"));
 
-            // Fetch paginated active and resolved reports
+            // Fetch paginated reports
             var activeReports = await _context.Rapport
                 .Where(r => r.TildelAnsattId == ansatt.AnsattId &&
                             (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"))
@@ -329,7 +299,7 @@ namespace KartverketWebApp.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Prepare markers for the view
+            // Serialize data to ViewBag
             var markers = activeReports
                 .Where(r => r.Kart != null && r.Kart.Koordinater.Any())
                 .Select(r => new
@@ -340,18 +310,26 @@ namespace KartverketWebApp.Controllers
                     Tittel = r.Kart.Tittel
                 }).ToList();
 
-            ViewBag.PolygonJson = JsonSerializer.Serialize(polygonCoordinates);
             ViewBag.MarkersJson = JsonSerializer.Serialize(markers);
+            ViewBag.PolygonJson = polygonCoordinates;
+
+            // Set pagination data
             ViewBag.ActiveCurrentPage = activePage;
             ViewBag.ActiveTotalPages = (int)Math.Ceiling(totalActiveReports / (double)pageSize);
+
             ViewBag.ResolvedCurrentPage = resolvedPage;
             ViewBag.ResolvedTotalPages = (int)Math.Ceiling(totalResolvedReports / (double)pageSize);
 
-            // Prepare the combined view model
+            // Pass user info to ViewBag
+            ViewBag.UserName = person?.Fornavn;
+            ViewBag.UserLastName = person?.Etternavn;
+            ViewBag.UserEmail = email;
+
+            // Prepare CombinedViewModel
             var combinedViewModel = new CombinedViewModel
             {
-                ActiveRapporter = activeReports,
-                ResolvedRapporter = resolvedReports
+                ActiveRapporter = activeReports, // Active reports
+                ResolvedRapporter = resolvedReports // Resolved reports
             };
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
@@ -473,6 +451,56 @@ namespace KartverketWebApp.Controllers
             }
         }
 
+ [HttpGet]
+[Authorize] // Sørger for at kun innloggede brukere kan få tilgang
+public async Task<IActionResult> MinSide()
+{
+    // Hent e-post fra den innloggede brukeren
+    var email = User.Identity?.Name;
+
+    if (string.IsNullOrEmpty(email))
+    {
+        _logger.LogWarning("Ingen bruker er logget inn.");
+        return RedirectToAction("Login", "Account");
+    }
+
+    // Hent bruker fra databasen basert på e-post
+    var bruker = await _context.Bruker
+        .Include(b => b.Personer) // Henter relaterte personer
+        .FirstOrDefaultAsync(b => b.Email == email);
+
+    if (bruker == null)
+    {
+        _logger.LogWarning($"Bruker med e-post {email} ble ikke funnet.");
+        return RedirectToAction("Login", "Account");
+    }
+
+    // Hent den første tilknyttede personen
+    var person = bruker.Personer.FirstOrDefault();
+    if (person == null)
+    {
+        _logger.LogWarning($"Ingen personer er tilknyttet brukeren med e-post {email}.");
+        return RedirectToAction("Login", "Account");
+    }
+
+    // Hent rapporter knyttet til personen
+    var rapporter = await _context.Rapport
+        .Include(r => r.Kart) // Henter relasjoner til Kart
+        .Where(r => r.PersonId == person.PersonId) // Filtrer rapportene for denne personen
+        .ToListAsync();
+
+    // Opprett ViewModel for å sende data til view
+    var viewModel = new MinSideViewModel
+    {
+        Bruker = bruker,
+        Person = person,
+        Rapporter = rapporter
+    };
+
+    return View(viewModel);
+}
+
+
         [HttpGet]
         public async Task<IActionResult> Soke(string kommunenummer)
         {
@@ -523,7 +551,7 @@ namespace KartverketWebApp.Controllers
         public PartialViewResult MineRapporter() => PartialView("_MineRapporter");
         public PartialViewResult Varslinger() => PartialView("_Oversikt");
         public PartialViewResult Meldinger() => PartialView("_Oversikt");
-        public PartialViewResult TidligereRapporter() => PartialView("_TidligereRapporter");
+        public PartialViewResult TidligereRapporter() => PartialView("_Oversikt");
 
         // SECTION: Helper Methods
         private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)
@@ -549,9 +577,6 @@ namespace KartverketWebApp.Controllers
             _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
             return 1; // Default AnsattId
         }
-
-
-
     }
 }
 
