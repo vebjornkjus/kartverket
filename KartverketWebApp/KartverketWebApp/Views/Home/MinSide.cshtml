@@ -1,0 +1,53 @@
+@model KartverketWebApp.Models.MinSideViewModel
+
+@{
+    ViewData["Title"] = "Min Side";
+}
+
+<h2 style="text-align: center;">Min Side</h2>
+
+@if (Model != null)
+{
+<h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn !</h3>
+
+<div class="text-center">
+    <h4>Personlig informasjon</h4>
+    <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
+    <p>Brukertype: @Model.Bruker.BrukerType</p>
+</div>
+
+
+    <h4>Dine rapporter</h4>
+    @if (Model.Rapporter != null && Model.Rapporter.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Status</th>
+                    <th>Opprettet</th>
+                    <th>Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rapport in Model.Rapporter)
+                {
+                    <tr>
+                        <td>@rapport.RapportId</td>
+                        <td>@rapport.RapportStatus</td>
+                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                        <td>@rapport.Kart?.Tittel </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Du har ingen rapporter.</p>
+    }
+}
+else
+{
+    <p>Ingen data tilgjengelig. Kontroller at brukeren er riktig logget inn og at data eksisterer.</p>
+}
