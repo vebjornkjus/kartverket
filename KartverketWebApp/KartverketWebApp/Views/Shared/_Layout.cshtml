@@ -26,6 +26,7 @@
 </head>
 <body>
 <header>
+    <header>
     <div class="nav-stedholder"> 
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
             <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
@@ -43,6 +44,10 @@
                         <button class="btn btn-primary">Til oversikt</button>
                     </a>
                 }
+
+                <a asp-action="MinSide" asp-controller="Home">
+                    <button class="btn btn-secondary">Min Side</button>
+                </a>
 
                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                     <button type="submit" class="btn btn-primary">Logg ut</button>
@@ -76,6 +81,7 @@
         </div>
     </div>
 </header>
+
 
 
 
