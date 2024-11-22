@@ -1,119 +1,106 @@
 ﻿@model KartverketWebApp.Models.DetaljertViewModel
+<link rel="stylesheet" href="~/css/RapportDetaljert.css" asp-append-version="true" />
 
-<!-- Include Bootstrap CSS for enhanced table styling -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-
-<!-- Your existing CSS -->
-<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
-
-<div class="center-container mt-5">
-    <!-- Top Section: Info and Map -->
-    <div class="main_rapport">
-        <!-- Info Section -->
-        <div class="info">
-            <div class="container">
+<div class="center-container">
+    <div class="detaljert-main">
+        <div class="main_rapport">
+            <!-- Kart Details Section -->
+            <div class="info">
                 <h2>Kart Detaljer</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover">
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
                         <tbody>
                             <tr>
-                                <th scope="row">Kart Tittel</th>
+                                <th>Kart Tittel</th>
                                 <td>@Model.Kart?.Tittel</td>
                             </tr>
                             <tr>
-                                <th scope="row">Beskrivelse</th>
+                                <th>Beskrivelse</th>
                                 <td>@Model.Kart?.Beskrivelse</td>
                             </tr>
                             <tr>
-                                <th scope="row">Kart Type</th>
+                                <th>Kart Type</th>
                                 <td>@Model.Kart?.MapType</td>
                             </tr>
                             <tr>
-                                <th scope="row">Rapport Type</th>
+                                <th>Rapport Type</th>
                                 <td>@Model.Kart?.RapportType</td>
                             </tr>
                             <tr>
-                                <th scope="row">Rapport Status</th>
+                                <th>Rapport Status</th>
                                 <td>@Model.Rapport?.RapportStatus</td>
                             </tr>
                             <tr>
-                                <th scope="row">Opprettet</th>
+                                <th>Opprettet</th>
                                 <td>@Model.Rapport?.Opprettet.ToString("dd.MM.yyyy")</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- Map Section -->
+            <div class="rapport_map">
+                <div id="map_detaljert" style="height: 100%; width: 100%;"></div>
+            </div>
         </div>
 
-        <!-- Map Section -->
-        <div class="rapport_map">
-            <div id="map_detaljert" style="height: 100%; width: 100%;"></div>
-        </div>
-    </div>
-
-    <!-- Bottom Section: Info-Bottom Elements -->
-    <div class="info-bottom-container">
-        <!-- Person Information -->
-        <div class="info-bottom">
-            <div class="container">
+        <!-- Info-Bottom Elements -->
+        <div class="info-bottom-container">
+            <!-- Person Information -->
+            <div class="info-bottom">
                 <h2>Person Informasjon</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover">
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
                         <tbody>
                             <tr>
-                                <th scope="row">Navn</th>
+                                <th>Navn</th>
                                 <td>@Model.Person?.Fornavn @Model.Person?.Etternavn</td>
                             </tr>
                             <tr>
-                                <th scope="row">Email</th>
+                                <th>Email</th>
                                 <td>@Model.Bruker?.Email</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Steddata Information -->
-        <div class="info-bottom">
-            <div class="container">
+            <!-- Steddata Information -->
+            <div class="info-bottom">
                 <h2>Steddata Informasjon</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover">
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
                         <tbody>
                             <tr>
-                                <th scope="row">Kommune</th>
+                                <th>Kommune</th>
                                 <td>@Model.Steddata?.Kommunenavn</td>
                             </tr>
                             <tr>
-                                <th scope="row">Kommunenummer</th>
+                                <th>Kommunenummer</th>
                                 <td>@Model.Steddata?.Kommunenummer</td>
                             </tr>
-                        </tbody>
                             <tr>
-                                <th scope="row">Fylke</th>
+                                <th>Fylke</th>
                                 <td>@Model.Steddata?.Fylkenavn</td>
                             </tr>
                             <tr>
-                                <th scope="row">Fylkesnummer</th>
+                                <th>Fylkesnummer</th>
                                 <td>@Model.Steddata?.Fylkenummer</td>
                             </tr>
-
+                        </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- Koordinater -->
-        <div class="info-bottom">
-            <div class="container">
+            <!-- Koordinater Information -->
+            <div class="info-bottom">
                 <h2>Koordinater</h2>
                 @if (Model.Kart?.Koordinater != null && Model.Kart.Koordinater.Any())
                 {
-                    <div class="table-responsive koordinater-scrollable">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead class="thead-dark">
+                    <div class="custom-table-wrapper koordinater-scrollable">
+                        <table class="custom-table">
+                            <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Nord</th>

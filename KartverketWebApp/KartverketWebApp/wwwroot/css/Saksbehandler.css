@@ -348,3 +348,15 @@ table tr:hover {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+#rapporter {
+    height: 100%;
+}
+#tidligereRapporter {
+    height: 100%;
+}
+#meldinger {
+    height: 100%;
+}
+#varslinger {
+    height: 100%;
+}

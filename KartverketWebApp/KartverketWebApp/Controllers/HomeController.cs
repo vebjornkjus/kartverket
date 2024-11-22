@@ -307,6 +307,7 @@ namespace KartverketWebApp.Controllers
             ViewBag.UserLastName = person?.Etternavn;
             ViewBag.UserEmail = email;
 
+
             // Prepare CombinedViewModel
             var combinedViewModel = new CombinedViewModel
             {
@@ -483,7 +484,7 @@ namespace KartverketWebApp.Controllers
         public PartialViewResult MineRapporter() => PartialView("_MineRapporter");
         public PartialViewResult Varslinger() => PartialView("_Oversikt");
         public PartialViewResult Meldinger() => PartialView("_Oversikt");
-        public PartialViewResult TidligereRapporter() => PartialView("_Oversikt");
+        public PartialViewResult TidligereRapporter() => PartialView("_TidligereRapporter");
 
         // SECTION: Helper Methods
         private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)
@@ -509,6 +510,9 @@ namespace KartverketWebApp.Controllers
             _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
             return 1; // Default AnsattId
         }
+
+
+
     }
 }
 

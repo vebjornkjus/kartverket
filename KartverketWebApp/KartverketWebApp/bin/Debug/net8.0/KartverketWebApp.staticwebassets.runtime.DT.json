@@ -24,6 +24,14 @@
             },
             "Patterns": null
           },
+          "RapportDetaljert.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/RapportDetaljert.css"
+            },
+            "Patterns": null
+          },
           "Register.css": {
             "Children": null,
             "Asset": {
