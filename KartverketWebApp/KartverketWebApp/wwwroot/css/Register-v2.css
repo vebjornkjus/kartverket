@@ -1,0 +1,90 @@
+/* Generell styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #eef2f5;
+    color: #333;
+}
+
+/* Hovedkonteiner */
+.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+.register-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 600px; /* Gjør skjemaet bredere */
+    width: 100%;
+}
+
+/* Header */
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
+/* Form layout */
+.form-row {
+    display: flex;
+    gap: 20px; /* Avstand mellom kolonner */
+}
+
+.form-group {
+    flex: 1;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Passordkrav */
+.password-requirements ul {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.password-requirements li {
+    font-size: 14px;
+    color: red;
+}
+
+/* Knapper */
+.btn-registrer {
+    background-color: #007b3c;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-registrer:hover {
+    background-color: #005a2e;
+}

@@ -61,15 +61,18 @@ builder.Services.AddAuthentication("AuthCookie")
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.Cookie.Name = "KartverketAuth";
-        options.ExpireTimeSpan = TimeSpan.FromHours(1);
-        options.SlidingExpiration = true;
-        options.AccessDeniedPath = "/Home/Index"; // Omdiriger til Index hvis tilgang nektes
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+        options.SlidingExpiration = false;
+        options.Cookie.HttpOnly = true; // Beskyttelse mot XSS
     });
+
 
 // Use AddAuthorizationBuilder for policies
 var authorizationBuilder = builder.Services.AddAuthorizationBuilder();
 authorizationBuilder.AddPolicy("AdminOrSaksbehandlerPolicy", policy =>
     policy.RequireClaim("BrukerType", "admin", "saksbehandler")); // Sjekker om BrukerType er admin eller saksbehandler
+authorizationBuilder.AddPolicy("AdminPolicy", policy =>
+    policy.RequireClaim("BrukerType", "admin"));
 
 // Add logging configuration
 builder.Logging.ClearProviders();
