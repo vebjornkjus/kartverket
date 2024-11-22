@@ -141,7 +141,7 @@ namespace KartverketWebApp.Controllers
                 await _context.SaveChangesAsync();
 
                 // Videresend til en velkomstside eller hjem
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Account");
             }
 
             // Håndter feil under oppretting av brukeren
