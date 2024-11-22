@@ -1,6 +1,5 @@
 ﻿@model KartverketWebApp.Models.CombinedViewModel
 <link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
-<script src="/js/Saksbehandler.js"></script>
 <script src="~/js/Overview.js"></script>
 
 <script>
@@ -25,19 +24,19 @@
             </div>
             <nav class="vertical-nav">
                 <ul>
-                    <li><a href="#" class="nav-item active" data-target="#oversikt"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
-                    <li><a href="#" class="nav-item" data-target="#varslinger"><i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger</a></li>
-                    <li><a href="#" class="nav-item" data-target="#rapporter"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
-                    <li><a href="#" class="nav-item" data-target="#meldinger"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
-                    <li><a href="#" class="nav-item" data-target="#tidligereRapporter"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
+                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item active"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
+                    <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
+
+
                     
                 </ul>
             </nav>
 
         </div>
         <div id="overviewOmrade">
-
-
             <div class="nav-beside">
                 <div class="beside-topp">
                     <h1 id="hei">Hei, @ViewBag.UserName</h1>
@@ -110,7 +109,7 @@
                         </div>
 
                         <div class="overview-right">
-                            <div id="map" class="map"></div>
+                            <div id="map-oversikt" class="map"></div>
                             <div class="data-container">
                                 <div class="data-left"></div>
                                 <div class="data-right"></div>

@@ -38,7 +38,7 @@ namespace KartverketWebApp.Services
 
                 var json = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation($"Position Data Response: {json}");
-
+                    
 
                 var stednavnResponse = JsonSerializer.Deserialize<StednavnResponse>(json);
                 // Check if data was deserialized properly
@@ -62,3 +62,4 @@ namespace KartverketWebApp.Services
     }
     }
 
+    

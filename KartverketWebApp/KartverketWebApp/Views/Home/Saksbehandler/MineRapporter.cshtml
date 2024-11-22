@@ -1,0 +1,141 @@
+﻿@model KartverketWebApp.Models.CombinedViewModel
+<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
+
+<div class="saksbehandlerMain">
+    <div class="SaksbehandlerContainer">
+        <div class="saksbehandlerNavigering">
+            <div class="innlogetBruker">
+                <div class="brukerIkon"><i class="fa-solid fa-user fa-2xl"></i></div>
+                <div class="brukerinfo">
+                    <p>@ViewBag.UserName @ViewBag.UserLastName</p>
+                    <p>@ViewBag.UserEmail</p>
+                </div>
+            </div>
+            <nav class="vertical-nav">
+                <ul>
+                    <li>
+                        <a asp-controller="Home" asp-action="Saksbehandler" class="nav-item active">
+                            <i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div id="overviewOmrade">
+            <div class="nav-beside">
+                <div class="beside-topp">
+                    <h1 id="hei">Hei, @ViewBag.UserName</h1>
+                    <p id="date-container"></p>
+                    <script>
+                        // Function to display date and weekday in Norwegian
+                        function displayDateAndWeekday() {
+                            const container = document.getElementById("date-container");
+                            const now = new Date();
+                            const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                            container.textContent = now.toLocaleDateString("no-NO", options); // Change locale to 'no-NO'
+                        }
+                        displayDateAndWeekday();
+                    </script>
+                </div>
+                <div class="beside-main">
+                    <div class="main-container">
+                        <div class="table-container">
+                            <form id="updateStatusForm" method="post" asp-action="UpdateStatusAndRedirect">
+                                @Html.AntiForgeryToken() <!-- Anti-forgery token for security -->
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kart Tittel</th>
+                                            <th>Rapport Type</th>
+                                            <th>Kart Type</th>
+                                            <th>Opprettet</th>
+                                            <th>Beskrivelse</th>
+                                            <th>Navn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.ActiveRapporter != null && Model.ActiveRapporter.Any())
+                                        {
+                                            foreach (var rapport in Model.ActiveRapporter)
+                                            {
+                                                <tr id="rapport-row-@rapport.RapportId"
+                                                    class="@(rapport.RapportStatus.Trim() == "Uåpnet" ? "unopened" : "")"
+                                                    style="cursor:pointer"
+                                                    onclick="submitFormWithId(@rapport.RapportId)">
+                                                    <td>@rapport.Kart?.Tittel</td>
+                                                    <td>@rapport.Kart?.RapportType</td>
+                                                    <td>@rapport.Kart?.MapType</td>
+                                                    <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                                    <td>@rapport.Kart?.Beskrivelse</td>
+                                                    <td>@ViewBag.UserName @ViewBag.UserLastName</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6">Ingen aktive rapporter tilgjengelig.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <input type="hidden" id="rapportIdInput" name="id" value="" />
+                            </form>
+                        </div>
+                        <!-- Pagination Controls -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                @if (ViewBag.ActiveCurrentPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("MineRapporter", new { activePage = ViewBag.ActiveCurrentPage - 1 })">Previous</a>
+                                    </li>
+                                }
+                                @for (int i = 1; i <= ViewBag.ActiveTotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.ActiveCurrentPage ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("MineRapporter", new { activePage = i })">@i</a>
+                                    </li>
+                                }
+                                @if (ViewBag.ActiveCurrentPage < ViewBag.ActiveTotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("MineRapporter", new { activePage = ViewBag.ActiveCurrentPage + 1 })">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function submitFormWithId(rapportId) {
+        // Set the hidden input value
+        document.getElementById("rapportIdInput").value = rapportId;
+        // Submit the form
+        document.getElementById("updateStatusForm").submit();
+    }
+</script>

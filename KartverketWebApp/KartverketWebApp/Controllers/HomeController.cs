@@ -340,13 +340,13 @@ namespace KartverketWebApp.Controllers
                     Tittel = r.Kart.Tittel
                 }).ToList();
 
-            ViewBag.PolygonJson = JsonSerializer.Serialize(polygonCoordinates);
-            ViewBag.MarkersJson = JsonSerializer.Serialize(markers);
+            // Assign raw polygon JSON directly to the ViewBag
+            ViewBag.PolygonJson = polygonCoordinates; // Use raw string, not serialized again
+            ViewBag.MarkersJson = JsonSerializer.Serialize(markers); // Serialize markers
             ViewBag.ActiveCurrentPage = activePage;
             ViewBag.ActiveTotalPages = (int)Math.Ceiling(totalActiveReports / (double)pageSize);
             ViewBag.ResolvedCurrentPage = resolvedPage;
             ViewBag.ResolvedTotalPages = (int)Math.Ceiling(totalResolvedReports / (double)pageSize);
-
             // Prepare the combined view model
             var combinedViewModel = new CombinedViewModel
             {
@@ -356,6 +356,73 @@ namespace KartverketWebApp.Controllers
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
+
+        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
+        [HttpGet]
+        public async Task<IActionResult> MineRapporter(int activePage = 1, int pageSize = 10)
+        {
+            // Fetch the logged-in user's email
+            var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                _logger.LogWarning("User email not found in claims.");
+                return Unauthorized("User not logged in.");
+            }
+
+            _logger.LogInformation($"Fetching data for user email: {userEmail}");
+
+            // Find the user in the database
+            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.Email == userEmail);
+            if (bruker == null)
+            {
+                _logger.LogWarning($"No Bruker found for email: {userEmail}");
+                return NotFound("User not found.");
+            }
+
+            // Fetch the associated Person and Ansatt entities
+            var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == bruker.BrukerId);
+            if (person == null)
+            {
+                _logger.LogWarning($"No Person found for BrukerId: {bruker.BrukerId}");
+                return NotFound("Person not found.");
+            }
+
+            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.PersonId == person.PersonId);
+            if (ansatt == null || ansatt.Kommunenummer == 0)
+            {
+                _logger.LogWarning($"Ansatt not found or invalid kommunenummer for PersonId: {person.PersonId}");
+                return NotFound("Ansatt or kommunenummer not found.");
+            }
+
+            // Add user information to ViewBag
+            ViewBag.UserName = person.Fornavn;
+            ViewBag.UserLastName = person.Etternavn;
+            ViewBag.UserEmail = userEmail;
+
+            // Fetch only active reports
+            var activeReports = await _context.Rapport
+                .Where(r => r.TildelAnsattId == ansatt.AnsattId &&
+                            (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"))
+                .Include(r => r.Kart) // Include Kart entity
+                .OrderByDescending(r => r.Opprettet)
+                .Skip((activePage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Populate the CombinedViewModel
+            var combinedViewModel = new CombinedViewModel
+            {
+                ActiveRapporter = activeReports
+            };
+
+            ViewBag.ActiveCurrentPage = activePage;
+            ViewBag.ActiveTotalPages = (int)Math.Ceiling((double)activeReports.Count / pageSize);
+
+            return View("~/Views/Home/Saksbehandler/MineRapporter.cshtml", combinedViewModel);
+        }
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> RapportDetaljert(int id)
@@ -399,6 +466,7 @@ namespace KartverketWebApp.Controllers
 
             return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
         }
+
 
         public IActionResult CorrectionsOverview()
         {
@@ -518,12 +586,6 @@ namespace KartverketWebApp.Controllers
             }
         }
 
-        // SECTION: Partial Views
-        public PartialViewResult Oversikt() => PartialView("_Oversikt");
-        public PartialViewResult MineRapporter() => PartialView("_MineRapporter");
-        public PartialViewResult Varslinger() => PartialView("_Oversikt");
-        public PartialViewResult Meldinger() => PartialView("_Oversikt");
-        public PartialViewResult TidligereRapporter() => PartialView("_TidligereRapporter");
 
         // SECTION: Helper Methods
         private async Task<int> GetTildelAnsattIdAsync(int? kommunenummer)

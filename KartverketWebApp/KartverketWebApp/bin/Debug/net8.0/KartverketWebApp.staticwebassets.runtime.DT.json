@@ -676,6 +676,20 @@
         "Asset": null,
         "Patterns": null
       },
+      "RapportBilder": {
+        "Children": {
+          "74aa5c82-6a10-40d3-b569-642c9e505027.png": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "RapportBilder/74aa5c82-6a10-40d3-b569-642c9e505027.png"
+            },
+            "Patterns": null
+          }
+        },
+        "Asset": null,
+        "Patterns": null
+      },
       "Identity": {
         "Children": {
           "css": {
