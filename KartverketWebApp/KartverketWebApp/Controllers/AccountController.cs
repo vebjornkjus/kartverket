@@ -1,29 +1,22 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using KartverketWebApp.Data; // Inkluder namespace for ApplicationDbContext
 using KartverketWebApp.Models; // Inkluder namespace for Bruker-modellen
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 
 namespace KartverketWebApp.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher<IdentityUser> _passwordHasher;
 
         public AccountController(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
             ApplicationDbContext context,
             IPasswordHasher<IdentityUser> passwordHasher) // Initialiser passwordHasher
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _context = context;
             _passwordHasher = passwordHasher; // Initialiser passwordHasher
         }
@@ -92,10 +85,10 @@ namespace KartverketWebApp.Controllers
         }
 
 
-      [HttpGet]
-       public IActionResult Register() => View();
+        [HttpGet]
+        public IActionResult Register() => View();
 
-      [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -103,54 +96,70 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
-            // Opprett IdentityUser
-            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
+            // Legg til passordkrav
+            if (!ErPassordGyldig(model.Password))
             {
-                // Logg inn brukeren etter vellykket registrering
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
-                // Hash passordet
-                var hashedPassword = _passwordHasher.HashPassword(user, model.Password);
-
-                // Opprett Bruker-objektet
-                var bruker = new Bruker
-                {
-                    Email = model.Email,
-                    Passord = hashedPassword,
-                    BrukerType = "Standard", // Standard brukerrolle
-                    IdentityUserId = user.Id // Knytter IdentityUser med Bruker
-                };
-
-                // Legg til Bruker i databasen
-                _context.Bruker.Add(bruker);
-                await _context.SaveChangesAsync();
-
-                // Opprett Person-objektet
-                var person = new Person
-                {
-                    Fornavn = model.Fornavn,
-                    Etternavn = model.Etternavn,
-                    BrukerId = bruker.BrukerId // Referanse til Bruker
-                };
-
-                // Legg til Person i databasen
-                _context.Person.Add(person);
-                await _context.SaveChangesAsync();
-
-                // Videresend til en velkomstside eller hjem
-                return RedirectToAction("Login", "Account");
+                ModelState.AddModelError(string.Empty, "Passordet må være minst 8 tegn langt, inneholde minst én stor bokstav, én liten bokstav,og ett tall");
+                return View(model);
             }
 
-            // Håndter feil under oppretting av brukeren
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+            // Hash passordet
+            var hashedPassword = _passwordHasher.HashPassword(null, model.Password);
 
-            return View(model);
+            // Opprett Bruker-objektet
+            var bruker = new Bruker
+            {
+                Email = model.Email,
+                Passord = hashedPassword, // Lagre hashet passord
+                BrukerType = "Standard" // Standard brukerrolle
+            };
+
+            // Legg til Bruker i databasen
+            _context.Bruker.Add(bruker);
+            await _context.SaveChangesAsync();
+
+            // Opprett Person-objektet
+            var person = new Person
+            {
+                Fornavn = model.Fornavn,
+                Etternavn = model.Etternavn,
+                BrukerId = bruker.BrukerId // Referanse til Bruker
+            };
+
+            // Legg til Person i databasen
+            _context.Person.Add(person);
+            await _context.SaveChangesAsync();
+
+            // Logg inn brukeren automatisk etter registrering
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, bruker.Email),
+                new Claim("Fornavn", model.Fornavn),
+                new Claim("BrukerType", bruker.BrukerType)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
+
+            await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
+            {
+                IsPersistent = false, // Midlertidig innlogging
+                ExpiresUtc = DateTime.UtcNow.AddHours(1)
+            });
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Metode for å validere passordet basert på krav
+        private bool ErPassordGyldig(string password)
+        {
+            if (string.IsNullOrEmpty(password) || password.Length < 8)
+                return false;
+
+            bool harStorBokstav = password.Any(char.IsUpper);
+            bool harLitenBokstav = password.Any(char.IsLower);
+            bool harTall = password.Any(char.IsDigit);
+
+            return harStorBokstav && harLitenBokstav && harTall;
         }
 
         [HttpPost]

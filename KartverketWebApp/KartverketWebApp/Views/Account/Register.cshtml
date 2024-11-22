@@ -1,43 +1,80 @@
 @model KartverketWebApp.Models.RegisterViewModel
 
-<link rel="stylesheet" href="~/css/Register.css">
+<link rel="stylesheet" href="~/css/Register-v2.css">
 
-<div class="register_main">
-    <div class="register_container">
-        
-        <img id="kartverket_logo" src="~/images/standard_kartverket.png" alt="Kartverket Logo">
+<div class="register-page">
+    <div class="register-container">
+        <header class="register-header">
+            <img src="/images/standard_kartverket.png" alt="Kartverket Logo" class="logo" />
+            <h1>Registrer din konto</h1>
+        </header>
 
-        <form asp-action="Register" method="post">
-            <div asp-validation-summary="All"></div>
-
-            <div>
-                <label asp-for="Fornavn"></label>
-                <input asp-for="Fornavn" type="text" required />
+        <form asp-controller="Account" asp-action="Register" method="post" id="registerForm" class="register-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Fornavn">Fornavn</label>
+                    <input asp-for="Fornavn" class="form-control" placeholder="Skriv inn ditt fornavn" />
+                    <span class="text-danger" asp-validation-for="Fornavn"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Etternavn">Etternavn</label>
+                    <input asp-for="Etternavn" class="form-control" placeholder="Skriv inn ditt etternavn" />
+                    <span class="text-danger" asp-validation-for="Etternavn"></span>
+                </div>
             </div>
-
-            <div>
-                <label asp-for="Etternavn"></label>
-                <input asp-for="Etternavn" type="text" required />
+            <div class="form-group">
+                <label asp-for="Email">E-post</label>
+                <input asp-for="Email" class="form-control" placeholder="Skriv inn din e-postadresse" />
+                <span class="text-danger" asp-validation-for="Email"></span>
             </div>
-
-            <div>
-                <label asp-for="Email"></label>
-                <input asp-for="Email" type="email" required />
+            <div class="form-group">
+                <label asp-for="Password">Passord</label>
+                <input asp-for="Password" class="form-control" placeholder="Skriv inn et passord" id="Password" />
+                <span class="text-danger" asp-validation-for="Password"></span>
+                <small class="password-requirements">
+                    Passordkrav:
+                    <ul id="passwordRequirements">
+                        <li id="length" class="requirement">Minst 8 tegn</li>
+                        <li id="uppercase" class="requirement">Minst én stor bokstav</li>
+                        <li id="lowercase" class="requirement">Minst én liten bokstav</li>
+                        <li id="number" class="requirement">Minst ett tall</li>
+                    </ul>
+                </small>
             </div>
-            
-            <div>
-                <label asp-for="Password"></label>
-                <input asp-for="Password" type="password" required />
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Bekreft passord</label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Bekreft passordet ditt" />
+                <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
             </div>
-            
-            <div>
-                <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" type="password" required />
-            </div>
-            
-            <button type="submit" class="btn_register">Registrer deg</button>
+            <button type="submit" class="btn btn-registrer">Registrer</button>
         </form>
-        
-        <a class="btn_login" href="/Account/Login">Allerede registrert? Logg inn her</a>
+
+        <footer>
+            <p>Har du allerede en konto? <a asp-controller="Account" asp-action="Login">Logg inn her</a>.</p>
+        </footer>
     </div>
 </div>
+
+<script>
+    // Dynamisk validering av passord
+    document.getElementById('Password').addEventListener('input', function () {
+        const password = this.value;
+
+        // Valideringskriterier
+        const length = document.getElementById('length');
+        const uppercase = document.getElementById('uppercase');
+        const lowercase = document.getElementById('lowercase');
+        const number = document.getElementById('number');
+
+        // Funksjon for å oppdatere krav
+        function updateRequirement(element, condition) {
+            element.style.color = condition ? 'green' : 'red';
+        }
+
+        // Oppdaterer fargene basert på oppfylte krav
+        updateRequirement(length, password.length >= 8);
+        updateRequirement(uppercase, /[A-Z]/.test(password));
+        updateRequirement(lowercase, /[a-z]/.test(password));
+        updateRequirement(number, /\d/.test(password));
+    });
+</script>
