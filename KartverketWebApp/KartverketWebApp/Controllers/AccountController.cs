@@ -32,6 +32,7 @@ namespace KartverketWebApp.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -96,6 +97,7 @@ namespace KartverketWebApp.Controllers
        public IActionResult Register() => View();
 
       [HttpPost]
+      [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -141,7 +143,7 @@ namespace KartverketWebApp.Controllers
                 await _context.SaveChangesAsync();
 
                 // Videresend til en velkomstside eller hjem
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Account");
             }
 
             // Håndter feil under oppretting av brukeren

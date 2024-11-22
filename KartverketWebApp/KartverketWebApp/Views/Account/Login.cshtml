@@ -10,6 +10,7 @@
 
         <!-- Innloggingsskjema -->
         <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="All" class="validation-errors"></div>
 
             <div class="form-group">
