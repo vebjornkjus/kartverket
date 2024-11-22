@@ -81,29 +81,29 @@ namespace KartverketWebApp.Controllers
             {
                 string filePath = null;
 
-                // Handle file upload (optional)
+                // Håndterer filopplastning
                 if (file != null && file.Length > 0)
                 {
                     try
                     {
                         var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                        filePath = Path.Combine("uploads", uniqueFileName);
+                        filePath = Path.Combine("RapportBilder", uniqueFileName);
                         var serverFilePath = Path.Combine("wwwroot", filePath);
 
                         using (var stream = new FileStream(serverFilePath, FileMode.Create))
                         {
                             await file.CopyToAsync(stream);
                         }
-                        _logger.LogInformation("File uploaded successfully: {FilePath}", filePath);
+                        _logger.LogInformation("File opplastning vellykket: {FilePath}", filePath);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error occurred while uploading the file.");
+                        _logger.LogError(ex, "Et problem oppsto ved opplastningen.");
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("No file uploaded. Proceeding without a file.");
+                    _logger.LogInformation("Ingen fil lastet opp. Fortsetter uten en fil.");
                 }
 
                 var firstKoord = koordinater.First();
