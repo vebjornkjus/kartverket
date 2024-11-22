@@ -8006,6 +8006,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Dapper >= 2.1.35",
+      "Microsoft.AspNetCore.Cryptography.KeyDerivation >= 8.0.10",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.10",
       "Microsoft.AspNetCore.Identity.UI >= 8.0.10",
       "Microsoft.EntityFrameworkCore >= 8.0.10",
@@ -8026,27 +8027,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\frede\\.nuget\\packages\\": {}
+    "/Users/vebjornkjus/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+      "projectUniqueName": "/Users/vebjornkjus/Documents/IT/H24/IS-202/gruppe-8/kartverket/KartverketWebApp/KartverketWebApp/KartverketWebApp.csproj",
       "projectName": "KartverketWebApp",
-      "projectPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
-      "packagesPath": "C:\\Users\\frede\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\obj\\",
+      "projectPath": "/Users/vebjornkjus/Documents/IT/H24/IS-202/gruppe-8/kartverket/KartverketWebApp/KartverketWebApp/KartverketWebApp.csproj",
+      "packagesPath": "/Users/vebjornkjus/.nuget/packages/",
+      "outputPath": "/Users/vebjornkjus/Documents/IT/H24/IS-202/gruppe-8/kartverket/KartverketWebApp/KartverketWebApp/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\frede\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/vebjornkjus/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -8073,6 +8071,10 @@
           "Dapper": {
             "target": "Package",
             "version": "[2.1.35, )"
+          },
+          "Microsoft.AspNetCore.Cryptography.KeyDerivation": {
+            "target": "Package",
+            "version": "[8.0.10, )"
           },
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
             "target": "Package",
@@ -8164,7 +8166,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

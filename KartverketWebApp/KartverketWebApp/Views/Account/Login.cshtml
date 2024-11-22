@@ -1,6 +1,6 @@
 @model KartverketWebApp.Models.LoginViewModel
 
-<link rel="stylesheet" href="~/css/Login.css">
+<link rel="stylesheet" href="~/css/Login-v1.css">
 
 <div class="login_main">
     <div class="login_container">
@@ -14,12 +14,12 @@
 
             <div class="form-group">
                 <label asp-for="Username">E-postadresse</label>
-                <input asp-for="Username" type="email" placeholder="Din e-post" required />
+                <input asp-for="Username" type="email" placeholder="Din e-post" required class="form-control validate-field" />
             </div>
 
             <div class="form-group">
                 <label asp-for="Password">Passord</label>
-                <input asp-for="Password" type="password" placeholder="Ditt passord" required />
+                <input asp-for="Password" type="password" placeholder="Ditt passord" required class="form-control validate-field" />
             </div>
 
             <div class="form-group">
@@ -34,3 +34,18 @@
         <a href="/Account/Register" class="register-link">Ny bruker? Registrer deg her</a>
     </div>
 </div>
+
+<script>
+    // Legg til en event listener for å validere feltene
+    document.querySelectorAll('.validate-field').forEach(input => {
+        input.addEventListener('input', function () {
+            if (this.checkValidity()) {
+                this.classList.add('valid');
+                this.classList.remove('invalid');
+            } else {
+                this.classList.add('invalid');
+                this.classList.remove('valid');
+            }
+        });
+    });
+</script>

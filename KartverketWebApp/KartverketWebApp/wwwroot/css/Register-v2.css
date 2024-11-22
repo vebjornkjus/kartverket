@@ -73,7 +73,7 @@ input {
 
 /* Knapper */
 .btn-registrer {
-    background-color: #007b3c;
+    background-color: #166631;
     color: white;
     padding: 12px;
     border: none;
@@ -86,5 +86,5 @@ input {
 }
 
 .btn-registrer:hover {
-    background-color: #005a2e;
+    background-color: #0f4923;
 }

@@ -32,6 +32,13 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
+            // Ekstra validering for e-postformat
+            if (!ErEpostGyldig(model.Username))
+            {
+                ModelState.AddModelError(string.Empty, "Ugyldig e-postformat. Sørg for at e-postadressen er riktig skrevet.");
+                return View(model);
+            }
+
             // Sjekk e-post i Bruker-tabellen
             var bruker = _context.Bruker.FirstOrDefault(b => b.Email == model.Username);
             if (bruker == null)
@@ -84,6 +91,16 @@ namespace KartverketWebApp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        // Ny metode for å validere e-post
+        private bool ErEpostGyldig(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            // Regex for å validere e-postformat
+            var regex = new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+            return regex.IsMatch(email);
+        }
 
         [HttpGet]
         public IActionResult Register() => View();
