@@ -1,7 +1,16 @@
 ﻿@model KartverketWebApp.Models.CombinedViewModel
 <link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
 <script src="/js/Saksbehandler.js"></script>
-<script src="~/js/MineRapporter.js"></script>
+<script src="~/js/Overview.js"></script>
+
+<script>
+    // Pass serialized JSON from the backend to JavaScript
+    window.coordinatesJson = '@Html.Raw(ViewBag.PolygonJson ?? "[]")'; // Pass polygon coordinates
+    window.markersJson = '@Html.Raw(ViewBag.MarkersJson ?? "[]")'; // Pass markers
+    console.log("Markers JSON:", '@Html.Raw(ViewBag.MarkersJson ?? "[]")');
+    console.log("Polygon JSON:", '@Html.Raw(ViewBag.PolygonJson ?? "[]")');
+</script>
+
 
 
 <div class="saksbehandlerMain">
@@ -172,9 +181,4 @@
         </div>
         </div>
 </div>
-<script src="~/js/Overview.js"></script>
-<script>
-    // Pass serialized JSON from the backend to JavaScript
-    window.coordinatesJson = '@Html.Raw(ViewBag.PolygonJson ?? "[]")'; // Pass polygon coordinates
-    window.markersJson = '@Html.Raw(ViewBag.MarkersJson ?? "[]")'; // Pass markers
-</script>
+
