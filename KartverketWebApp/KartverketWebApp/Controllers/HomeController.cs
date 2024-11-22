@@ -236,40 +236,73 @@ namespace KartverketWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
-            // Fetch the associated `Ansatt` entity
-            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.AnsattId == ansattId);
-            if (ansatt == null || string.IsNullOrEmpty(ansatt.Kommunenummer.ToString()))
+            // Fetch the logged-in user's email
+            var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
+            if (string.IsNullOrEmpty(userEmail))
             {
-                _logger.LogWarning($"No valid Ansatt or Kommunenummer found for Ansatt ID: {ansattId}");
-                return NotFound("Ansatt or Kommunenummer not found.");
+                _logger.LogWarning("User email not found in claims.");
+                return Unauthorized("User not logged in.");
             }
 
-            // Fetch the associated `Person` and `Bruker` entities
-            var person = await _context.Person.FirstOrDefaultAsync(p => p.PersonId == ansatt.PersonId);
-            var bruker = person != null ? await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == person.BrukerId) : null;
-            string email = bruker?.Email ?? "Unknown";
+            _logger.LogInformation($"Fetching data for user email: {userEmail}");
+
+            // Find the user in the database
+            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.Email == userEmail);
+            if (bruker == null)
+            {
+                _logger.LogWarning($"No Bruker found for email: {userEmail}");
+                return NotFound("User not found.");
+            }
+
+            // Fetch the associated Person and Ansatt entities
+            var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == bruker.BrukerId);
+            if (person == null)
+            {
+                _logger.LogWarning($"No Person found for BrukerId: {bruker.BrukerId}");
+                return NotFound("Person not found.");
+            }
+
+            var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.PersonId == person.PersonId);
+            if (ansatt == null || ansatt.Kommunenummer == 0)
+            {
+                _logger.LogWarning($"Ansatt not found or invalid kommunenummer for PersonId: {person.PersonId}");
+                return NotFound("Ansatt or kommunenummer not found.");
+            }
+
+            // Add user information to ViewBag
+            ViewBag.UserName = person.Fornavn;
+            ViewBag.UserLastName = person.Etternavn;
+            ViewBag.UserEmail = userEmail;
 
             // Fetch polygon data
             string polygonCoordinates = null;
-            try
+            if (ansatt.Kommunenummer == 0)
             {
-                var polygonResponse = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{ansatt.Kommunenummer}/omrade");
-                polygonResponse.EnsureSuccessStatusCode();
-
-                var content = await polygonResponse.Content.ReadAsStringAsync();
-                var jsonDoc = JsonDocument.Parse(content);
-                if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
-                    omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
+                _logger.LogWarning("Invalid kommunenummer: 0");
+                polygonCoordinates = "[]"; // Fallback to empty polygons
+            }
+            else
+            {
+                try
                 {
-                    polygonCoordinates = coordinatesElement.GetRawText();
+                    var polygonResponse = await _httpClient.GetAsync($"{_apiSettings.KommuneInfoApiBaseUrl}/kommuner/{ansatt.Kommunenummer}/omrade");
+                    polygonResponse.EnsureSuccessStatusCode();
+
+                    var content = await polygonResponse.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(content);
+                    if (jsonDoc.RootElement.TryGetProperty("omrade", out JsonElement omradeElement) &&
+                        omradeElement.TryGetProperty("coordinates", out JsonElement coordinatesElement))
+                    {
+                        polygonCoordinates = coordinatesElement.GetRawText();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching polygon data for kommunenummer: {Kommunenummer}", ansatt.Kommunenummer);
-            }
 
-            // Fetch total counts
+            // Fetch total counts for active and resolved reports
             var totalActiveReports = await _context.Rapport
                 .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
                                  (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"));
@@ -278,7 +311,7 @@ namespace KartverketWebApp.Controllers
                 .CountAsync(r => r.TildelAnsattId == ansatt.AnsattId &&
                                  (r.RapportStatus == "Avklart" || r.RapportStatus == "Avvist"));
 
-            // Fetch paginated reports
+            // Fetch paginated active and resolved reports
             var activeReports = await _context.Rapport
                 .Where(r => r.TildelAnsattId == ansatt.AnsattId &&
                             (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling"))
@@ -299,7 +332,7 @@ namespace KartverketWebApp.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Serialize data to ViewBag
+            // Prepare markers for the view
             var markers = activeReports
                 .Where(r => r.Kart != null && r.Kart.Koordinater.Any())
                 .Select(r => new
@@ -315,14 +348,13 @@ namespace KartverketWebApp.Controllers
             ViewBag.MarkersJson = JsonSerializer.Serialize(markers); // Serialize markers
             ViewBag.ActiveCurrentPage = activePage;
             ViewBag.ActiveTotalPages = (int)Math.Ceiling(totalActiveReports / (double)pageSize);
-
             ViewBag.ResolvedCurrentPage = resolvedPage;
             ViewBag.ResolvedTotalPages = (int)Math.Ceiling(totalResolvedReports / (double)pageSize);
             // Prepare the combined view model
             var combinedViewModel = new CombinedViewModel
             {
-                ActiveRapporter = activeReports, // Active reports
-                ResolvedRapporter = resolvedReports // Resolved reports
+                ActiveRapporter = activeReports,
+                ResolvedRapporter = resolvedReports
             };
 
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
