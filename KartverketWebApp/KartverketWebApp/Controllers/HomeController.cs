@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace KartverketWebApp.Controllers
 {
@@ -171,14 +172,29 @@ namespace KartverketWebApp.Controllers
 
                 var tildelAnsattId = await GetTildelAnsattIdAsync(steddata?.Kommunenummer);
 
+                // Legg til logikk for å hente innlogget brukers BrukerId
+                var brukerId = User.FindFirstValue(ClaimTypes.Name); // Henter brukerens e-post fra claims
+                var bruker = _context.Bruker.FirstOrDefault(b => b.Email == brukerId);
+                if (bruker == null)
+                {
+                    _logger.LogWarning("Bruker ikke funnet.");
+                    return BadRequest("Bruker ikke funnet.");
+                }
+
+                var person = _context.Person.FirstOrDefault(p => p.BrukerId == bruker.BrukerId);
+                if (person == null)
+                {
+                    _logger.LogWarning("Person ikke funnet.");
+                    return BadRequest("Person ikke funnet.");
+                }
+
                 var newRapport = new Rapport
                 {
                     RapportStatus = "Uåpnet",
                     Opprettet = DateTime.Now,
                     KartEndringId = newKart.KartEndringId,
-                    PersonId = 1, // Temporary placeholder
+                    PersonId = person.PersonId, // Koble rapport til innlogget person
                     TildelAnsattId = tildelAnsattId,
-
                 };
 
                 _context.Rapport.Add(newRapport);
