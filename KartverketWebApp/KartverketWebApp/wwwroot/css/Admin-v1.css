@@ -1,0 +1,98 @@
+﻿/* Generelle stiler */
+body {
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Tittel */
+h2 {
+    font-size: 28px;
+    color: #444;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Filterform */
+form {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+    .btn-secondary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary:active {
+        background-color: #003f7f;
+    }
+
+/* Tabell */
+.table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+    .table th, .table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+
+    .table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+    }
+
+    .table td {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+/* Mobilvennlighet */
+@media (max-width: 768px) {
+    .table {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-secondary {
+        width: 100%;
+    }
+}

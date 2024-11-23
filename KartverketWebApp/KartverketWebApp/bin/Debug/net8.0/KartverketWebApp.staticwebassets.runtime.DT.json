@@ -8,6 +8,14 @@
     "Children": {
       "css": {
         "Children": {
+          "Admin-v1.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/Admin-v1.css"
+            },
+            "Patterns": null
+          },
           "LeafletOverride.css": {
             "Children": null,
             "Asset": {
