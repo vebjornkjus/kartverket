@@ -8,11 +8,11 @@
     "Children": {
       "css": {
         "Children": {
-          "Admin.css": {
+          "Admin-v1.css": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "css/Admin.css"
+              "SubPath": "css/Admin-v1.css"
             },
             "Patterns": null
           },
@@ -29,6 +29,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "css/Login.css"
+            },
+            "Patterns": null
+          },
+          "MinSide.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/MinSide.css"
             },
             "Patterns": null
           },
