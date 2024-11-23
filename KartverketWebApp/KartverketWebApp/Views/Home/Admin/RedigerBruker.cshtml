@@ -1,0 +1,50 @@
+﻿@model KartverketWebApp.Models.BrukerOversiktViewModel
+
+@{
+    ViewData["Title"] = "Rediger Bruker";
+}
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Admin-v1.css" asp-append-version="true" />
+</head>
+<body>
+    <h2>@ViewData["Title"]</h2>
+
+    <form method="post" asp-action="RedigerBruker" asp-controller="Admin">
+        <input type="hidden" name="BrukerId" value="@Model.BrukerId" />
+
+        <div class="form-group">
+            <label for="Email">E-post</label>
+            <input type="email" id="Email" name="Email" class="form-control" value="@Model.Email" required />
+        </div>
+
+        <div class="form-group">
+            <label for="BrukerType">Brukertype</label>
+            <select id="BrukerType" name="BrukerType" class="form-control" required>
+                <option value="admin" selected="@(Model.BrukerType == "admin")">Admin</option>
+                <option value="saksbehandler" selected="@(Model.BrukerType == "saksbehandler")">Saksbehandler</option>
+                <option value="standard" selected="@(Model.BrukerType == "standard")">Standard</option>
+                <option value="spesial" selected="@(Model.BrukerType == "spesial")">Spesial</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Fornavn">Fornavn</label>
+            <input type="text" id="Fornavn" name="Fornavn" class="form-control" value="@Model.Fornavn" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Etternavn">Etternavn</label>
+            <input type="text" id="Etternavn" name="Etternavn" class="form-control" value="@Model.Etternavn" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lagre endringer</button>
+        <a href="@Url.Action("BrukerOversikt", "Admin")" class="btn btn-secondary">Avbryt</a>
+    </form>
+</body>
+</html>
