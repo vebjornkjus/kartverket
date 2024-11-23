@@ -11,6 +11,7 @@ using MySqlConnector;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();
 
 // Set default culture
 var cultureInfo = new CultureInfo("en-US");

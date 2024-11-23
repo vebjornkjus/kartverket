@@ -1,4 +1,5 @@
 @model KartverketWebApp.Models.MinSideViewModel
+<link rel="stylesheet" href="/css/minside.css">
 
 @{
     ViewData["Title"] = "Min Side";
@@ -17,7 +18,8 @@
 </div>
 
 
-    <h4>Dine rapporter</h4>
+    <h4 class="reports-title">Dine rapporter</h4>
+
     @if (Model.Rapporter != null && Model.Rapporter.Any())
     {
         <table class="table">
@@ -36,7 +38,11 @@
                         <td>@rapport.RapportId</td>
                         <td>@rapport.RapportStatus</td>
                         <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                        <td>@rapport.Kart?.Tittel </td>
+                        <td>
+                            <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
+                            @rapport.Kart?.Tittel
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>
