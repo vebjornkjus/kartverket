@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using KartverketWebApp.Data; // Inkluder namespace for ApplicationDbContext
-using KartverketWebApp.Models; // Inkluder namespace for Bruker-modellen
+using KartverketWebApp.Data;
+using KartverketWebApp.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +15,10 @@ namespace KartverketWebApp.Controllers
 
         public AccountController(
             ApplicationDbContext context,
-            IPasswordHasher<IdentityUser> passwordHasher) // Initialiser passwordHasher
+            IPasswordHasher<IdentityUser> passwordHasher)
         {
             _context = context;
-            _passwordHasher = passwordHasher; // Initialiser passwordHasher
+            _passwordHasher = passwordHasher;
         }
 
         [HttpGet]
@@ -32,14 +32,12 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
-            // Ekstra validering for e-postformat
             if (!ErEpostGyldig(model.Username))
             {
                 ModelState.AddModelError(string.Empty, "Ugyldig e-postformat. Sørg for at e-postadressen er riktig skrevet.");
                 return View(model);
             }
 
-            // Sjekk e-post i Bruker-tabellen
             var bruker = _context.Bruker.FirstOrDefault(b => b.Email == model.Username);
             if (bruker == null)
             {
@@ -47,19 +45,22 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
-            // Verifiser passord
-            var isPasswordValid = false;
-            if (bruker.Passord == model.Password) // Sjekk klartekst (kun for testing)
+            bool isPasswordValid;
+            try
             {
-                isPasswordValid = true;
-            }
-            else
-            {
-                var hashedValidationResult = _passwordHasher.VerifyHashedPassword(null, bruker.Passord, model.Password);
-                if (hashedValidationResult == PasswordVerificationResult.Success)
+                // Sjekk klartekst først (for eksisterende brukere)
+                isPasswordValid = bruker.Passord == model.Password;
+
+                // Hvis klartekst ikke matcher, prøv hashed passord
+                if (!isPasswordValid)
                 {
-                    isPasswordValid = true;
+                    var hashedValidationResult = _passwordHasher.VerifyHashedPassword(null, bruker.Passord, model.Password);
+                    isPasswordValid = hashedValidationResult == PasswordVerificationResult.Success;
                 }
+            }
+            catch
+            {
+                isPasswordValid = false;
             }
 
             if (!isPasswordValid)
@@ -68,24 +69,21 @@ namespace KartverketWebApp.Controllers
                 return View(model);
             }
 
-            // Hent fornavn fra Person-tabellen
             var person = _context.Person.FirstOrDefault(p => p.BrukerId == bruker.BrukerId);
 
-            // Legg til e-post og fornavn i claims
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, bruker.Email), // Bruk e-post som identifikator
-                new Claim("Fornavn", person?.Fornavn ?? "Ukjent"), // Legg til fornavnet
-                new Claim("BrukerType", bruker.BrukerType) // Valgfritt: Brukerrollen
+                new Claim(ClaimTypes.Name, bruker.Email),
+                new Claim("Fornavn", person?.Fornavn ?? "Ukjent"),
+                new Claim("BrukerType", bruker.BrukerType)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
 
-            // Sett opp autentisering med claims
             await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
             {
                 IsPersistent = model.RememberMe,
-                ExpiresUtc = DateTime.UtcNow.AddHours(1)
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
             });
 
             return RedirectToAction("Index", "Home");
@@ -108,46 +106,67 @@ namespace KartverketWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            if (!IsRegistrationModelValid(model))
+            {
+                return View(model);
+            }
+
+            var bruker = await CreateBruker(model);
+            await CreatePerson(model, bruker.BrukerId);
+            await SignInNewUser(model, bruker);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        private bool IsRegistrationModelValid(RegisterViewModel model)
+        {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return false;
             }
 
-            // Legg til passordkrav
             if (!ErPassordGyldig(model.Password))
             {
-                ModelState.AddModelError(string.Empty, "Passordet må være minst 8 tegn langt, inneholde minst én stor bokstav, én liten bokstav,og ett tall");
-                return View(model);
+                ModelState.AddModelError(string.Empty, 
+                    "Passordet må være minst 8 tegn langt, inneholde minst én stor bokstav, én liten bokstav,og ett tall");
+                return false;
             }
 
-            // Hash passordet
-            var hashedPassword = _passwordHasher.HashPassword(null, model.Password);
+            return true;
+        }
 
-            // Opprett Bruker-objektet
+        private async Task<Bruker> CreateBruker(RegisterViewModel model)
+        {
+            var hashedPassword = _passwordHasher.HashPassword(null, model.Password);
+            
             var bruker = new Bruker
             {
                 Email = model.Email,
-                Passord = hashedPassword, // Lagre hashet passord
-                BrukerType = "Standard" // Standard brukerrolle
+                Passord = hashedPassword,
+                BrukerType = "Standard"
             };
 
-            // Legg til Bruker i databasen
             _context.Bruker.Add(bruker);
             await _context.SaveChangesAsync();
 
-            // Opprett Person-objektet
+            return bruker;
+        }
+
+        private async Task CreatePerson(RegisterViewModel model, int brukerId)
+        {
             var person = new Person
             {
                 Fornavn = model.Fornavn,
                 Etternavn = model.Etternavn,
-                BrukerId = bruker.BrukerId // Referanse til Bruker
+                BrukerId = brukerId
             };
 
-            // Legg til Person i databasen
             _context.Person.Add(person);
             await _context.SaveChangesAsync();
+        }
 
-            // Logg inn brukeren automatisk etter registrering
+        private async Task SignInNewUser(RegisterViewModel model, Bruker bruker)
+        {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, bruker.Email),
@@ -156,17 +175,18 @@ namespace KartverketWebApp.Controllers
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
-
-            await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
-            {
-                IsPersistent = false, // Midlertidig innlogging
-                ExpiresUtc = DateTime.UtcNow.AddHours(1)
-            });
-
-            return RedirectToAction("Index", "Home");
+            
+            await HttpContext.SignInAsync(
+                "AuthCookie", 
+                new ClaimsPrincipal(claimsIdentity), 
+                new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
+                }
+            );
         }
 
-        // Metode for å validere passordet basert på krav
         private bool ErPassordGyldig(string password)
         {
             if (string.IsNullOrEmpty(password) || password.Length < 8)

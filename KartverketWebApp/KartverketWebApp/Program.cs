@@ -59,8 +59,8 @@ builder.Services.AddAuthentication("AuthCookie")
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.Cookie.Name = "KartverketAuth";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
-        options.SlidingExpiration = false;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true; // Protection against XSS
     });
 
