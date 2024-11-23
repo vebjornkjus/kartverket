@@ -80,11 +80,20 @@ namespace KartverketWebApp.Controllers
 
             var claimsIdentity = new ClaimsIdentity(claims, "AuthCookie");
 
-            await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
+            if (HttpContext != null)
             {
-                IsPersistent = model.RememberMe,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-            });
+                await HttpContext.SignInAsync("AuthCookie", new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
+                {
+                    IsPersistent = model.RememberMe,
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                });
+            }
+            else
+            {
+                // Handle the case where HttpContext is null
+                ModelState.AddModelError(string.Empty, "An error occurred while processing your request. Please try again.");
+                return View(model);
+            }
 
             return RedirectToAction("Index", "Home");
         }
