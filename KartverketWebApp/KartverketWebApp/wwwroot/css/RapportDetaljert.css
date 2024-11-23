@@ -77,6 +77,7 @@ body {
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     border-radius: 11px;
     min-height: 400px;
+    overflow-y: auto;
 }
 
 .rapport_map {
@@ -126,6 +127,37 @@ body {
     display: flex;
     flex-direction: column;
 }
+.submission-content img {
+    max-width: 100%; /* Bildet tilpasses bredden av containeren */
+    max-height: 300px; /* Begrenser høyden på bildet */
+    height: auto; /* Bevarer proporsjonene */
+    display: block; /* Sentrerer bildet */
+    margin: 0 auto; /* Legger bildet midt i containeren */
+    border-radius: 8px; /* Runde hjørner som matcher boksen */
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; /* Valgfri skyggeeffekt */
+}
+.submission-box {
+    height: 350px; /* Juster høyden etter behov */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Sørger for at innholdet holder seg øverst */
+    overflow: hidden; /* Klipper innhold som er for stort */
+}
+.submission-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Tar opp all høyde i boksen */
+    overflow: hidden; /* Klipper bildet hvis det er for stort */
+}
+
+.submission-content img {
+    max-width: 100%;
+    max-height: 100%; /* Passer alltid i rammen */
+    object-fit: cover; /* Klipper bildet for å fylle rammen hvis nødvendig */
+    border-radius: 8px;
+}
+
 
 .comment-content {
     background-color: #f8f9fa;
@@ -267,4 +299,55 @@ h2 {
     .submission-box {
         width: 100%;
     }
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 250px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    z-index: 1000;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+.ansatt-navn {
+    font-weight: 500;
+}
+
+.ansatt-kommune {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Success message styling */
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.info-table-scrollable {
+    max-height: 100%;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
