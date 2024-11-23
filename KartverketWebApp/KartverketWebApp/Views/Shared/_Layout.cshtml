@@ -35,15 +35,15 @@
         <div id="saksbehandler">
             @inject ApplicationDbContext _context
 
-            @if (User.Identity.IsAuthenticated)
-            {
-                // Kun vis knappen hvis brukeren er admin eller saksbehandler
-                if (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler")))
-                {
-                    <a asp-action="Saksbehandler" asp-controller="Home">
-                        <button class="btn btn-primary">Til oversikt</button>
-                    </a>
-                }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        // Kun vis knappen hvis brukeren er admin eller saksbehandler
+                        if (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler")))
+                        {
+                 <a asp-action="Saksbehandler" asp-controller="Home">
+                     <button class="btn btn-primary">Til oversikt</button>
+                 </a>
+                        }
 
                 <a asp-action="MinSide" asp-controller="Home">
                     <button class="btn btn-secondary">Min Side</button>
@@ -77,6 +77,11 @@
                 <a asp-action="Login" asp-controller="Account">
                     <button class="btn btn-primary">Logg inn</button>
                 </a>
+
+        <a asp-action="BrukerOversikt" asp-controller="Admin">
+            <button class="btn btn-primary">AdminOversikt</button>
+        </a>
+
             }
         </div>
     </div>
