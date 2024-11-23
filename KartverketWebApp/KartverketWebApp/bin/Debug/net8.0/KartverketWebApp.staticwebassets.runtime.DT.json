@@ -156,6 +156,14 @@
             },
             "Patterns": null
           },
+          "rapportDetaljert.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/rapportDetaljert.js"
+            },
+            "Patterns": null
+          },
           "Saksbehandler.js": {
             "Children": null,
             "Asset": {

@@ -1,5 +1,27 @@
 ﻿@model KartverketWebApp.Models.DetaljertViewModel
-<link rel="stylesheet" href="~/css/RapportDetaljert.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/RapportDetaljert.css" />
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="~/js/rapportDetaljert.js"></script>
+    <script>
+        // Initialize with data from server
+        window.rapportId = @Model.Rapport.RapportId;
+        const mapData = @Html.Raw(Json.Serialize(new
+            {
+                MapType = Model.Kart?.MapType,
+                Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
+            }));
+
+        // Initialize the RapportDetaljert class
+        document.addEventListener('DOMContentLoaded', () => {
+            new RapportDetaljert(mapData);
+        });
+
+        // Make visAnsatteListe available globally
+        window.visAnsatteListe = RapportDetaljert.visAnsatteListe;
+    </script>
+}
 
 <div class="center-container">
     @if (TempData["Error"] != null)
@@ -37,7 +59,7 @@
             <!-- Kart Details Section -->
             <div class="info">
                 <h2>Kart Detaljer</h2>
-                <div class="custom-table-wrapper">
+                <div class="custom-table-wrapper info-table-scrollable">
                     <table class="custom-table">
                         <tbody>
                             <tr>
@@ -181,104 +203,4 @@
     </div>
 </div>
 
-@section Scripts {
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <script>
-        // Map initialization
-        var mapData = @Html.Raw(Json.Serialize(new
-            {
-                MapType = Model.Kart?.MapType,
-                Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
-            }));
-
-        console.log("Map Data:", mapData);
-        console.log("mapType:", mapData.mapType);
-
-        if (mapData && mapData.mapType && mapData.coordinates && mapData.coordinates.length > 0) {
-            var firstCoord = mapData.coordinates[0];
-            var map = L.map('map_detaljert').setView([firstCoord.nord, firstCoord.ost], 13);
-
-            var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
-                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-            });
-            var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
-                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-            });
-            var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
-                attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-            });
-
-            console.log("Selecting map layer for mapType:", mapData.mapType);
-
-            if (mapData.mapType === "Norge kart") {
-                map.addLayer(norgeKart);
-                console.log("Added Norge kart layer");
-            } else if (mapData.mapType === "Turkart") {
-                map.addLayer(turKart);
-                console.log("Added Turkart layer");
-            } else if (mapData.mapType === "Sjøkart") {
-                map.addLayer(sjoKart);
-                console.log("Added Sjøkart layer");
-            } else {
-                console.warn('Map type not recognized:', mapData.mapType);
-            }
-
-            var latlngs = mapData.coordinates.map(function (coord) {
-                return [coord.nord, coord.ost];
-            });
-            var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
-            map.fitBounds(polyline.getBounds());
-        } else {
-            console.warn('No coordinates available to display on the map or mapType is missing.');
-        }
-
-        // Ansatte dropdown functionality
-        function visAnsatteListe() {
-            const liste = document.getElementById('ansatteListe');
-
-            if (liste.style.display === 'block') {
-                liste.style.display = 'none';
-                return;
-            }
-
-            fetch('/RapportStatus/HentTilgjengeligeAnsatte')
-                .then(response => response.json())
-                .then(ansatte => {
-                    liste.innerHTML = '';
-                    ansatte.forEach(ansatt => {
-                        const button = document.createElement('button');
-                        button.textContent = ansatt.fulltNavn;
-                        button.onclick = function (e) {
-                            e.preventDefault();
-                            tildelTilAnsatt(ansatt.ansattId);
-                        };
-                        liste.appendChild(button);
-                    });
-                    liste.style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        function tildelTilAnsatt(ansattId) {
-            const rapportId = @Model.Rapport.RapportId;
-            const form = document.createElement('form');
-            form.method = 'post';
-            form.action = `/RapportStatus/TildelRapport?rapportId=${rapportId}&nyAnsattId=${ansattId}`;
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function (event) {
-            const dropdown = document.getElementById('ansatteListe');
-            const button = event.target.closest('.detbtn');
-            if (!button && dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-            }
-        });
-    </script>
-}
