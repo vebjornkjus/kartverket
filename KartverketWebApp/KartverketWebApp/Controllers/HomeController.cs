@@ -56,7 +56,7 @@ namespace KartverketWebApp.Controllers
         }
 
         // SECTION: Static Views
-        public IActionResult TakkRapport() => View("~/Views/Home/Innsender/TakkRapport.cshtml");
+        
         public IActionResult Innlogging() => View();
         public IActionResult Admin() => View();
         public IActionResult soke() => View();
@@ -216,6 +216,91 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
+        public IActionResult TakkRapport()
+        {
+            try
+            {
+                var latestReport = _context.Kart
+                    .Include(k => k.Koordinater)
+                    .Include(k => k.Steddata)
+                    .OrderByDescending(k => k.KartEndringId)
+                    .FirstOrDefault();
+
+                if (latestReport == null)
+                {
+                    return NotFound("Ingen rapport funnet.");
+                }
+
+                // Create coordinates list
+                var coordinates = latestReport.Koordinater
+                    .Select(k => new KartverketWebApp.Models.PositionModel.Coordinate  // Use fully qualified name
+                    {
+                        Nord = k.Nord,
+                        Ost = k.Ost
+                    })
+                    .ToList();
+
+                var viewModel = new CombinedViewModel
+                {
+                    Tittel = latestReport.Tittel ?? "Ukjent tittel",
+                    RapportType = latestReport.RapportType ?? "Ukjent rapporttype",
+                    Beskrivelse = latestReport.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
+                    Positions = new List<KartverketWebApp.Models.PositionModel>  // Use fully qualified name
+    {
+        new KartverketWebApp.Models.PositionModel  // Use fully qualified name
+        {
+            Kart_endring_id = latestReport.KartEndringId.ToString(),
+            MapType = latestReport.MapType ?? "Turkart",
+            Tittel = latestReport.Tittel,
+            Beskrivelse = latestReport.Beskrivelse,
+            Coordinates = coordinates
+        }
+    }
+                };
+
+                // Add debug logging
+                Console.WriteLine($"ViewModel created with {viewModel.Positions.Count} positions");
+                if (viewModel.Positions.Any())
+                {
+                    Console.WriteLine($"First position has {viewModel.Positions[0].Coordinates.Count} coordinates");
+                    Console.WriteLine($"MapType: {viewModel.Positions[0].MapType}");
+                    foreach (var coord in viewModel.Positions[0].Coordinates)
+                    {
+                        Console.WriteLine($"Coordinate: Nord={coord.Nord}, Ost={coord.Ost}");
+                    }
+                }
+
+                return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in TakkRapport: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [HttpPost]
+        public IActionResult OppdaterRapport(string Tittel, string Beskrivelse, string RapportType)
+        {
+            // Logikk for oppdatering av rapporten
+            var latestReport = _context.Kart
+                .OrderByDescending(k => k.KartEndringId)
+                .FirstOrDefault();
+
+            if (latestReport != null)
+            {
+                latestReport.Tittel = Tittel;
+                latestReport.Beskrivelse = Beskrivelse;
+                latestReport.RapportType = RapportType;
+
+                _context.SaveChanges();
+            }
+
+            // Omdiriger til hjem-skjermen etter oppdatering
+            return RedirectToAction("Index", "Home");
+        }
 
 
 
@@ -434,54 +519,49 @@ namespace KartverketWebApp.Controllers
 
 
 
-       [HttpGet]
-public async Task<IActionResult> RapportDetaljert(int id)
-{
-    var rapport = await _context.Rapport
-        .Include(r => r.Kart)
-            .ThenInclude(k => k.Koordinater)
-        .Include(r => r.Person)
-            .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
-        .FirstOrDefaultAsync(r => r.RapportId == id);
-
-    if (rapport == null)
-    {
-        return NotFound();
-    }
-
-    var kart = rapport.Kart;
-    Steddata steddata = null;
-
-    // If Kart and its Koordinater exist, retrieve the first coordinate and then fetch Steddata
-    if (kart?.Koordinater?.Any() == true)
-    {
-        var firstCoord = kart.Koordinater.First();
-        steddata = await _context.Steddata
-            .FirstOrDefaultAsync(s => s.Id == kart.SteddataId);
-
-        if (steddata == null)
+        [HttpGet]
+        public async Task<IActionResult> RapportDetaljert(int id)
         {
-            _logger.LogWarning("Steddata for Kart {KartId} was not found.", kart.KartEndringId);
+            var rapport = await _context.Rapport
+    .Include(r => r.Kart)
+        .ThenInclude(k => k.Koordinater)
+    .Include(r => r.Person)
+        .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
+    .FirstOrDefaultAsync(r => r.RapportId == id);
+
+            if (rapport == null)
+            {
+                return NotFound();
+            }
+
+            var kart = rapport.Kart;
+            Steddata steddata = null;
+
+            // If Kart and its Koordinater exist, retrieve the first coordinate and then fetch Steddata
+            if (kart?.Koordinater?.Any() == true)
+            {
+                var firstCoord = kart.Koordinater.First();
+                steddata = await _context.Steddata
+                    .FirstOrDefaultAsync(s => s.Id == kart.SteddataId);
+
+                if (steddata == null)
+                {
+                    _logger.LogWarning("Steddata for Kart {KartId} was not found.", kart.KartEndringId);
+                }
+            }
+
+            var viewModel = new DetaljertViewModel
+            {
+                Rapport = rapport,
+                Kart = rapport.Kart,
+                Person = rapport.Person,
+                Bruker = rapport.Person?.Bruker,
+                Steddata = steddata
+            };
+
+            return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
         }
-    }
 
-    // Konverter FilePath til en URL hvis det finnes en sti
-    if (!string.IsNullOrEmpty(kart?.FilePath))
-    {
-        kart.FilePath = $"/RapportBilder/{Path.GetFileName(kart.FilePath)}";
-    }
-
-    var viewModel = new DetaljertViewModel
-    {
-        Rapport = rapport,
-        Kart = kart,
-        Person = rapport.Person,
-        Bruker = rapport.Person?.Bruker,
-        Steddata = steddata
-    };
-
-    return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
-}
 
         public IActionResult CorrectionsOverview()
         {
