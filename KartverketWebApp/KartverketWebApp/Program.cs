@@ -10,13 +10,12 @@ using System.Data;
 using MySqlConnector;
 using System.Globalization;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
+// Set default culture
 var cultureInfo = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
 
 // Bind the API settings from appsettings.json
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
@@ -28,10 +27,10 @@ builder.Services.AddHttpClient<IStednavn, StednavnService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Aktiver CSRF-beskyttelse globalt
+// Enable CSRF protection globally
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute()); 
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
 });
 
 // Add PasswordHasher
@@ -45,16 +44,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         mySqlOptions => mySqlOptions.EnableRetryOnFailure()
     ));
 
-// Add this line to register IDbConnection
+// Add IDbConnection for raw database queries
 builder.Services.AddTransient<IDbConnection>(sp =>
     new MySqlConnection(builder.Configuration.GetConnectionString("MariaDbConnection")));
-
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Cookies for Autentisering
+// Cookies for authentication
 builder.Services.AddAuthentication("AuthCookie")
     .AddCookie("AuthCookie", options =>
     {
@@ -63,14 +61,13 @@ builder.Services.AddAuthentication("AuthCookie")
         options.Cookie.Name = "KartverketAuth";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
         options.SlidingExpiration = false;
-        options.Cookie.HttpOnly = true; // Beskyttelse mot XSS
+        options.Cookie.HttpOnly = true; // Protection against XSS
     });
-
 
 // Use AddAuthorizationBuilder for policies
 var authorizationBuilder = builder.Services.AddAuthorizationBuilder();
 authorizationBuilder.AddPolicy("AdminOrSaksbehandlerPolicy", policy =>
-    policy.RequireClaim("BrukerType", "admin", "saksbehandler")); // Sjekker om BrukerType er admin eller saksbehandler
+    policy.RequireClaim("BrukerType", "admin", "saksbehandler")); // Check if BrukerType is admin or saksbehandler
 authorizationBuilder.AddPolicy("AdminPolicy", policy =>
     policy.RequireClaim("BrukerType", "admin"));
 
@@ -93,11 +90,21 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();  // Enable authentication
+app.UseAuthentication(); // Enable authentication
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    // Default route
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    // Meldinger-specific route
+    endpoints.MapControllerRoute(
+        name: "meldinger",
+        pattern: "meldinger/{action=Index}/{rapportId?}",
+        defaults: new { controller = "Meldinger" });
+});
 
 app.Run();

@@ -24,11 +24,19 @@
             },
             "Patterns": null
           },
-          "Register.css": {
+          "RapportDetaljert.css": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "css/Register.css"
+              "SubPath": "css/RapportDetaljert.css"
+            },
+            "Patterns": null
+          },
+          "Register-v2.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/Register-v2.css"
             },
             "Patterns": null
           },
@@ -662,6 +670,20 @@
               }
             },
             "Asset": null,
+            "Patterns": null
+          }
+        },
+        "Asset": null,
+        "Patterns": null
+      },
+      "RapportBilder": {
+        "Children": {
+          "74aa5c82-6a10-40d3-b569-642c9e505027.png": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "RapportBilder/74aa5c82-6a10-40d3-b569-642c9e505027.png"
+            },
             "Patterns": null
           }
         },

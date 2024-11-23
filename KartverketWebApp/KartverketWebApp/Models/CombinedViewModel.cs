@@ -12,6 +12,10 @@ namespace KartverketWebApp.Models
 
         public List<Rapport> ActiveRapporter { get; set; }
         public List<Rapport> ResolvedRapporter { get; set; }
+        public List<Meldinger> Meldinger { get; set; }
+        public List<SammtaleModel> SammtaleModel { get; set; }
+
+        
 
         public CombinedViewModel()
         {

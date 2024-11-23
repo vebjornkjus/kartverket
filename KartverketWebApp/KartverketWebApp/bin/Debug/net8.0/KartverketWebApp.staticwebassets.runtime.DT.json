@@ -32,11 +32,11 @@
             },
             "Patterns": null
           },
-          "Register.css": {
+          "Register-v2.css": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "css/Register.css"
+              "SubPath": "css/Register-v2.css"
             },
             "Patterns": null
           },
@@ -132,6 +132,14 @@
       },
       "js": {
         "Children": {
+          "Meldinger.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/Meldinger.js"
+            },
+            "Patterns": null
+          },
           "Overview.js": {
             "Children": null,
             "Asset": {
