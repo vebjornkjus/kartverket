@@ -71,6 +71,14 @@
               "SubPath": "css/site.css"
             },
             "Patterns": null
+          },
+          "TakkRapport.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/TakkRapport.css"
+            },
+            "Patterns": null
           }
         },
         "Asset": null,
