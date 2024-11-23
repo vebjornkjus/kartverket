@@ -132,6 +132,14 @@
       },
       "js": {
         "Children": {
+          "Meldinger.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/Meldinger.js"
+            },
+            "Patterns": null
+          },
           "Overview.js": {
             "Children": null,
             "Asset": {
