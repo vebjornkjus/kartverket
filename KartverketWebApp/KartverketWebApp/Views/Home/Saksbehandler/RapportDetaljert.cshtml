@@ -5,21 +5,20 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="~/js/rapportDetaljert.js"></script>
     <script>
-        // Initialize with data from server
-        window.rapportId = @Model.Rapport.RapportId;
-        const mapData = @Html.Raw(Json.Serialize(new
+        // Initialize data
+        window.appData = {
+            rapportId: @Model.Rapport.RapportId,
+            mapData: @Html.Raw(Json.Serialize(new
             {
                 MapType = Model.Kart?.MapType,
                 Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
-            }));
+            }))
+                };
 
-        // Initialize the RapportDetaljert class
+        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            new RapportDetaljert(mapData);
+            window.rapportDetaljert = new RapportDetaljert(window.appData);
         });
-
-        // Make visAnsatteListe available globally
-        window.visAnsatteListe = RapportDetaljert.visAnsatteListe;
     </script>
 }
 
@@ -46,7 +45,7 @@
 
             <!-- Send til knapp med dropdown -->
             <div class="dropdown" style="display: inline;">
-                <button type="button" class="detbtn" onclick="visAnsatteListe()">
+                <button type="button" class="detbtn" onclick="visAnsatteListe(event)">
                     Send til <i class="fa-solid fa-share-from-square"></i>
                 </button>
                 <div id="ansatteListe" class="dropdown-content">
@@ -192,15 +191,18 @@
     }
 
     <!-- Boks for Legg til kommentar -->
-    <div class="submission-box">
-        <h2>Legg til kommentar</h2>
-        <div class="submission-content">
-            <textarea id="newComment" placeholder="Skriv din kommentar her..."></textarea>
-            <button class="send-btn">
-                Send <i class="fa-solid fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
+            <div class="submission-box">
+                <h2>Legg til kommentar</h2>
+                <div class="submission-content">
+                    <form id="commentForm">
+                        @Html.AntiForgeryToken()
+                        <textarea id="newComment" placeholder="Skriv din kommentar her..." rows="3"></textarea>
+                        <button type="submit" class="send-btn">
+                            Send <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
 </div>
 
 

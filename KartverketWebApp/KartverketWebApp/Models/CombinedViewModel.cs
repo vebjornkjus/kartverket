@@ -1,4 +1,5 @@
 ﻿using KartverketWebApp.Data;
+using KartverketWebApp.Models;
 
 namespace KartverketWebApp.Models
 {
@@ -14,6 +15,7 @@ namespace KartverketWebApp.Models
         public List<Rapport> ResolvedRapporter { get; set; }
         public List<Meldinger> Meldinger { get; set; }
         public List<SammtaleModel> SammtaleModel { get; set; }
+        public List<TildelRapportModel> TildelRapportModel { get; set; }
 
 
 

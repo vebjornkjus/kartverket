@@ -1,13 +1,65 @@
-﻿@model KartverketWebApp.Models.AdminViewModel
-
-<head>
-    <link href="~/css/Admin.css" rel="stylesheet" />
-</head>
-
+﻿@model IEnumerable<KartverketWebApp.Models.BrukerOversiktViewModel>
 @{
     ViewData["Title"] = "Bruker Oversikt";
 }
 
-<h2>@ViewData["Title"]</h2>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
 
+    <!-- Link til admin CSS -->
+    <link rel="stylesheet" href="~/css/Admin-v1.css" asp-append-version="true" />
+</head>
+<body>
+    <h2>@ViewData["Title"]</h2>
 
+    <!-- Filterform -->
+    <form method="get" action="@Url.Action("BrukerOversikt", "Admin")">
+        <div class="btn-group" role="group" aria-label="Brukertype filter">
+            <button type="submit" name="filter" value="admin" class="btn btn-secondary">Admin</button>
+            <button type="submit" name="filter" value="saksbehandler" class="btn btn-secondary">Saksbehandler</button>
+            <button type="submit" name="filter" value="standard" class="btn btn-secondary">Standard</button>
+            <button type="submit" name="filter" value="spesial" class="btn btn-secondary">Spesial</button>
+            <button type="submit" name="filter" value="" class="btn btn-secondary">Tilbakestill</button> <!-- Tilbakestill filter -->
+        </div>
+    </form>
+
+    <!-- Brukertabell -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>BrukerId</th>
+                <th>Email</th>
+                <th>BrukerType</th>
+                <th>Fornavn</th>
+                <th>Etternavn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bruker in Model)
+            {
+                <tr>
+                    <td>@bruker.BrukerId</td>
+                    <td>@bruker.Email</td>
+                    <td>@bruker.BrukerType</td>
+                    <td>@bruker.Fornavn</td>
+                    <td>@bruker.Etternavn</td>
+
+                    <td>
+                        <a href="@Url.Action("RedigerBruker", "Admin", new { id = bruker.BrukerId })" class="btn btn-primary">Rediger</a>
+                        <form method="post" action="@Url.Action("SlettBruker", "Admin")" style="display:inline;">
+                            @Html.AntiForgeryToken()  <!-- Legger til AntiForgeryToken for CSRF-beskyttelse -->
+                            <input type="hidden" name="id" value="@bruker.BrukerId" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Er du sikker på at du vil slette denne brukeren?');">Slett</button>
+                        </form>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
