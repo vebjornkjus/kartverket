@@ -1,4 +1,7 @@
-﻿@model KartverketWebApp.Models.PositionModel
+﻿@model KartverketWebApp.Models.CombinedViewModel
+@{
+    var position = Model.Positions.FirstOrDefault();
+}
 
 <div class="container">
     <div class="row">
@@ -6,7 +9,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5>Tittel</h5>
-                    <p>@Model.Tittel</p>
+                    <p>@position?.Tittel</p>
                 </div>
             </div>
         </div>
@@ -14,7 +17,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5>Beskrivelse</h5>
-                    <p>@Model.Beskrivelse</p>
+                    <p>@position?.Beskrivelse</p>
                 </div>
             </div>
         </div>
@@ -22,7 +25,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5>Rapporttype</h5>
-                    <p>@Model.RapportType</p>
+                    <p>@position?.RapportType</p>
                 </div>
             </div>
         </div>
@@ -41,8 +44,8 @@
             document.addEventListener('DOMContentLoaded', function () {
                 console.log("Initializing Leaflet map");
 
-                // Use the Model.Coordinates to initialize the map
-                var coordinates = @Html.Raw(Json.Serialize(Model.Coordinates));
+                // Use the Model.Positions[0].Coordinates to initialize the map
+                var coordinates = @Html.Raw(Json.Serialize(position?.Coordinates));
                 console.log("Coordinates data:", coordinates);
 
                 // Check if there's at least one coordinate
@@ -53,50 +56,130 @@
                         zoom: 13
                     });
 
-                    // Define Kartverket tile layers and add the appropriate one based on Model.MapType
-                    var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                    // Define Kartverket tile layers
+                    var norgeKart = L.tileLayer('https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}', {
+                        attribution: '© <a href="https://www.kartverket.no/">Kartverket</a>'
                     });
 
-                    var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                    var turKart = L.tileLayer('https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=toporaster4&zoom={z}&x={x}&y={y}', {
+                        attribution: '© <a href="https://www.kartverket.no/">Kartverket</a>'
                     });
 
-                    var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                    var sjoKart = L.tileLayer('https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=sjokartraster&zoom={z}&x={x}&y={y}', {
+                        attribution: '© <a href="https://www.kartverket.no/">Kartverket</a>'
                     });
 
-                    if (Model.MapType === "Norge kart") {
+                    // Add the appropriate base layer
+                    if (position?.MapType === "Norge kart") {
                         norgeKart.addTo(map);
                         console.log("Loaded Norge kart");
-                    } else if (Model.MapType === "Turkart") {
+                    } else if (position?.MapType === "Turkart") {
                         turKart.addTo(map);
                         console.log("Loaded Turkart");
-                    } else if (Model.MapType === "Sjøkart") {
+                    } else if (position?.MapType === "Sjøkart") {
                         sjoKart.addTo(map);
                         console.log("Loaded Sjøkart");
                     } else {
-                        console.warn("Unknown mapType, defaulting to Norge kart");
                         norgeKart.addTo(map);
+                        console.log("Defaulting to Norge kart");
                     }
 
-                    // Add markers for each coordinate
-                    coordinates.forEach(function (coord, coordIndex) {
-                        L.marker([coord.Nord, coord.Ost]).addTo(map).bindPopup(`
-                                        <div>
-                                            <h4>Point ${coordIndex + 1}</h4>
-                                            <p>Nord: ${coord.Nord.toFixed(6)}</p>
-                                            <p>Øst: ${coord.Ost.toFixed(6)}</p>
-                                        </div>
-                                    `);
-                    });
-
-                    // Add a polyline connecting all points
+                    // Create an array of LatLng points
                     var latlngs = coordinates.map(coord => [coord.Nord, coord.Ost]);
-                    var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
 
-                    // Automatically fit the map to the polyline bounds
-                    map.fitBounds(polyline.getBounds());
+                    // Create a blue polyline connecting all points
+                    var polyline = L.polyline(latlngs, {
+                        color: 'blue',
+                        weight: 3,
+                        opacity: 0.8
+                    }).addTo(map);
+
+                    // Add start and end markers with different colors
+                    if (latlngs.length > 0) {
+                        // Start marker (green)
+                        L.marker(latlngs[0], {
+                            icon: L.divIcon({
+                                className: 'custom-div-icon',
+                                html: '<div style="background-color: #4CAF50; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                                iconSize: [15, 15],
+                                iconAnchor: [7, 7]
+                            })
+                        }).addTo(map).bindPopup('Startpunkt');
+
+                        // End marker (red) - only if there's more than one point
+                        if (latlngs.length > 1) {
+                            L.marker(latlngs[latlngs.length - 1], {
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: '<div style="background-color: #f44336; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                                    iconSize: [15, 15],
+                                    iconAnchor: [7, 7]
+                                })
+                            }).addTo(map).bindPopup('Sluttpunkt');
+                        }
+
+                        // Add intermediate points if there are any
+                        for (let i = 1; i < latlngs.length - 1; i++) {
+                            L.marker(latlngs[i], {
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: '<div style="background-color: #2196F3; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white;"></div>',
+                                    iconSize: [10, 10],
+                                    iconAnchor: [5, 5]
+                                })
+                            }).addTo(map).bindPopup(`Punkt ${i + 1}`);
+                        }
+
+                        // Create an area around the polyline (buffer)
+                        var bufferedArea = [];
+                        var bufferDistance = 0.0002; // Adjust this value to change the buffer size
+
+                        for (let i = 0; i < latlngs.length - 1; i++) {
+                            let p1 = latlngs[i];
+                            let p2 = latlngs[i + 1];
+                            
+                            // Calculate perpendicular points for buffer
+                            let dx = p2[1] - p1[1];
+                            let dy = p2[0] - p1[0];
+                            let length = Math.sqrt(dx * dx + dy * dy);
+                            
+                            let normalX = -dy / length * bufferDistance;
+                            let normalY = dx / length * bufferDistance;
+
+                            // Add buffer points
+                            bufferedArea.push([p1[0] + normalY, p1[1] + normalX]);
+                            bufferedArea.push([p2[0] + normalY, p2[1] + normalX]);
+                        }
+
+                        // Add points in reverse order to close the polygon
+                        for (let i = latlngs.length - 1; i > 0; i--) {
+                            let p1 = latlngs[i];
+                            let p2 = latlngs[i - 1];
+                            
+                            let dx = p2[1] - p1[1];
+                            let dy = p2[0] - p1[0];
+                            let length = Math.sqrt(dx * dx + dy * dy);
+                            
+                            let normalX = -dy / length * bufferDistance;
+                            let normalY = dx / length * bufferDistance;
+
+                            bufferedArea.push([p1[0] - normalY, p1[1] - normalX]);
+                            bufferedArea.push([p2[0] - normalY, p2[1] - normalX]);
+                        }
+
+                        // Create and add the buffered area polygon
+                        L.polygon(bufferedArea, {
+                            color: 'blue',
+                            weight: 1,
+                            opacity: 0.3,
+                            fillOpacity: 0.1
+                        }).addTo(map);
+                    }
+
+                    // Fit the map to show all markers
+                    map.fitBounds(polyline.getBounds(), {
+                        padding: [50, 50] // Add some padding around the bounds
+                    });
 
                     // Ensure the map resizes correctly
                     setTimeout(() => {
