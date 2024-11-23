@@ -2,7 +2,37 @@
 <link rel="stylesheet" href="~/css/RapportDetaljert.css" asp-append-version="true" />
 
 <div class="center-container">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["Error"]
+        </div>
+    }
     <div class="detaljert-main">
+        <div class="button-container">
+            <!-- Avklart knapp -->
+            <form asp-controller="RapportStatus" asp-action="SetAvklart" method="post" style="display: inline;">
+                <input type="hidden" name="rapportId" value="@Model.Rapport.RapportId" />
+                <button type="submit" class="detbtn">Avklart <i class="fa-solid fa-check" style="color: #ffffff;"></i></button>
+            </form>
+
+            <!-- Fjern knapp -->
+            <form asp-controller="RapportStatus" asp-action="SetFjernet" method="post" style="display: inline;">
+                <input type="hidden" name="rapportId" value="@Model.Rapport.RapportId" />
+                <button type="submit" class="detbtn">Fjern <i class="fa-solid fa-trash"></i></button>
+            </form>
+
+            <!-- Send til knapp med dropdown -->
+            <div class="dropdown" style="display: inline;">
+                <button type="button" class="detbtn" onclick="visAnsatteListe()">
+                    Send til <i class="fa-solid fa-share-from-square"></i>
+                </button>
+                <div id="ansatteListe" class="dropdown-content">
+                    <!-- Vil bli fylt med JavaScript -->
+                </div>
+            </div>
+        </div>
+
         <div class="main_rapport">
             <!-- Kart Details Section -->
             <div class="info">
@@ -126,34 +156,50 @@
                 }
             </div>
         </div>
+
+        <div class="bottom-extra-container">
+            @if (!string.IsNullOrEmpty(Model.Kart?.FilePath))
+            {
+                <div class="comment-box">
+                    <h2>Kommentarer</h2>
+                    <div class="comment-content">
+                        <p>@Model.Kart?.FilePath</p>
+                    </div>
+                </div>
+            }
+
+            <div class="submission-box">
+                <h2>Legg til kommentar</h2>
+                <div class="submission-content">
+                    <textarea id="newComment" placeholder="Skriv din kommentar her..."></textarea>
+                    <button class="send-btn">
+                        Send <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 
 @section Scripts {
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
-        // Define the data required for the map, including mapType and coordinates
+        // Map initialization
         var mapData = @Html.Raw(Json.Serialize(new
             {
                 MapType = Model.Kart?.MapType,
                 Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
             }));
 
-        // Log the entire mapData object
         console.log("Map Data:", mapData);
-
-        // Log the value of mapType
         console.log("mapType:", mapData.mapType);
 
-        // Initialize the map if there are coordinates
         if (mapData && mapData.mapType && mapData.coordinates && mapData.coordinates.length > 0) {
             var firstCoord = mapData.coordinates[0];
             var map = L.map('map_detaljert').setView([firstCoord.nord, firstCoord.ost], 13);
 
-            // Define the map layers
             var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
                 attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
             });
@@ -164,10 +210,8 @@
                 attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
             });
 
-            // Log the map type being used
             console.log("Selecting map layer for mapType:", mapData.mapType);
 
-            // Add the correct map layer based on mapType
             if (mapData.mapType === "Norge kart") {
                 map.addLayer(norgeKart);
                 console.log("Added Norge kart layer");
@@ -181,7 +225,6 @@
                 console.warn('Map type not recognized:', mapData.mapType);
             }
 
-            // Collect coordinates and draw the polyline
             var latlngs = mapData.coordinates.map(function (coord) {
                 return [coord.nord, coord.ost];
             });
@@ -190,5 +233,52 @@
         } else {
             console.warn('No coordinates available to display on the map or mapType is missing.');
         }
+
+        // Ansatte dropdown functionality
+        function visAnsatteListe() {
+            const liste = document.getElementById('ansatteListe');
+
+            if (liste.style.display === 'block') {
+                liste.style.display = 'none';
+                return;
+            }
+
+            fetch('/RapportStatus/HentTilgjengeligeAnsatte')
+                .then(response => response.json())
+                .then(ansatte => {
+                    liste.innerHTML = '';
+                    ansatte.forEach(ansatt => {
+                        const button = document.createElement('button');
+                        button.textContent = ansatt.fulltNavn;
+                        button.onclick = function (e) {
+                            e.preventDefault();
+                            tildelTilAnsatt(ansatt.ansattId);
+                        };
+                        liste.appendChild(button);
+                    });
+                    liste.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function tildelTilAnsatt(ansattId) {
+            const rapportId = @Model.Rapport.RapportId;
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = `/RapportStatus/TildelRapport?rapportId=${rapportId}&nyAnsattId=${ansattId}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('ansatteListe');
+            const button = event.target.closest('.detbtn');
+            if (!button && dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            }
+        });
     </script>
 }
