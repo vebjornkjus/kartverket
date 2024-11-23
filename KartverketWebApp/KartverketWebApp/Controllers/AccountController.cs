@@ -86,12 +86,19 @@ namespace KartverketWebApp.Controllers
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
             });
 
-        // Sjekk brukertype og omdiriger basert på dette
-        if (bruker.BrukerType.Equals("Saksbehandler", StringComparison.OrdinalIgnoreCase))
-        {
-            return RedirectToAction("Saksbehandler", "Home");  // Anta at vi har en OversiktController med Index action
-        }
-            return RedirectToAction("Index", "Home");
+            // Sjekk brukertype og omdiriger basert på dette
+            if (bruker.BrukerType.Equals("Saksbehandler", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("Saksbehandler", "Home");  // Anta at vi har en OversiktController med Index action
+            }
+            else if (bruker.BrukerType.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction("BrukerOversikt", "Admin");
+            }
+
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         // Ny metode for å validere e-post
