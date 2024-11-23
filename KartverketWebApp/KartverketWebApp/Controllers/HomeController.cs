@@ -56,7 +56,6 @@ namespace KartverketWebApp.Controllers
         }
 
         // SECTION: Static Views
-        public IActionResult TakkRapport() => View("~/Views/Home/Innsender/TakkRapport.cshtml");
         public IActionResult Innlogging() => View();
         public IActionResult Admin() => View();
         public IActionResult soke() => View();
@@ -675,6 +674,40 @@ public async Task<IActionResult> MinSide()
             // Log the fallback to AnsattId = 1
             _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
             return 1; // Default AnsattId
+        }
+
+
+        public IActionResult TakkRapport(int id)
+        {
+            // Retrieve the most recent report
+            var rapport = _context.Rapport
+                .Include(r => r.Kart)
+                .Include(r => r.Kart.Koordinater)
+                .FirstOrDefault(r => r.RapportId == id);
+
+            if (rapport == null || rapport.Kart == null)
+            {
+                // Handle the case when the report or its related data is not found
+                return NotFound();
+            }
+
+            // Prepare the PositionModel
+            var positionModel = new PositionModel
+            {
+                Kart_endring_id = rapport.Kart.KartEndringId.ToString(),
+                Koordsys = rapport.Kart.Koordsys,
+                Tittel = rapport.Kart.Tittel,
+                Beskrivelse = rapport.Kart.Beskrivelse,
+                MapType = rapport.Kart.MapType,
+                RapportType = rapport.Kart.RapportType,
+                Coordinates = rapport.Kart.Koordinater.Select(k => new PositionModel.Coordinate
+                {
+                    Nord = k.Nord,
+                    Ost = k.Ost
+                }).ToList()
+            };
+
+            return View("~/Views/Home/Innsender/TakkRapport.cshtml", positionModel);
         }
     }
 }

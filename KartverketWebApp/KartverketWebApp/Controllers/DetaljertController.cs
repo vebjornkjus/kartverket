@@ -5,6 +5,8 @@ using System.Data;
 using Microsoft.Extensions.Logging;
 using KartverketWebApp.Data;
 using KartverketWebApp.API_Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace KartverketWebApp.Controllers
 {
@@ -91,25 +93,46 @@ namespace KartverketWebApp.Controllers
                 return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
             }
         }
-
+        [Authorize]
         [HttpGet]
+
         public IActionResult HentTilgjengeligeAnsatte()
         {
             try
             {
-                // Hent alle saksbehandlere (basert på BrukerType)
-                const string query = @"
-            SELECT a.AnsattId, 
-                   CONCAT(p.Fornavn, ' ', p.Etternavn) as FulltNavn,
-                   s.Kommunenavn
+                // Først hent kommunenummer for innlogget bruker
+                const string userQuery = @"
+            SELECT DISTINCT a.Kommunenummer
             FROM Ansatt a
-            JOIN Person p ON a.PersonId = p.PersonId
-            JOIN Bruker b ON p.BrukerId = b.BrukerId
-            JOIN Steddata s ON a.Kommunenummer = s.Kommunenummer
+            INNER JOIN Person p ON a.PersonId = p.PersonId
+            INNER JOIN Bruker b ON p.BrukerId = b.BrukerId
+            WHERE b.Email = @UserEmail";  // Anta at vi bruker email for å identifisere brukeren
+
+                var userEmail = User.Identity.Name; // Henter innlogget brukers email
+                var userKommunenummer = _dbConnection.QueryFirstOrDefault<int>(userQuery, new { UserEmail = userEmail });
+
+                // Så hent alle ansatte fra samme kommune
+                const string query = @"
+            SELECT 
+                a.AnsattId as AnsattId,
+                p.Fornavn as Fornavn,
+                p.Etternavn as Etternavn,
+                s.Kommunenavn as Kommunenavn
+            FROM Ansatt a
+            INNER JOIN Person p ON a.PersonId = p.PersonId
+            INNER JOIN Bruker b ON p.BrukerId = b.BrukerId
+            LEFT JOIN Steddata s ON a.Kommunenummer = s.Kommunenummer
             WHERE b.BrukerType = 'saksbehandler'
+            AND a.Kommunenummer = @Kommunenummer
+            AND b.Email != @CurrentUserEmail  -- Ekskluder innlogget bruker
             ORDER BY p.Fornavn, p.Etternavn";
 
-                var ansatte = _dbConnection.Query(query);
+                var ansatte = _dbConnection.Query(query, new
+                {
+                    Kommunenummer = userKommunenummer,
+                    CurrentUserEmail = userEmail
+                });
+
                 return Json(ansatte);
             }
             catch (Exception ex)
@@ -120,45 +143,12 @@ namespace KartverketWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult TildelRapport(int rapportId, int nyAnsattId)
+        [ValidateAntiForgeryToken]
+        public IActionResult TildelRapport([FromBody] TildelRapportModel model)
         {
             try
             {
-                // Først sjekk om rapporten eksisterer og dens nåværende status
-                const string checkRapportQuery = @"
-            SELECT r.RapportStatus, r.TildelAnsattId, k.SteddataId
-            FROM Rapport r
-            JOIN Kart k ON r.KartEndringId = k.KartEndringId
-            WHERE r.RapportId = @RapportId";
-
-                var rapportInfo = _dbConnection.QueryFirstOrDefault(checkRapportQuery, new { RapportId = rapportId });
-
-                if (rapportInfo == null)
-                {
-                    TempData["Error"] = "Rapporten ble ikke funnet.";
-                    return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-                }
-
-                // Sjekk om den nye ansatte er en gyldig saksbehandler for dette området
-                const string checkAnsattQuery = @"
-            SELECT a.AnsattId, s.Kommunenummer
-            FROM Ansatt a
-            JOIN Person p ON a.PersonId = p.PersonId
-            JOIN Bruker b ON p.BrukerId = b.BrukerId
-            JOIN Steddata s ON a.Kommunenummer = s.Kommunenummer
-            WHERE a.AnsattId = @AnsattId 
-            AND b.BrukerType = 'saksbehandler'";
-
-                var ansattInfo = _dbConnection.QueryFirstOrDefault(checkAnsattQuery, new { AnsattId = nyAnsattId });
-
-                if (ansattInfo == null)
-                {
-                    TempData["Error"] = "Ugyldig saksbehandler valgt.";
-                    return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-                }
-
-                // Oppdater rapporten med ny saksbehandler
-                const string updateQuery = @"
+                const string query = @"
             UPDATE Rapport 
             SET TildelAnsattId = @NyAnsattId,
                 RapportStatus = CASE 
@@ -167,26 +157,101 @@ namespace KartverketWebApp.Controllers
                 END
             WHERE RapportId = @RapportId";
 
-                var parameters = new
+                _dbConnection.Execute(query, new
                 {
-                    RapportId = rapportId,
-                    NyAnsattId = nyAnsattId
-                };
+                    RapportId = model.RapportId,
+                    NyAnsattId = model.NyAnsattId
+                });
 
-                _dbConnection.Execute(updateQuery, parameters);
-
-                // Logg endringen
-                _logger.LogInformation($"Rapport {rapportId} er tildelt ansatt {nyAnsattId}");
-                TempData["Success"] = "Rapporten ble overført til ny saksbehandler.";
-
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                // Since this is an AJAX call, we'll return JSON with a redirect URL
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Saksbehandler", "Home")  // Adjust controller name if needed
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Feil ved tildeling av rapport {rapportId} til ansatt {nyAnsattId}: {ex.Message}");
-                TempData["Error"] = "Det oppstod en feil ved tildeling av rapporten.";
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                _logger.LogError($"Feil ved tildeling av rapport {model.RapportId} til ansatt {model.NyAnsattId}: {ex.Message}");
+                return Json(new { success = false, error = "Kunne ikke tildele rapport." });
             }
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddComment([FromForm] string innhold, [FromForm] int rapportId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(innhold))
+                {
+                    return Json(new { success = false, message = "Comment content cannot be empty." });
+                }
+
+                var userEmail = User.Identity?.Name;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Json(new { success = false, message = "User not authenticated properly." });
+                }
+
+                // Get sender's PersonId using Dapper
+                const string senderQuery = @"
+            SELECT p.PersonId
+            FROM Person p
+            INNER JOIN Bruker b ON p.BrukerId = b.BrukerId
+            WHERE b.Email = @Email";
+
+                var senderPersonId = await _dbConnection.QueryFirstOrDefaultAsync<int?>(senderQuery, new { Email = userEmail });
+
+                if (!senderPersonId.HasValue)
+                {
+                    return Json(new { success = false, message = "User profile not found." });
+                }
+
+                // Get recipient's PersonId using Dapper
+                const string recipientQuery = @"
+            SELECT PersonId
+            FROM Rapport
+            WHERE RapportId = @RapportId";
+
+                var mottakerPersonId = await _dbConnection.QueryFirstOrDefaultAsync<int?>(recipientQuery, new { RapportId = rapportId });
+
+                if (!mottakerPersonId.HasValue)
+                {
+                    return Json(new { success = false, message = "Rapport not found." });
+                }
+
+                // Insert new message using Dapper
+                const string insertQuery = @"
+            INSERT INTO Meldinger (RapportId, SenderPersonId, MottakerPersonId, Innhold, Tidsstempel, Status)
+            VALUES (@RapportId, @SenderPersonId, @MottakerPersonId, @Innhold, @Tidsstempel, @Status)";
+
+                var parameters = new
+                {
+                    RapportId = rapportId,
+                    SenderPersonId = senderPersonId.Value,
+                    MottakerPersonId = mottakerPersonId.Value,
+                    Innhold = innhold,
+                    Tidsstempel = DateTime.Now,
+                    Status = "sendt"
+                };
+
+                await _dbConnection.ExecuteAsync(insertQuery, parameters);
+
+                return Json(new { success = true, message = "Comment added successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error adding comment: {ex.Message}");
+                return Json(new { success = false, message = "Could not add comment." });
+            }
+        }
+
+        public class TildelRapportModel
+        {
+            public int RapportId { get; set; }
+            public int NyAnsattId { get; set; }
+        }
+
     }
 }
