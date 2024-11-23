@@ -126,6 +126,37 @@ body {
     display: flex;
     flex-direction: column;
 }
+.submission-content img {
+    max-width: 100%; /* Bildet tilpasses bredden av containeren */
+    max-height: 300px; /* Begrenser høyden på bildet */
+    height: auto; /* Bevarer proporsjonene */
+    display: block; /* Sentrerer bildet */
+    margin: 0 auto; /* Legger bildet midt i containeren */
+    border-radius: 8px; /* Runde hjørner som matcher boksen */
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; /* Valgfri skyggeeffekt */
+}
+.submission-box {
+    height: 350px; /* Juster høyden etter behov */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Sørger for at innholdet holder seg øverst */
+    overflow: hidden; /* Klipper innhold som er for stort */
+}
+.submission-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Tar opp all høyde i boksen */
+    overflow: hidden; /* Klipper bildet hvis det er for stort */
+}
+
+.submission-content img {
+    max-width: 100%;
+    max-height: 100%; /* Passer alltid i rammen */
+    object-fit: cover; /* Klipper bildet for å fylle rammen hvis nødvendig */
+    border-radius: 8px;
+}
+
 
 .comment-content {
     background-color: #f8f9fa;
