@@ -86,6 +86,11 @@ namespace KartverketWebApp.Controllers
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
             });
 
+        // Sjekk brukertype og omdiriger basert på dette
+        if (bruker.BrukerType.Equals("Saksbehandler", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Saksbehandler", "Home");  // Anta at vi har en OversiktController med Index action
+        }
             return RedirectToAction("Index", "Home");
         }
 
