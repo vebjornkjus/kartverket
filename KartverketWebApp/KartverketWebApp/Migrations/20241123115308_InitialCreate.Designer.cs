@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartverketWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241122192946_Innitial-Create")]
-    partial class InnitialCreate
+    [Migration("20241123115308_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -775,7 +775,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 1,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3517)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9908)
                         },
                         new
                         {
@@ -785,7 +785,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 1,
                             SenderPersonId = 1,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3525)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9915)
                         },
                         new
                         {
@@ -795,7 +795,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 2,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3532)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9919)
                         },
                         new
                         {
@@ -805,7 +805,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 2,
                             SenderPersonId = 2,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3538)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9923)
                         },
                         new
                         {
@@ -815,7 +815,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 3,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3544)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9974)
                         },
                         new
                         {
@@ -825,7 +825,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 3,
                             SenderPersonId = 3,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3550)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9978)
                         },
                         new
                         {
@@ -835,7 +835,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 4,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 21, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3555)
+                            Tidsstempel = new DateTime(2024, 11, 22, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9982)
                         },
                         new
                         {
@@ -845,7 +845,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 4,
                             SenderPersonId = 4,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3563)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9987)
                         },
                         new
                         {
@@ -855,7 +855,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 5,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3568)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9991)
                         },
                         new
                         {
@@ -865,7 +865,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 5,
                             SenderPersonId = 5,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3573)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9995)
                         },
                         new
                         {
@@ -875,7 +875,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 6,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3577)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9999)
                         },
                         new
                         {
@@ -885,7 +885,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 6,
                             SenderPersonId = 6,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3582)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(3)
                         },
                         new
                         {
@@ -895,7 +895,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 7,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3587)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(6)
                         },
                         new
                         {
@@ -905,7 +905,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 7,
                             SenderPersonId = 7,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3592)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(10)
                         },
                         new
                         {
@@ -915,7 +915,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 8,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3597)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(14)
                         },
                         new
                         {
@@ -925,7 +925,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 8,
                             SenderPersonId = 8,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3601)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(18)
                         },
                         new
                         {
@@ -935,7 +935,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 9,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3605)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(21)
                         },
                         new
                         {
@@ -945,7 +945,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 9,
                             SenderPersonId = 9,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3610)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(25)
                         },
                         new
                         {
@@ -955,7 +955,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 10,
                             SenderPersonId = 12,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3615)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(29)
                         },
                         new
                         {
@@ -965,7 +965,7 @@ namespace KartverketWebApp.Migrations
                             RapportId = 10,
                             SenderPersonId = 10,
                             Status = "sendt",
-                            Tidsstempel = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3619)
+                            Tidsstempel = new DateTime(2024, 11, 23, 12, 53, 7, 893, DateTimeKind.Local).AddTicks(33)
                         });
                 });
 
@@ -1200,7 +1200,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 1,
                             KartEndringId = 1,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3064),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9655),
                             PersonId = 1,
                             RapportStatus = "Uåpnet",
                             TildelAnsattId = 1
@@ -1209,7 +1209,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 2,
                             KartEndringId = 2,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3186),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9717),
                             PersonId = 2,
                             RapportStatus = "Under behandling",
                             TildelAnsattId = 1
@@ -1228,7 +1228,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 4,
                             KartEndringId = 4,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3202),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9725),
                             PersonId = 4,
                             RapportStatus = "Uåpnet",
                             TildelAnsattId = 1
@@ -1237,7 +1237,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 5,
                             KartEndringId = 5,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3209),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9729),
                             PersonId = 5,
                             RapportStatus = "Under behandling",
                             TildelAnsattId = 1
@@ -1256,7 +1256,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 7,
                             KartEndringId = 7,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3218),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9734),
                             PersonId = 7,
                             RapportStatus = "Uåpnet",
                             TildelAnsattId = 1
@@ -1265,7 +1265,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 8,
                             KartEndringId = 8,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3233),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9739),
                             PersonId = 8,
                             RapportStatus = "Under behandling",
                             TildelAnsattId = 1
@@ -1284,7 +1284,7 @@ namespace KartverketWebApp.Migrations
                         {
                             RapportId = 10,
                             KartEndringId = 10,
-                            Opprettet = new DateTime(2024, 11, 22, 20, 29, 44, 895, DateTimeKind.Local).AddTicks(3241),
+                            Opprettet = new DateTime(2024, 11, 23, 12, 53, 7, 892, DateTimeKind.Local).AddTicks(9744),
                             PersonId = 10,
                             RapportStatus = "Uåpnet",
                             TildelAnsattId = 1
