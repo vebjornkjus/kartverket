@@ -112,7 +112,24 @@ namespace KartverketWebApp.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                // Get the user's email from claims
+                var userEmail = User.Identity?.Name;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest("User not authenticated properly.");
+                }
+
+                // Get the user's PersonId from Bruker and Person tables
+                var bruker = await _context.Bruker
+                    .Include(b => b.Personer)
+                    .FirstOrDefaultAsync(b => b.Email == userEmail);
+
+                if (bruker == null || !bruker.Personer.Any())
+                {
+                    return BadRequest("User profile not found.");
+                }
+
+                var personId = bruker.Personer.First().PersonId;
 
                 var messages = await _context.Meldinger
                     .Where(m => m.RapportId == rapportId)
@@ -124,15 +141,22 @@ namespace KartverketWebApp.Controllers
                         SenderName = m.Sender.Fornavn + " " + m.Sender.Etternavn,
                         Innhold = m.Innhold,
                         Tidsstempel = m.Tidsstempel.ToString("dd.MM.yyyy HH:mm"),
-                        IsSender = m.SenderPersonId == userId
+                        IsSender = m.SenderPersonId == personId  // Using personId instead of userId
                     })
                     .ToListAsync();
 
-                return Json(messages); // Ensure JSON response is returned correctly
+                // Add debug logging
+                foreach (var message in messages)
+                {
+                    Console.WriteLine($"Message: {message.Innhold}, IsSender: {message.IsSender}, SenderPersonId: {message.SenderName}");
+                }
+
+                return Json(messages);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in GetConversation: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return BadRequest("Failed to load conversation.");
             }
         }

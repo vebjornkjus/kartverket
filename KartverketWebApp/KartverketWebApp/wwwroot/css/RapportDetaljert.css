@@ -2,6 +2,7 @@
 body {
     background-color: #f4f4f9;
     margin: 0;
+    overflow: hidden; /* Prevent body scroll */
 }
 
 .center-container {
@@ -13,6 +14,7 @@ body {
     width: 100vw;
     height: 86.41vh;
     margin: auto;
+    overflow: hidden; /* Contain everything */
 }
 
 .detaljert-main {
@@ -23,6 +25,10 @@ body {
     width: 96vw;
     height: 96%;
     border-radius: 11px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .main_rapport {
@@ -31,6 +37,7 @@ body {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 20px;
+    min-height: fit-content; /* Ensure content is visible */
 }
 
 .info,
@@ -39,12 +46,14 @@ body {
     margin: 20px;
     background-color: white;
     border-radius: 11px;
+    min-height: 400px; /* Minimum height to ensure visibility */
 }
 
 .rapport_map {
     background-color: #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
+    position: relative; /* For map containment */
 }
 
 /* Info-Bottom Layout */
@@ -55,6 +64,7 @@ body {
     justify-content: space-between;
     width: 100%;
     gap: 20px;
+    min-height: fit-content; /* Ensure content is visible */
 }
 
 .info-bottom {
@@ -63,11 +73,13 @@ body {
     border-radius: 11px;
     padding: 20px;
     min-width: 300px;
+    height: fit-content; /* Adjust height to content */
 }
 
 /* Custom Table Styles */
 .custom-table-wrapper {
     overflow-x: auto;
+    margin-bottom: 10px;
 }
 
 .custom-table {
@@ -91,6 +103,33 @@ body {
         background-color: #e0ffe0;
     }
 
+/* Koordinater Scrollable Area */
+.koordinater-scrollable {
+    max-height: 200px; /* Fixed height for coordinate table */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Custom Scrollbar Styles */
+.detaljert-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+.detaljert-main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.detaljert-main::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    .detaljert-main::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .main_rapport {
@@ -100,7 +139,20 @@ body {
     .info,
     .rapport_map,
     .info-bottom {
-        width: 100%;
-        margin-right: 0;
+        width: calc(100% - 40px); /* Account for margins */
+        margin: 20px;
     }
+
+    .info-bottom-container {
+        flex-direction: column;
+    }
+}
+
+/* Map Container Specific Styles */
+#map_detaljert {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }

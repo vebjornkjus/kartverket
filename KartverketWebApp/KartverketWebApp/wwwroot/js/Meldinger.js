@@ -43,18 +43,33 @@ class ChatUIManager {
         }
 
         this.container.innerHTML = "";
-        messages.forEach(msg => this.renderMessage(msg));
+        messages.forEach(msg => {
+            // Debug log to check the isSender value
+            console.log("Message:", msg.innhold, "isSender:", msg.isSender);
+            this.renderMessage(msg);
+        });
         this.scrollToBottom();
     }
 
     renderMessage(msg) {
-        const msgElement = document.createElement("div");
-        msgElement.className = msg.isSender ? "message-sent" : "message-received";
-        msgElement.innerHTML = `
+        const messageDiv = document.createElement("div");
+        // Explicitly check the boolean value
+        const messageClass = msg.isSender === true ? "message message-sent" : "message message-received";
+        console.log("Assigning class:", messageClass, "for message:", msg.innhold);
+        messageDiv.className = messageClass;
+
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "message-content";
+        contentDiv.innerHTML = `
             <p>${msg.innhold}</p>
-            <span class="timestamp">${msg.tidsstempel}</span>
+            <span class="message-info">
+                <span class="sender-name">${msg.senderName}</span>
+                <span class="timestamp">${msg.tidsstempel}</span>
+            </span>
         `;
-        this.container.appendChild(msgElement);
+
+        messageDiv.appendChild(contentDiv);
+        this.container.appendChild(messageDiv);
     }
 
     scrollToBottom() {
