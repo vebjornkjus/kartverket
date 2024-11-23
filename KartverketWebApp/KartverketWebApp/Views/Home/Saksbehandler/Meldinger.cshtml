@@ -1,15 +1,15 @@
 ﻿@model KartverketWebApp.Models.CombinedViewModel
 
+
 <link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
-<script src="~/js/Overview.js"></script>
+<script src="~/js/Meldinger.js"></script>
 
 <script>
-    // Pass serialized JSON from the backend to JavaScript
-    window.coordinatesJson = '@Html.Raw(ViewBag.PolygonJson ?? "[]")'; // Pass polygon coordinates
-    window.markersJson = '@Html.Raw(ViewBag.MarkersJson ?? "[]")'; // Pass markers
-    console.log("Markers JSON:", '@Html.Raw(ViewBag.MarkersJson ?? "[]")');
-    console.log("Polygon JSON:", '@Html.Raw(ViewBag.PolygonJson ?? "[]")');
+    window.conversations = @Html.Raw(Json.Serialize(Model.SammtaleModel));
+    console.log("window.conversations:", window.conversations);
 </script>
+
+
 
 
 
@@ -25,17 +25,13 @@
             </div>
             <nav class="vertical-nav">
                 <ul>
-                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item active"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
+                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
                     <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger</a></li>
                     <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
-                    <li><a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
+                    <li><a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item active"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
                     <li><a asp-controller="Home" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
-
-
-                    
                 </ul>
             </nav>
-
         </div>
         <div id="overviewOmrade">
             <div class="nav-beside">
@@ -54,41 +50,50 @@
                     </script>
                 </div>
                 <div class="beside-main">
-                    <div class="main-container">
-                                <form id="updateStatusForm" method="post" asp-action="UpdateStatusAndRedirect">
-                                    @Html.AntiForgeryToken() <!-- Add anti-forgery token for security -->
-                                    <input type="hidden" id="rapportIdInput" name="id" value="" />
-                                </form>
-                                <div class="melding-left">
-                                    <div class="conversation-list">
-                                        @foreach (var conversation in Model.SammtaleModel)
-                                        {
-                                        <div class="conversation">
-                                            <h4>@conversation.Tittel av @conversation.SenderName</h4>
-                                            <p>@conversation.LastSenderName: @conversation.LastMessage</p>
-                                            <a asp-action="Meldinger" asp-route-rapportId="@conversation.RapportId">View All Messages</a>
-                                        </div>
-                                         <hr />
-                                        }
+                    <div class="main-melding">
+                        <div class="melding-left">
+                        <form id="updateMessageStatusForm" method="post" asp-action="UpdateMessageStatus">
+                            @Html.AntiForgeryToken()
+                                @foreach (var conversation in Model.SammtaleModel)
+                                {
+                                    <div id="conversation-@conversation.RapportId"
+                                         class="conversation-card"
+                                         onclick="handleConversationClick(@conversation.RapportId)">
+                                        <h2>@conversation.Tittel av @conversation.SenderName</h2>
+                                        <p>@conversation.LastSenderName: @conversation.LastMessage</p>
                                     </div>
-                                </div>
+                                }
 
+                            <input type="hidden" id="messageIdInput" name="id" value="" />
+                        </form>
+                        </div>
+                        <div class="melding-right">
+                            <div id="conversation-container">
+                                <!-- Messages will load here -->
                             </div>
-                           
+
+                            <form id="sendMessageForm" method="post" asp-action="SendMessage">
+                                @Html.AntiForgeryToken()
+                                <textarea id="messageInput" name="innhold" placeholder="Write a message..." rows="3"></textarea>
+                                <input type="hidden" id="activeConversationRapportId" name="rapportId" value="" />
+                                <input type="hidden" id="activeConversationRecipientId" name="mottakerPersonId" value="" />
+                                <button type="submit">Send</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            <script>
-                function submitFormWithId(rapportId) {
-                    // Set the hidden input value
-                    document.getElementById("rapportIdInput").value = rapportId;
-                    // Submit the form
-                    document.getElementById("updateStatusForm").submit();
-                }
-            </script>
-            </div>
+<script>
+    function submitFormWithId(rapportId) {
+        document.getElementById("messageIdInput").value = rapportId;
+        document.getElementById("updateMessageStatusForm").submit();
+    }
+</script>
+
 
 
 

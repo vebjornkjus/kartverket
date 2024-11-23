@@ -2,6 +2,7 @@
 body {
     background-color: #f4f4f9;
     margin: 0;
+    overflow: hidden;
 }
 
 .center-container {
@@ -13,6 +14,7 @@ body {
     width: 100vw;
     height: 86.41vh;
     margin: auto;
+    overflow: hidden;
 }
 
 .detaljert-main {
@@ -23,38 +25,74 @@ body {
     width: 96vw;
     height: 96%;
     border-radius: 11px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 20px;
 }
 
-.main_rapport {
-    flex: 2;
+/* Button Container */
+.button-container {
     display: flex;
-    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 11px;
+    margin: 20px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.detbtn {
+    padding: 8px 16px;
+    background-color: #17682e;
+    color: white;
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+}
+
+    .detbtn:hover {
+        background-color: #145628;
+    }
+
+/* Main Report Section */
+.main_rapport {
+    display: flex;
+    width: calc(100% - 40px);
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin: 0 20px;
+    gap: 20px;
+    min-height: 400px;
 }
 
 .info,
 .rapport_map {
     flex: 1;
-    margin: 20px;
+    padding: 20px;
     background-color: white;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     border-radius: 11px;
+    min-height: 400px;
 }
 
 .rapport_map {
-    background-color: #e0e0e0;
-    border-radius: 10px;
+    position: relative;
     overflow: hidden;
 }
 
 /* Info-Bottom Layout */
 .info-bottom-container {
-    flex: 1;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    width: 100%;
+    width: calc(100% - 40px);
     gap: 20px;
+    margin: 20px;
+    min-height: 300px;
 }
 
 .info-bottom {
@@ -63,17 +101,99 @@ body {
     border-radius: 11px;
     padding: 20px;
     min-width: 300px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-/* Custom Table Styles */
+/* Bottom Extra Container */
+.bottom-extra-container {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 40px);
+    gap: 20px;
+    margin: 20px;
+    min-height: 300px;
+}
+
+/* Comment Box and Submission Box */
+.comment-box,
+.submission-box {
+    flex: 1;
+    background-color: white;
+    border-radius: 11px;
+    padding: 20px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-content {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1;
+    min-height: 200px;
+}
+
+.submission-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+    .submission-content textarea {
+        width: 100%;
+        flex: 1;
+        min-height: 200px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        resize: vertical;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+        .submission-content textarea:focus {
+            outline: none;
+            border-color: #17682e;
+        }
+
+.send-btn {
+    align-self: flex-end;
+    padding: 8px 16px;
+    background-color: #17682e;
+    color: white;
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .send-btn:hover {
+        background-color: #145628;
+    }
+
+/* Map Container */
+#map_detaljert {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Table Styles */
 .custom-table-wrapper {
     overflow-x: auto;
+    margin-top: 10px;
 }
 
 .custom-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 0;
 }
 
     .custom-table th,
@@ -91,6 +211,39 @@ body {
         background-color: #e0ffe0;
     }
 
+/* Koordinater Scrollable Area */
+.koordinater-scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Scrollbar Styles */
+.detaljert-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+.detaljert-main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.detaljert-main::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    .detaljert-main::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Headings */
+h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .main_rapport {
@@ -98,9 +251,20 @@ body {
     }
 
     .info,
-    .rapport_map,
-    .info-bottom {
+    .rapport_map {
         width: 100%;
-        margin-right: 0;
+    }
+
+    .info-bottom-container {
+        flex-direction: column;
+    }
+
+    .bottom-extra-container {
+        flex-direction: column;
+    }
+
+    .comment-box,
+    .submission-box {
+        width: 100%;
     }
 }

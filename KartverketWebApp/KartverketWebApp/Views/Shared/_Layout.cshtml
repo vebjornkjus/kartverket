@@ -12,78 +12,62 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <link rel="stylesheet" href="/css/LeafletOverride.css" />
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    
-    <!-- font awsome-->
+    <!-- font awesome-->
     <script src="https://kit.fontawesome.com/29c703464a.js" crossorigin="anonymous"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
 </head>
 <body>
-<header>
     <header>
-    <div class="nav-stedholder"> 
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-            <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
-        </a>
+        <div class="nav-stedholder">
+            @{
+                var userType = User.Claims.FirstOrDefault(c => c.Type == "BrukerType")?.Value?.ToLower();
+                var isStandardUser = userType == "standard";
+                var isAdminOrSaksbehandler = userType == "admin" || userType == "saksbehandler";
+            }
 
-        <div id="saksbehandler">
-            @inject ApplicationDbContext _context
-
-            @if (User.Identity.IsAuthenticated)
+            @if (isStandardUser)
             {
-                // Kun vis knappen hvis brukeren er admin eller saksbehandler
-                if (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler")))
-                {
-                    <a asp-action="Saksbehandler" asp-controller="Home">
-                        <button class="btn btn-primary">Til oversikt</button>
-                    </a>
-                }
-
-                <a asp-action="MinSide" asp-controller="Home">
-                    <button class="btn btn-secondary">Min Side</button>
+                <!-- Standard bruker: Logo med link til Index -->
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Kartverket Logo" class="kartverket_logo">
                 </a>
-
-                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-primary">Logg ut</button>
-                </form>
-                <span class="nav-link">
-                    <i class="bi bi-person-circle"></i>
-                    @{
-                        // Hent e-post fra User.Identity.Name
-                        var email = User.Identity.Name;
-
-                        // Slå opp fornavnet i databasen
-                        var fornavn = (from bruker in _context.Bruker
-                                       join person in _context.Person on bruker.BrukerId equals person.BrukerId
-                                       where bruker.Email == email
-                                       select person.Fornavn).FirstOrDefault();
-
-                        // Gjør fornavnet penere
-                        var formattedFornavn = string.IsNullOrWhiteSpace(fornavn)
-                            ? "Bruker"
-                            : char.ToUpper(fornavn[0]) + fornavn.Substring(1).ToLower();
-                    }
-                    @formattedFornavn
-                </span>
             }
             else
             {
-                <a asp-action="Login" asp-controller="Account">
-                    <button class="btn btn-primary">Logg inn</button>
-                </a>
+                <!-- Admin/Saksbehandler: Logo uten link -->
+                <div class="navbar-brand">
+                    <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Kartverket Logo" class="kartverket_logo">
+                </div>
             }
+
+            @inject ApplicationDbContext _context
+            <div id="saksbehandler">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @if (isStandardUser)
+                    {
+                        <!-- Standard bruker ser Min Side -->
+                        <a asp-action="MinSide" asp-controller="Home">
+                            <button class="btn btn-secondary">Min Side</button>
+                        </a>
+                    }
+                    
+                    <!-- Alle innloggede brukere ser Logg ut -->
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-primary">Logg ut</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-action="Login" asp-controller="Account">
+                        <button class="btn btn-primary">Logg inn</button>
+                    </a>
+                }
+            </div>
         </div>
-    </div>
-</header>
-
-
-
+    </header>
 
     <div>
         <main role="main">
@@ -92,8 +76,8 @@
     </div>
 
     <footer>
-
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

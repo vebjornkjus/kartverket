@@ -1,11 +1,18 @@
-﻿namespace KartverketWebApp.Models
+﻿using Org.BouncyCastle.Cms;
+
+namespace KartverketWebApp.Models
 {
-    public class SammtaleModel
-    {
-        public int RapportId { get; set; }
-        public string Tittel { get; set; }
-        public string SenderName { get; set; } // Name of the person you're having a conversation with
-        public string LastSenderName { get; set; } // "deg" or the sender's name
-        public string LastMessage { get; set; } // Content of the last message
+
+        public class SammtaleModel
+        {
+            public int RapportId { get; set; }
+            public string Tittel { get; set; }
+            public string LastMessage { get; set; }
+            public string LastSenderName { get; set; }
+            public string SenderName { get; set; }
+            public string Status { get; set; }
+            public int RecipientId { get; set; }
+
     }
+
 }
