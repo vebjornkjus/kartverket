@@ -179,26 +179,26 @@
             </div>
         </div>
 
-        <div class="bottom-extra-container">
-            @if (!string.IsNullOrEmpty(Model.Kart?.FilePath))
-            {
-                <div class="comment-box">
-                    <h2>Kommentarer</h2>
-                    <div class="comment-content">
-                        <p>@Model.Kart?.FilePath</p>
-                    </div>
-                </div>
-            }
-
-            <div class="submission-box">
-                <h2>Legg til kommentar</h2>
-                <div class="submission-content">
-                    <textarea id="newComment" placeholder="Skriv din kommentar her..."></textarea>
-                    <button class="send-btn">
-                        Send <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </div>
+<div class="bottom-extra-container">
+    @if (!string.IsNullOrEmpty(Model.Kart?.FilePath))
+    {
+        <!-- Boks for Vedlagt Bilde -->
+        <div class="submission-box">
+            <h2>Vedlagt Bilde</h2>
+            <div class="submission-content">
+                <img src="@Model.Kart.FilePath" alt="Vedlagt bilde" class="responsive-image" />
             </div>
+        </div>
+    }
+
+    <!-- Boks for Legg til kommentar -->
+    <div class="submission-box">
+        <h2>Legg til kommentar</h2>
+        <div class="submission-content">
+            <textarea id="newComment" placeholder="Skriv din kommentar her..."></textarea>
+            <button class="send-btn">
+                Send <i class="fa-solid fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 </div>

@@ -2,13 +2,130 @@
     ViewData["Title"] = "Takk for rapport";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Takk for at du rapporterte feil</h1>
-    <p>Vi tar din rapport på største alvor</p>
-    <div class="container-center">
-        <img id"takk" src="https://bygg1.no/wp-content/uploads/2018/04/Tommel-opp.png"/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Tittel</h5>
+                    <p>@Model.Tittel</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Beskrivelse</h5>
+                    <p>@Model.Beskrivelse</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Rapporttype</h5>
+                    <p>@Model.RapportType</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="center-container">
-    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Home</a>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div id="map_corrections" style="height: 400px; width: 100%;"></div>
+        </div>
     </div>
-</div>
+
+
+    @section Scripts {
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log("Initializing Leaflet map");
+
+                var positions = @Html.Raw(Json.Serialize(Model.Positions));
+                console.log("Positions data:", positions);
+
+                // Check if there's at least one position
+                if (positions && positions.length > 0) {
+                    var position = positions[0]; // Use the first position
+                    console.log("Processing position:", position);
+
+                    // Ensure the container exists
+                    var mapContainer = document.getElementById('map_corrections');
+                    if (!mapContainer) {
+                        console.error("Map container 'map_corrections' not found.");
+                        return;
+                    }
+
+                    // Check for valid coordinates
+                    if (position.coordinates && position.coordinates.length > 0) {
+                        var firstCoord = position.coordinates[0]; // Use the first coordinate for the initial view
+                        var map = L.map('map_corrections', {
+                            center: [firstCoord.nord, firstCoord.ost],
+                            zoom: 13
+                        });
+
+                        // Define Kartverket tile layers
+                        var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                        });
+
+                        var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
+                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                        });
+
+                        var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
+                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                        });
+
+                        // Load the appropriate map layer based on position.mapType
+                        if (position.mapType === "Norge kart") {
+                            norgeKart.addTo(map);
+                            console.log("Loaded Norge kart");
+                        } else if (position.mapType === "Turkart") {
+                            turKart.addTo(map);
+                            console.log("Loaded Turkart");
+                        } else if (position.mapType === "Sjøkart") {
+                            sjoKart.addTo(map);
+                            console.log("Loaded Sjøkart");
+                        } else {
+                            console.warn("Unknown mapType, defaulting to Norge kart");
+                            norgeKart.addTo(map);
+                        }
+
+                        // Add markers for each coordinate
+                        position.coordinates.forEach(function (coord, coordIndex) {
+                            L.marker([coord.nord, coord.ost]).addTo(map).bindPopup(`
+                                                <div>
+                                                    <h4>Point ${coordIndex + 1}</h4>
+                                                    <p>Nord: ${coord.nord.toFixed(6)}</p>
+                                                    <p>Øst: ${coord.ost.toFixed(6)}</p>
+                                                </div>
+                                            `);
+                        });
+
+                        // Add a polyline connecting all points
+                        var latlngs = position.coordinates.map(coord => [coord.nord, coord.ost]);
+                        var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+
+                        // Automatically fit the map to the polyline bounds
+                        map.fitBounds(polyline.getBounds());
+
+                        // Ensure the map resizes correctly
+                        setTimeout(() => {
+                            map.invalidateSize();
+                        }, 300);
+                    } else {
+                        console.warn("No valid coordinates found for the position.");
+                    }
+                } else {
+                    console.warn("No position data available for map rendering.");
+                }
+            });
+        </script>
+    }
+
+
+

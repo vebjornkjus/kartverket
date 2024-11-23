@@ -434,49 +434,54 @@ namespace KartverketWebApp.Controllers
 
 
 
-        [HttpGet]
-        public async Task<IActionResult> RapportDetaljert(int id)
+       [HttpGet]
+public async Task<IActionResult> RapportDetaljert(int id)
+{
+    var rapport = await _context.Rapport
+        .Include(r => r.Kart)
+            .ThenInclude(k => k.Koordinater)
+        .Include(r => r.Person)
+            .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
+        .FirstOrDefaultAsync(r => r.RapportId == id);
+
+    if (rapport == null)
+    {
+        return NotFound();
+    }
+
+    var kart = rapport.Kart;
+    Steddata steddata = null;
+
+    // If Kart and its Koordinater exist, retrieve the first coordinate and then fetch Steddata
+    if (kart?.Koordinater?.Any() == true)
+    {
+        var firstCoord = kart.Koordinater.First();
+        steddata = await _context.Steddata
+            .FirstOrDefaultAsync(s => s.Id == kart.SteddataId);
+
+        if (steddata == null)
         {
-            var rapport = await _context.Rapport
-    .Include(r => r.Kart)
-        .ThenInclude(k => k.Koordinater)
-    .Include(r => r.Person)
-        .ThenInclude(p => p.Bruker) // Include Bruker related to the Person
-    .FirstOrDefaultAsync(r => r.RapportId == id);
-
-            if (rapport == null)
-            {
-                return NotFound();
-            }
-
-            var kart = rapport.Kart;
-            Steddata steddata = null;
-
-            // If Kart and its Koordinater exist, retrieve the first coordinate and then fetch Steddata
-            if (kart?.Koordinater?.Any() == true)
-            {
-                var firstCoord = kart.Koordinater.First();
-                steddata = await _context.Steddata
-                    .FirstOrDefaultAsync(s => s.Id == kart.SteddataId);
-
-                if (steddata == null)
-                {
-                    _logger.LogWarning("Steddata for Kart {KartId} was not found.", kart.KartEndringId);
-                }
-            }
-
-            var viewModel = new DetaljertViewModel
-            {
-                Rapport = rapport,
-                Kart = rapport.Kart,
-                Person = rapport.Person,
-                Bruker = rapport.Person?.Bruker,
-                Steddata = steddata
-            };
-
-            return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
+            _logger.LogWarning("Steddata for Kart {KartId} was not found.", kart.KartEndringId);
         }
+    }
 
+    // Konverter FilePath til en URL hvis det finnes en sti
+    if (!string.IsNullOrEmpty(kart?.FilePath))
+    {
+        kart.FilePath = $"/RapportBilder/{Path.GetFileName(kart.FilePath)}";
+    }
+
+    var viewModel = new DetaljertViewModel
+    {
+        Rapport = rapport,
+        Kart = kart,
+        Person = rapport.Person,
+        Bruker = rapport.Person?.Bruker,
+        Steddata = steddata
+    };
+
+    return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
+}
 
         public IActionResult CorrectionsOverview()
         {
