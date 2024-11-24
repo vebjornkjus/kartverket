@@ -422,7 +422,7 @@ table tr:hover {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    background-color: white;
+    background-color: #d0ecd6;
     box-shadow: 5px 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 11px 0 0 11px;
     justify-content: space-between;

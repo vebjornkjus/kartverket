@@ -14,31 +14,10 @@
             </div>
             <nav class="vertical-nav">
                 <ul>
-                    <li>
-                        <a asp-controller="Home" asp-action="Saksbehandler" class="nav-item">
-                            <i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
-                            <i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
-                            <i class="fa-solid fa-envelope" style="color: #166633;"></i> Mine Rapporter
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
-                            <i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Saksbehandler" asp-action="TidligereRapporter" class="nav-item active">
-                            <i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter
-                        </a>
-                    </li>
+                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
+                    <li><a asp-controller="Saksbehandler" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
+                    <li><a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
+                    <li><a asp-controller="Saksbehandler" asp-action="TidligereRapporter" class="nav active"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
                 </ul>
             </nav>
         </div>
@@ -69,7 +48,6 @@
                                         <th>Kart Tittel</th>
                                         <th>Status</th>
                                         <th>Opprettet</th>
-                                        <th>Handlinger</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -82,12 +60,6 @@
                                                 <td>@rapport.Tittel</td>
                                                 <td>@rapport.RapportStatus</td>
                                                 <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                                                <td>
-                                                    <a href="@Url.Action("RapportDetaljer", "Saksbehandler", new { id = rapport.RapportId })"
-                                                       class="btn btn-primary btn-sm">
-                                                        <i class="fa-solid fa-eye"></i> Se detaljer
-                                                    </a>
-                                                </td>
                                             </tr>
                                         }
                                     }
@@ -134,7 +106,6 @@
                                         <th>Kart Tittel</th>
                                         <th>Status</th>
                                         <th>Opprettet</th>
-                                        <th>Handlinger</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,12 +118,6 @@
                                                 <td>@rapport.Tittel</td>
                                                 <td>@rapport.RapportStatus</td>
                                                 <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                                                <td>
-                                                    <a href="@Url.Action("RapportDetaljer", "Saksbehandler", new { id = rapport.RapportId })"
-                                                       class="btn btn-primary btn-sm">
-                                                        <i class="fa-solid fa-eye"></i> Se detaljer
-                                                    </a>
-                                                </td>
                                             </tr>
                                         }
                                     }

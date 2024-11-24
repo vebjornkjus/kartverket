@@ -8339,19 +8339,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\kfhol\\.nuget\\packages\\": {}
+    "C:\\Users\\frede\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kristoffer kartverket\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+      "projectUniqueName": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
       "projectName": "KartverketWebApp",
-      "projectPath": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kristoffer kartverket\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
-      "packagesPath": "C:\\Users\\kfhol\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kristoffer kartverket\\kartverket\\KartverketWebApp\\KartverketWebApp\\obj\\",
+      "projectPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj",
+      "packagesPath": "C:\\Users\\frede\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\kfhol\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\frede\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

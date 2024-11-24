@@ -10,19 +10,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KartverketWebApp.Controllers
 {
+    /// <summary>
+    /// Kontroller for håndtering av rapportstatus og tilknyttede operasjoner
+    /// Krever at brukeren er enten admin eller saksbehandler
+    /// </summary>
     [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
-    public class RapportStatusController : Controller
+    public class DetaljertController : Controller
     {
-        // Private fields for dependencies
-        private readonly ILogger<RapportStatusController> _logger;
+        // Privat felt for avhengigheter som brukes i kontrolleren
+        private readonly ILogger<DetaljertController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IDbConnection _dbConnection;
         private readonly HttpClient _httpClient;
         private readonly ApiSettings _apiSettings;
 
-        // Constructor
-        public RapportStatusController(
-            ILogger<RapportStatusController> logger,
+        /// <summary>
+        /// Konstruktør som initialiserer alle nødvendige tjenester og avhengigheter
+        /// </summary>
+        public DetaljertController(
+            ILogger<DetaljertController> logger,
             ApplicationDbContext context,
             IDbConnection dbConnection,
             HttpClient httpClient,
@@ -35,16 +41,21 @@ namespace KartverketWebApp.Controllers
             _apiSettings = apiSettings.Value;
         }
 
+        /// <summary>
+        /// Setter status på en rapport til 'Avklart' og oppdaterer behandlingsdato
+        /// </summary>
+        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         [HttpPost]
-        public IActionResult SetAvklart(int rapportId)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetFjernet(int rapportId)
         {
             try
             {
                 const string query = @"
-                    UPDATE Rapport 
-                    SET RapportStatus = 'Avklart',
-                        BehandletDato = @BehandletDato
-                    WHERE RapportId = @RapportId";
+            UPDATE Rapport 
+            SET RapportStatus = 'Fjernet',
+                BehandletDato = @BehandletDato
+            WHERE RapportId = @RapportId";
 
                 var parameters = new
                 {
@@ -52,67 +63,73 @@ namespace KartverketWebApp.Controllers
                     BehandletDato = DateTime.Now
                 };
 
-                _dbConnection.Execute(query, parameters);
-                _logger.LogInformation($"Rapport {rapportId} er satt til Avklart");
-
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Feil ved setting av rapport {rapportId} til Avklart: {ex.Message}");
-                TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-            }
-        }
-
-        [HttpPost]
-        public IActionResult SetFjernet(int rapportId)
-        {
-            try
-            {
-                const string query = @"
-                    UPDATE Rapport 
-                    SET RapportStatus = 'Fjernet',
-                        BehandletDato = @BehandletDato
-                    WHERE RapportId = @RapportId";
-
-                var parameters = new
-                {
-                    RapportId = rapportId,
-                    BehandletDato = DateTime.Now
-                };
-
-                _dbConnection.Execute(query, parameters);
+                await _dbConnection.ExecuteAsync(query, parameters);
                 _logger.LogInformation($"Rapport {rapportId} er satt til Fjernet");
 
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                return RedirectToAction("Saksbehandler", "Home");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Feil ved setting av rapport {rapportId} til Fjernet: {ex.Message}");
                 TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                return RedirectToAction("Saksbehandler", "Home");
             }
         }
+
+        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetAvklart(int rapportId)
+        {
+            try
+            {
+                const string query = @"
+            UPDATE Rapport 
+            SET RapportStatus = 'Avklart',
+                BehandletDato = @BehandletDato
+            WHERE RapportId = @RapportId";
+
+                var parameters = new
+                {
+                    RapportId = rapportId,
+                    BehandletDato = DateTime.Now
+                };
+
+                await _dbConnection.ExecuteAsync(query, parameters);
+                _logger.LogInformation($"Rapport {rapportId} er satt til Avklart");
+
+                return RedirectToAction("Saksbehandler", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Feil ved setting av rapport {rapportId} til Avklart: {ex.Message}");
+                TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
+                return RedirectToAction("Saksbehandler", "Home");
+            }
+        }
+        /// <summary>
+        /// Henter liste over tilgjengelige saksbehandlere i samme kommune som innlogget bruker
+        /// Returnerer ikke den innloggede brukeren i listen
+        /// Brukes for å hente inn mulige ansatte som kan over ta rapporten
+        /// </summary>
         [Authorize]
         [HttpGet]
-
         public IActionResult HentTilgjengeligeAnsatte()
         {
             try
             {
-                // Først hent kommunenummer for innlogget bruker
+                // Henter kommunenummer for innlogget bruker
                 const string userQuery = @"
             SELECT DISTINCT a.Kommunenummer
             FROM Ansatt a
             INNER JOIN Person p ON a.PersonId = p.PersonId
             INNER JOIN Bruker b ON p.BrukerId = b.BrukerId
-            WHERE b.Email = @UserEmail";  // Anta at vi bruker email for å identifisere brukeren
+            WHERE b.Email = @UserEmail";
 
-                var userEmail = User.Identity.Name; // Henter innlogget brukers email
+                var userEmail = User.Identity.Name;
                 var userKommunenummer = _dbConnection.QueryFirstOrDefault<int>(userQuery, new { UserEmail = userEmail });
 
-                // Så hent alle ansatte fra samme kommune
+                // Henter alle saksbehandlere fra samme kommune, unntatt innlogget bruker
                 const string query = @"
             SELECT 
                 a.AnsattId as AnsattId,
@@ -125,7 +142,7 @@ namespace KartverketWebApp.Controllers
             LEFT JOIN Steddata s ON a.Kommunenummer = s.Kommunenummer
             WHERE b.BrukerType = 'saksbehandler'
             AND a.Kommunenummer = @Kommunenummer
-            AND b.Email != @CurrentUserEmail  -- Ekskluder innlogget bruker
+            AND b.Email != @CurrentUserEmail
             ORDER BY p.Fornavn, p.Etternavn";
 
                 var ansatte = _dbConnection.Query(query, new
@@ -143,6 +160,11 @@ namespace KartverketWebApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Sender en rapport til en ny saksbehandler
+        /// Oppdaterer også rapportstatus til 'Under behandling' hvis den var 'Uåpnet'
+        /// </summary>
+        /// <param name="model">Inneholder RapportId og NyAnsattId for tildelingen</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult TildelRapport([FromBody] TildelRapportModel model)
@@ -164,11 +186,10 @@ namespace KartverketWebApp.Controllers
                     NyAnsattId = model.NyAnsattId
                 });
 
-                // Since this is an AJAX call, we'll return JSON with a redirect URL
                 return Json(new
                 {
                     success = true,
-                    redirectUrl = Url.Action("Saksbehandler", "Home")  // Adjust controller name if needed
+                    redirectUrl = Url.Action("Saksbehandler", "Home")
                 });
             }
             catch (Exception ex)
@@ -178,24 +199,32 @@ namespace KartverketWebApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Oppretter en ny meldeig bassert på RapportId
+        /// Oppretter en melding mellom avsender og mottaker i databasen
+        /// </summary>
+        /// <param name="innhold">Innholdet i kommentaren</param>
+        /// <param name="rapportId">ID-en til rapporten kommentaren tilhører</param>
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddComment([FromForm] string innhold, [FromForm] int rapportId)
         {
             try
             {
+                // Validerer at kommentaren ikke er tom
                 if (string.IsNullOrWhiteSpace(innhold))
                 {
                     return Json(new { success = false, message = "Comment content cannot be empty." });
                 }
 
+                // Henter innlogget brukers e-post
                 var userEmail = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     return Json(new { success = false, message = "User not authenticated properly." });
                 }
 
-                // Get sender's PersonId using Dapper
+                // Henter avsenders PersonId
                 const string senderQuery = @"
             SELECT p.PersonId
             FROM Person p
@@ -209,7 +238,7 @@ namespace KartverketWebApp.Controllers
                     return Json(new { success = false, message = "User profile not found." });
                 }
 
-                // Get recipient's PersonId using Dapper
+                // Henter mottakers PersonId
                 const string recipientQuery = @"
             SELECT PersonId
             FROM Rapport
@@ -222,7 +251,7 @@ namespace KartverketWebApp.Controllers
                     return Json(new { success = false, message = "Rapport not found." });
                 }
 
-                // Insert new message using Dapper
+                // Lagrer ny melding i databasen
                 const string insertQuery = @"
             INSERT INTO Meldinger (RapportId, SenderPersonId, MottakerPersonId, Innhold, Tidsstempel, Status)
             VALUES (@RapportId, @SenderPersonId, @MottakerPersonId, @Innhold, @Tidsstempel, @Status)";
@@ -248,11 +277,13 @@ namespace KartverketWebApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Modell for å tildele en rapport til en ny saksbehandler
+        /// </summary>
         public class TildelRapportModel
         {
             public int RapportId { get; set; }
             public int NyAnsattId { get; set; }
         }
-
     }
 }

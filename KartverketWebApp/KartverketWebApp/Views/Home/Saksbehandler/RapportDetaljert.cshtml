@@ -32,14 +32,17 @@
     <div class="detaljert-main">
         <div class="button-container">
             <!-- Avklart knapp -->
-            <form asp-controller="Saksbehandler" asp-action="SetAvklart" method="post" style="display: inline;">
+            <!-- Avklart knapp -->
+            <form asp-controller="Detaljert" asp-action="SetAvklart" method="post" style="display: inline;">
                 <input type="hidden" name="rapportId" value="@Model.Rapport.RapportId" />
+                @Html.AntiForgeryToken()
                 <button type="submit" class="detbtn">Avklart <i class="fa-solid fa-check" style="color: #ffffff;"></i></button>
             </form>
 
             <!-- Fjern knapp -->
-            <form asp-controller="Saksbehandler" asp-action="SetFjernet" method="post" style="display: inline;">
+            <form asp-controller="Detaljert" asp-action="SetFjernet" method="post" style="display: inline;">
                 <input type="hidden" name="rapportId" value="@Model.Rapport.RapportId" />
+                @Html.AntiForgeryToken()
                 <button type="submit" class="detbtn">Fjern <i class="fa-solid fa-trash"></i></button>
             </form>
 

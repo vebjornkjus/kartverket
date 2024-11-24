@@ -112,6 +112,13 @@ app.UseEndpoints(endpoints =>
         name: "saksbehandler",
         pattern: "saksbehandler/{action=Index}/{rapportId?}",
         defaults: new { controller = "Saksbehandler" });
+
+    // Dette mønsteret vil matche Detaljert controller actions
+    endpoints.MapControllerRoute(
+        name: "detaljert",
+        pattern: "Detaljert/{action}/{id?}",
+        defaults: new { controller = "Detaljert" });
+
 });
 
 app.Run();
