@@ -1,3 +1,5 @@
+@import url('/css/paste.css');
+
 .btn-danger {
     background-color: #dc3545;
     color: white;
@@ -591,3 +593,106 @@ button[type="submit"] {
     overflow: hidden;
 }
 
+/* Page Title */
+.page-title {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* Personal Information Section */
+.personal-info {
+    background-color: #f6f7f9;
+    border-radius: 11px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.personal-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.personal-info p {
+    margin: 5px 0;
+}
+
+.SlettBruker {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.SlettBruker:hover {
+    background-color: #c82333;
+}
+
+/* Reports Section */
+.reports-section {
+    background-color: #f6f7f9;
+    border-radius: 11px;
+    padding: 20px;
+}
+
+.reports-title {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 11px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.styled-table th {
+    background-color: #f5f5f5;
+}
+
+.btn-report-info {
+    background-color: #166633;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 11px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-report-info:hover {
+    background-color: #145628;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 11px;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
