@@ -33,8 +33,8 @@ namespace KartverketWebApp.Controllers
             _dbConnection = dbConnection;
         }
 
+        [Authorize]
         [HttpGet]
-        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         public async Task<IActionResult> Meldinger()
         {
             var email = User.Identity?.Name;
@@ -65,45 +65,47 @@ namespace KartverketWebApp.Controllers
 
             var currentPersonId = person.PersonId;
 
-            var conversations = await _context.Meldinger
-                // First filter messages to only include relevant rapport statuses
-                .Where(m => _context.Rapport
-                    .Where(r => r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling")
-                    .Any(r => r.RapportId == m.RapportId))
-                // Then filter to only include conversations where the current user is involved
+            // Fetch all relevant messages
+            var messages = await _context.Meldinger
+                .Where(m => _context.Rapport.Any(r => r.RapportId == m.RapportId && (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling")))
                 .Where(m => m.SenderPersonId == currentPersonId || m.MottakerPersonId == currentPersonId)
                 .Include(m => m.Sender)
                 .Include(m => m.Mottaker)
-                .GroupBy(m => m.RapportId)
-                .Select(group => new
-                {
-                    RapportId = group.Key,
-                    Tittel = _context.Rapport
-                        .Where(r => r.RapportId == group.Key)
-                        .Select(r => r.Kart.Tittel)
-                        .FirstOrDefault(),
-                    LastMessage = group.OrderByDescending(m => m.Tidsstempel).FirstOrDefault(),
-                    // Determine the other party in the conversation (not the current user)
-                    SenderName = group.FirstOrDefault().MottakerPersonId == currentPersonId
-                        ? group.FirstOrDefault().Sender.Fornavn + " " + group.FirstOrDefault().Sender.Etternavn
-                        : group.FirstOrDefault().Mottaker.Fornavn + " " + group.FirstOrDefault().Mottaker.Etternavn,
-                    LastSenderName = group.OrderByDescending(m => m.Tidsstempel)
-                        .Select(m => m.Sender.Fornavn + " " + m.Sender.Etternavn)
-                        .FirstOrDefault(),
-                    Status = group.OrderByDescending(m => m.Tidsstempel).Select(m => m.Status).FirstOrDefault(),
-                    RecipientId = group.FirstOrDefault().MottakerPersonId
-                })
+                .Include(m => m.Rapport.Kart)
+                .OrderByDescending(m => m.Tidsstempel)
                 .ToListAsync();
+
+            // Group messages by rapport ID
+            var conversations = messages
+                .GroupBy(m => m.RapportId)
+                .Select(g => new
+                {
+                    RapportId = g.Key,
+                    Tittel = g.FirstOrDefault()?.Rapport?.Kart?.Tittel ?? "Ukjent tittel",
+                    LastMessage = g.FirstOrDefault(),
+                    SenderName = g.FirstOrDefault().SenderPersonId == currentPersonId
+                        ? "Deg"
+                        : g.FirstOrDefault().MottakerPersonId == currentPersonId
+                            ? g.FirstOrDefault().Sender.Fornavn + " " + g.FirstOrDefault().Sender.Etternavn
+                            : g.FirstOrDefault().Mottaker.Fornavn + " " + g.FirstOrDefault().Mottaker.Etternavn,
+                    LastSenderName = g.OrderByDescending(m => m.Tidsstempel).FirstOrDefault().SenderPersonId == currentPersonId
+                        ? "Deg"
+                        : g.OrderByDescending(m => m.Tidsstempel).FirstOrDefault().Sender.Fornavn + " " + g.OrderByDescending(m => m.Tidsstempel).FirstOrDefault().Sender.Etternavn,
+                    Status = g.OrderByDescending(m => m.Tidsstempel).FirstOrDefault().Status,
+                    RecipientId = g.FirstOrDefault().MottakerPersonId
+                })
+                .OrderByDescending(c => c.LastMessage.Tidsstempel)
+                .ToList();
 
             var combinedViewModel = new CombinedViewModel
             {
                 SammtaleModel = conversations.Select(c => new SammtaleModel
                 {
                     RapportId = c.RapportId,
-                    Tittel = c.Tittel ?? "Ukjent tittel",
+                    Tittel = c.Tittel,
                     LastMessage = c.LastMessage?.Innhold ?? "Ingen melding",
                     SenderName = c.SenderName,
-                    LastSenderName = c.LastMessage?.SenderPersonId == currentPersonId ? "Deg" : c.LastSenderName,
+                    LastSenderName = c.LastSenderName,
                     Status = c.Status,
                     RecipientId = c.RecipientId
                 }).ToList()
@@ -111,7 +113,6 @@ namespace KartverketWebApp.Controllers
 
             return View("~/Views/Home/Saksbehandler/Meldinger.cshtml", combinedViewModel);
         }
-
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetConversation(int rapportId)

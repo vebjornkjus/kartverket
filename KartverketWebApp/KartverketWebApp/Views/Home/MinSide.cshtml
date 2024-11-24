@@ -4,75 +4,153 @@
     ViewData["Title"] = "Min Side";
 }
 
-<h2 style="text-align: center;">Min Side</h2>
 
-@if (Model != null)
-{
-    <h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn!</h3>
-    <div class="text-center">
-        <h4>Personlig informasjon</h4>
-        <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
-        <p>Brukertype: @Model.Bruker.BrukerType</p>
+<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/MineRapporter.css" asp-append-version="true" />
 
-       <form method="post" action="@Url.Action("SlettBruker", "MinSide")" style="display:inline;">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="id" value="@Model.Bruker.BrukerId" />
-    <button type="submit" class="btn btn-danger" 
-            onclick="return confirm('Er du sikker på at du vil slette brukeren din? Dine rapporter vil bli bevart, men anonymisert. Dette kan ikke angres.');">
-        Slett min bruker
-    </button>
-</form>
+
+<div class="saksbehandlerMain">
+    <div class="SaksbehandlerContainer">
+        <div class="saksbehandlerNavigering">
+            <div class="innlogetBruker">
+                <div class="brukerIkon"><i class="fa-solid fa-user fa-2xl"></i></div>
+                <div class="brukerinfo">
+                    <p>@ViewBag.UserName @ViewBag.UserLastName</p>
+                    <p>@ViewBag.UserEmail</p>
+                </div>
+            </div>
+            <nav class="vertical-nav">
+                <ul>
+                    <li>
+                        <a asp-controller="Home" asp-action="MinSide" class="nav-item">
+                            <i class="fa-solid fa-house" style="color: #166633;"></i> Mine rapporter
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item">
+                            <i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger
+                        </a>
+                    </li>   
+                </ul>
+            </nav>
+        </div>
+        <div id="overviewOmrade">
+            <div class="nav-beside">
+                <div class="beside-topp">
+                    <h1 id="hei">Hei, @ViewBag.UserName</h1>
+                    <p id="date-container"></p>
+                    <script>
+                        // Function to display date and weekday in Norwegian
+                        function displayDateAndWeekday() {
+                            const container = document.getElementById("date-container");
+                            const now = new Date();
+                            const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                            container.textContent = now.toLocaleDateString("no-NO", options); // Change locale to 'no-NO'
+                        }
+                        displayDateAndWeekday();
+                    </script>
+                </div>
+                <div class="beside-main">
+                    <div class="main-container">
+
+
+                @*         
+                    Her begynner delen du jobbam med //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                *@
+                        <h2 style="text-align: center;">Min Side</h2>
+
+                        @if (Model != null)
+                        {
+                            <h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn!</h3>
+                            <div class="text-center">
+                                <h4>Personlig informasjon</h4>
+                                <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
+                                <p>Brukertype: @Model.Bruker.BrukerType</p>
+
+                                <form method="post" action="@Url.Action("SlettBruker", "MinSide")" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Bruker.BrukerId" />
+                                    <button type="submit" class="btn btn-danger"
+                                            onclick="return confirm('Er du sikker på at du vil slette brukeren din? Dine rapporter vil bli bevart, men anonymisert. Dette kan ikke angres.');">
+                                        Slett min bruker
+                                    </button>
+                                </form>
+                            </div>
+
+                            <h4 class="reports-title">Dine rapporter</h4>
+                            @if (Model.Rapporter != null && Model.Rapporter.Any())
+                            {
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Status</th>
+                                            <th>Opprettet</th>
+                                            <th>Info</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var rapport in Model.Rapporter)
+                                        {
+                                            <tr>
+                                                <td>@rapport.RapportId</td>
+                                                <td>@rapport.RapportStatus</td>
+                                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                                <td>
+                                                    <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
+                                                        @rapport.Kart?.Tittel
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>Du har ingen rapporter.</p>
+                            }
+
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @TempData["Error"]
+                                </div>
+                            }
+
+                            @if (TempData["Success"] != null)
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    @TempData["Success"]
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>Ingen data tilgjengelig. Kontroller at brukeren er riktig logget inn og at data eksisterer.</p>
+                        }
+
+
+
+                        @*
+                            Her slutter delen/////////////////////////////////////////////////////////////////////////////////////////////
+
+                        *@
+                       
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+<script>
+    function submitFormWithId(rapportId) {
+        // Set the hidden input value
+        document.getElementById("rapportIdInput").value = rapportId;
+        // Submit the form
+        document.getElementById("updateStatusForm").submit();
+    }
+</script>
 
-    <h4 class="reports-title">Dine rapporter</h4>
-    @if (Model.Rapporter != null && Model.Rapporter.Any())
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Status</th>
-                    <th>Opprettet</th>
-                    <th>Info</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var rapport in Model.Rapporter)
-                {
-                    <tr>
-                        <td>@rapport.RapportId</td>
-                        <td>@rapport.RapportStatus</td>
-                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                        <td>
-                            <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
-                                @rapport.Kart?.Tittel
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Du har ingen rapporter.</p>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger" role="alert">
-            @TempData["Error"]
-        </div>
-    }
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success" role="alert">
-            @TempData["Success"]
-        </div>
-    }
-}
-else
-{
-    <p>Ingen data tilgjengelig. Kontroller at brukeren er riktig logget inn og at data eksisterer.</p>
-}
