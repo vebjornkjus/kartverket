@@ -19,7 +19,9 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title">Rapport Detaljer</h5>
                         <button class="btn btn-primary" onclick="toggleEdit()">Rediger</button>
+                        <a asp-controller="Home" asp-action="Index" id="continueButton" class="btn">Fortsett</a>
                     </div>
+
 
                     <!-- View Mode -->
                     <div id="viewMode">
@@ -59,7 +61,6 @@
                             </div>
                         </form>
                     </div>
-
 
                     @section Scripts {
                         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

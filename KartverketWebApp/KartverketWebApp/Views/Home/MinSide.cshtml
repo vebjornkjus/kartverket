@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/MineRapporter.css" asp-append-version="true" />
-
+<link rel="stylesheet" href="~/css/MinSide.css" asp-append-version="true" />
 
 <div class="saksbehandlerMain">
     <div class="SaksbehandlerContainer">
@@ -54,122 +54,90 @@
                     <div class="main-container">
 
 
-                @*         
-                    Her begynner delen du jobbam med //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                *@
-                        <h2 style="text-align: center;">Min Side</h2>
-
-                        @if (Model != null)
-                        {
-                            <h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn!</h3>
-                            <div class="text-center">
-                                <h4>Personlig informasjon</h4>
-                                <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
-                                <p>Brukertype: @Model.Bruker.BrukerType</p>
-
-                                <form method="post" action="@Url.Action("SlettBruker", "MinSide")" style="display:inline;">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Bruker.BrukerId" />
-                                    <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Er du sikker på at du vil slette brukeren din? Dine rapporter vil bli bevart, men anonymisert. Dette kan ikke angres.');">
-                                        Slett min bruker
-                                    </button>
-                                </form>
-                            </div>
-
-                            <h4 class="reports-title">Dine rapporter</h4>
-                            @if (Model.Rapporter != null && Model.Rapporter.Any())
-                            {
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Status</th>
-                                            <th>Opprettet</th>
-                                            <th>Info</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var rapport in Model.Rapporter)
-                                        {
-                                            <tr>
-                                                <td>@rapport.RapportId</td>
-                                                <td>@rapport.RapportStatus</td>
-                                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                                                <td>
-                                                    <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
-                                                        @rapport.Kart?.Tittel
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                            else
-                            {
-                                <p>Du har ingen rapporter.</p>
-                            }
-    <h4 class="reports-title">Dine rapporter</h4>
-    @if (Model.Rapporter != null && Model.Rapporter.Any())
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Status</th>
-                    <th>Opprettet</th>
-                    <th>Info</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var rapport in Model.Rapporter)
-                {
+                
+ @if (Model != null)
+{
+    <div class="container">
+        <div class="user-info-container">
+            <table class="styled-table">
+                <tbody>
                     <tr>
-                        <td>@rapport.RapportId</td>
-                        <td>@rapport.RapportStatus</td>
-                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
-                        <td>
-                            <a asp-controller="Home" asp-action="MinSideRapporter" asp-route-id="@rapport.RapportId">
-                                @rapport.Kart?.Tittel
-                            </a>
+                        <td><strong>Navn:</strong></td>
+                        <td>@Model.Person.Fornavn @Model.Person.Etternavn</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Brukertype:</strong></td>
+                        <td>@Model.Bruker.BrukerType</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <form method="post" action="@Url.Action("SlettBruker", "MinSide")" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Bruker.BrukerId" />
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Er du sikker på at du vil slette brukeren din? Dine rapporter vil bli bevart, men anonymisert. Dette kan ikke angres.');">
+                                        Slett min bruker
+                                </button>
+                            </form>
                         </td>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Du har ingen rapporter.</p>
-    }
-
-                            @if (TempData["Error"] != null)
-                            {
-                                <div class="alert alert-danger" role="alert">
-                                    @TempData["Error"]
-                                </div>
-                            }
-
-                            @if (TempData["Success"] != null)
-                            {
-                                <div class="alert alert-success" role="alert">
-                                    @TempData["Success"]
-                                </div>
-                            }
-                        }
-                        else
+                </tbody>
+            </table>
+        </div>
+        <div class="reports-section">
+            <h4 class="reports-title">Dine rapporter</h4>
+            @if (Model.Rapporter != null && Model.Rapporter.Any())
+            {
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Status</th>
+                            <th>Opprettet</th>
+                            <th>Handling</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rapport in Model.Rapporter)
                         {
-                            <p>Ingen data tilgjengelig. Kontroller at brukeren er riktig logget inn og at data eksisterer.</p>
+                            <tr>
+                                <td>@rapport.RapportId</td>
+                                <td>@rapport.RapportStatus</td>
+                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <a asp-controller="Home" asp-action="MinSideRapporter" asp-route-id="@rapport.RapportId" class="btn-report-info">
+                                        Info om rapport
+                                    </a>
+                                </td>
+                            </tr>
                         }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Du har ingen rapporter.</p>
+            }
+        </div>
+    </div>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["Error"]
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @TempData["Success"]
+        </div>
+    }
+}
+else
+{
+    <p>Ingen data tilgjengelig. Kontroller at brukeren er riktig logget inn og at data eksisterer.</p>
+}
 
 
-
-                        @*
-                            Her slutter delen/////////////////////////////////////////////////////////////////////////////////////////////
-
-                        *@
                        
 
                     </div>
