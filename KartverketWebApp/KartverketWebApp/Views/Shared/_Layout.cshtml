@@ -1,7 +1,10 @@
 ﻿@using KartverketWebApp.Data
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Head content remains the same -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - KartverketWebApp</title>
@@ -18,13 +21,13 @@
     <script src="https://kit.fontawesome.com/29c703464a.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-    <header>
+    <body data-authenticated="@User.Identity.IsAuthenticated.ToString().ToLower()">
+        <header>
         <div class="nav-stedholder">
             @if (User.Identity.IsAuthenticated &&
             (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler"))))
             {
-                <!-- For admin og saksbehandler - logo uten link -->
+                <!-- For admin og saksbehandler - originale funksjoner beholdes -->
                 <div class="navbar-brand">
                     <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
                 </div>
@@ -42,7 +45,7 @@
             }
             else if (User.Identity.IsAuthenticated)
             {
-                <!-- For standard-bruker og spesial-bruker - fungerende logo, Min side og logg ut -->
+                <!-- For standard-bruker og spesial-bruker - originale funksjoner beholdes -->
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
                 </a>
@@ -59,8 +62,8 @@
             }
             else
             {
-                <!-- For ikke-innloggede brukere - fungerende logo og logg inn -->
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <!-- For ikke-innloggede brukere - alle linker går til login -->
+                <a class="navbar-brand" asp-area="" asp-controller="Account" asp-action="Login">
                     <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
                 </a>
 
@@ -75,6 +78,20 @@
 
     <div>
         <main role="main">
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const buttons = document.querySelectorAll('button:not([type="submit"])');
+                        buttons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                window.location.href = '/Account/Login';
+                            });
+                        });
+                    });
+                </script>
+            }
             @RenderBody()
         </main>
     </div>

@@ -21,6 +21,7 @@ using System.Security.Claims;
 
 namespace KartverketWebApp.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         // Private fields for dependencies
@@ -63,6 +64,7 @@ namespace KartverketWebApp.Controllers
 
         // SECTION: CRUD Operations
         [HttpGet]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Index(int koordsys, string tittel, string beskrivelse, string mapType, string rapportType, List<KoordinatModel> koordinater, IFormFile? file)
         {
@@ -215,6 +217,7 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
+        [Authorize]
         public IActionResult TakkRapport()
         {
             try
@@ -266,6 +269,7 @@ namespace KartverketWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult OppdaterRapport(string Tittel, string Beskrivelse, string RapportType)
@@ -307,6 +311,7 @@ namespace KartverketWebApp.Controllers
         }
 
 
+        [Authorize]
         [HttpPost]
         public IActionResult UpdateStatusAndRedirect(int id)
         {
@@ -455,11 +460,8 @@ namespace KartverketWebApp.Controllers
             return View("~/Views/Home/Saksbehandler/Saksbehandler.cshtml", combinedViewModel);
         }
 
-       
 
-
-
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> RapportDetaljert(int id)
         {
@@ -503,7 +505,7 @@ namespace KartverketWebApp.Controllers
             return View("~/Views/Home/Saksbehandler/RapportDetaljert.cshtml", viewModel);
         }
 
-
+        [Authorize]
         public IActionResult CorrectionsOverview()
         {
             // Prepare the CombinedViewModel to be passed to the view
@@ -532,6 +534,7 @@ namespace KartverketWebApp.Controllers
         }
 
         // SECTION: Search Functionality
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Sok(string kommuneName)
         {
@@ -633,6 +636,7 @@ namespace KartverketWebApp.Controllers
     
 
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Soke(string kommunenummer)
         {
