@@ -8,11 +8,11 @@
     "Children": {
       "css": {
         "Children": {
-          "Admin.css": {
+          "Admin-v1.css": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "css/Admin.css"
+              "SubPath": "css/Admin-v1.css"
             },
             "Patterns": null
           },
@@ -29,6 +29,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "css/Login.css"
+            },
+            "Patterns": null
+          },
+          "MinSide.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/MinSide.css"
             },
             "Patterns": null
           },
@@ -61,6 +69,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "css/site.css"
+            },
+            "Patterns": null
+          },
+          "TakkRapport.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/TakkRapport.css"
             },
             "Patterns": null
           }
@@ -153,6 +169,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "js/Overview.js"
+            },
+            "Patterns": null
+          },
+          "rapportDetaljert.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/rapportDetaljert.js"
             },
             "Patterns": null
           },
@@ -699,6 +723,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "RapportBilder/74aa5c82-6a10-40d3-b569-642c9e505027.png"
+            },
+            "Patterns": null
+          },
+          "fc1acdd6-3060-42da-a74f-3fa31230ae12.jfif": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "RapportBilder/fc1acdd6-3060-42da-a74f-3fa31230ae12.jfif"
             },
             "Patterns": null
           }

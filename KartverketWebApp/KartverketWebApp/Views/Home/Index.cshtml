@@ -136,3 +136,30 @@
 }
 
 <script src="/js/site.js"></script>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="savePopup" class="save-popup">
+        <div class="save-popup-content">
+            <i class="fas fa-check-circle"></i>
+            <p>@TempData["SuccessMessage"]</p>
+        </div>
+    </div>
+}
+@section Scripts {
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('savePopup');
+                if (popup) {
+                    popup.style.display = 'flex'; // Show the popup
+                    setTimeout(function () {
+                        popup.style.display = 'none'; // Hide the popup after 3 seconds
+                    }, 3000);
+                }
+            });
+        </script>
+    }
+}
+

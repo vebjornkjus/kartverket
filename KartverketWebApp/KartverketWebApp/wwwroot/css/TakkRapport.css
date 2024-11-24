@@ -1,131 +1,87 @@
-/* Bakgrunn */
-.background-container {
-    background: linear-gradient(to bottom, #D0ECD6 50%, white 50%);
+/* Reset and Base Styles */
+body {
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding-bottom: 40px;
-}
-
-/* Info Container */
-.info-container {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-    width: 100%;
-    max-width: 1200px;
-    padding: 0 20px;
-}
-
-.info-box {
-    border: 1px solid #ccc;
-    padding: 15px;
-    width: 30%;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    background: white;
-    border-radius: 10px;
-}
-
-/* Map and Container Styles */
-.map-and-form-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 20px;
-    width: 100%;
-    max-width: 1200px;
-    padding: 0 20px;
-}
-
-.map-container {
-    width: 100%;
-    height: 700px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    background: white;
     position: relative;
 }
 
-/* Leaflet Map Styles */
-.leaflet-container {
-    width: 100% !important;
-    height: 100% !important;
+/* Background Container */
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, #D0ECD6 0%, #D0ECD6 50%, #F4F2F2 50%, #F4F2F2 100%);
+    z-index: -1;
+}
+
+/* Main Container */
+.container {
+    position: relative;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    z-index: 1;
+}
+
+/* Map Styles */
+#map_corrections {
+    background-color: white;
     border-radius: 10px;
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 700px;
 }
 
-#map_corrections_0 {
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+/* Card Styles */
+.card {
+    background-color: #F8E7C9;
+    height: 70%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
-/* Leaflet Controls */
-.leaflet-control-container {
-    position: absolute;
-    z-index: 1000;
+.card-body {
+    height: 70%;
+    display: flex;
+    flex-direction: column;
 }
 
-.leaflet-top {
-    top: 10px !important;
+/* Form Controls */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
 }
 
-.leaflet-right {
-    right: 10px !important;
-}
-
-/* Map Popup Styling */
-.marker-popup {
-    padding: 12px;
-    min-width: 200px;
-}
-
-    .marker-popup h4 {
-        margin: 0 0 8px 0;
-        font-size: 16px;
-        color: #333;
-        font-weight: 600;
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
-    .marker-popup p {
-        margin: 4px 0;
-        font-size: 14px;
-        color: #666;
-    }
-
-/* Responsive Styles */
-@media (max-width: 1200px) {
-    .info-container,
-    .map-and-form-container {
-        padding: 0 15px;
-    }
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
 }
 
-@media (max-width: 768px) {
-    .info-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .info-box {
-        width: 90%;
-        margin-bottom: 15px;
-    }
-
-    .map-container {
-        height: 500px;
-    }
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+/* Success Button Style (needed for Lagre button) */
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+

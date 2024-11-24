@@ -215,98 +215,98 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
-            public async Task<IActionResult> TakkRapport(int? id = null)
+        public IActionResult TakkRapport()
+        {
+            try
             {
-                try
+                var latestReport = _context.Kart
+                    .Include(k => k.Koordinater)
+                    .Include(k => k.Steddata)
+                    .OrderByDescending(k => k.KartEndringId)
+                    .FirstOrDefault();
+
+                if (latestReport == null)
                 {
-                    var latestReport = id.HasValue 
-                        ? await _context.Kart
-                            .Include(k => k.Koordinater)
-                            .Include(k => k.Steddata)
-                            .Include(k => k.Rapporter)
-                            .FirstOrDefaultAsync(k => k.Rapporter.Any(r => r.RapportId == id))
-                        : await _context.Kart
-                            .Include(k => k.Koordinater)
-                            .Include(k => k.Steddata)
-                            .OrderByDescending(k => k.KartEndringId)
-                            .FirstOrDefaultAsync();
-
-                    if (latestReport == null)
-                    {
-                        return NotFound("Ingen rapport funnet.");
-                    }
-
-                    var coordinates = latestReport.Koordinater
-                        .Select(k => new PositionModel.Coordinate
-                        {
-                            Nord = k.Nord,
-                            Ost = k.Ost
-                        })
-                        .ToList();
-
-                    var position = new PositionModel
-                    {
-                        Kart_endring_id = latestReport.KartEndringId.ToString(),
-                        MapType = latestReport.MapType ?? "Turkart",
-                        Tittel = latestReport.Tittel,
-                        Beskrivelse = latestReport.Beskrivelse,
-                        RapportType = latestReport.RapportType,
-                        Koordsys = latestReport.Koordsys,
-                        Coordinates = coordinates
-                    };
-
-                    var viewModel = new CombinedViewModel
-                    {
-                        
-                        // Positions for kartet
-                        Positions = new List<PositionModel> { position },
-                        
-                        // Initialiserer andre lister som kan være nødvendige
-                        Stednavn = new List<StednavnViewModel>(),
-                        Rapporter = new List<Rapport> { latestReport.Rapporter?.FirstOrDefault() }.Where(r => r != null).ToList(),
-                        KartData = new List<Kart> { latestReport },
-                        KoordinatData = latestReport.Koordinater.ToList(),
-                        
-                        // Disse er ikke relevante for TakkRapport-visningen, men initialiseres for å unngå null
-                        ActiveRapporter = new List<Rapport>(),
-                        ResolvedRapporter = new List<Rapport>(),
-                        Meldinger = new List<Meldinger>(),
-                        SammtaleModel = new List<SammtaleModel>(),
-                        TildelRapportModel = new List<TildelRapportModel>()
-                    };
-
-                    _logger.LogInformation($"Created ViewModel with {coordinates.Count} coordinates for report {latestReport.KartEndringId}");
-
-                    return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
+                    return NotFound("Ingen rapport funnet.");
                 }
-                catch (Exception ex)
+
+                // Create coordinates list
+                var coordinates = latestReport.Koordinater
+                    .Select(k => new KartverketWebApp.Models.PositionModel.Coordinate
+                    {
+                        Nord = k.Nord,
+                        Ost = k.Ost
+                    })
+                    .ToList();
+
+                var viewModel = new KartverketWebApp.Models.PositionModel
                 {
-                    _logger.LogError(ex, "Error in TakkRapport");
-                    throw;
+                    Kart_endring_id = latestReport.KartEndringId.ToString(),
+                    MapType = latestReport.MapType ?? "Turkart",
+                    Tittel = latestReport.Tittel,
+                    Beskrivelse = latestReport.Beskrivelse,
+                    RapportType = latestReport.RapportType,
+                    Positions = new List<PositionModel.Position>
+            {
+                new PositionModel.Position
+                {
+                    MapType = latestReport.MapType ?? "Turkart",
+                    Coordinates = coordinates
                 }
             }
+                };
+
+                return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in TakkRapport");
+                return StatusCode(500, "Det oppstod en feil under behandling av rapporten.");
+            }
+        }
 
         [HttpPost]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult OppdaterRapport(string Tittel, string Beskrivelse, string RapportType)
         {
-            // Logikk for oppdatering av rapporten
-            var latestReport = _context.Kart
-                .OrderByDescending(k => k.KartEndringId)
-                .FirstOrDefault();
-
-            if (latestReport != null)
+            if (string.IsNullOrEmpty(Tittel) || string.IsNullOrEmpty(Beskrivelse) || string.IsNullOrEmpty(RapportType))
             {
-                latestReport.Tittel = Tittel;
-                latestReport.Beskrivelse = Beskrivelse;
-                latestReport.RapportType = RapportType;
-
-                _context.SaveChanges();
+                TempData["ErrorMessage"] = "Alle felt må fylles ut.";
+                return RedirectToAction("TakkRapport");
             }
 
-            // Omdiriger til hjem-skjermen etter oppdatering
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                var latestReport = _context.Kart
+                    .OrderByDescending(k => k.KartEndringId)
+                    .FirstOrDefault();
+
+                if (latestReport != null)
+                {
+                    latestReport.Tittel = Tittel.Trim();
+                    latestReport.Beskrivelse = Beskrivelse.Trim();
+                    latestReport.RapportType = RapportType.Trim();
+                    _context.SaveChanges();
+
+                    TempData["SuccessMessage"] = "Rapport oppdatert vellykket!";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Ingen rapport funnet for oppdatering.";
+                    return RedirectToAction("TakkRapport");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OppdaterRapport: {ex.Message}");
+                TempData["ErrorMessage"] = "Det oppstod en feil ved oppdatering av rapporten.";
+                return RedirectToAction("TakkRapport");
+            }
         }
+
+        [HttpPost]
 
 
 
