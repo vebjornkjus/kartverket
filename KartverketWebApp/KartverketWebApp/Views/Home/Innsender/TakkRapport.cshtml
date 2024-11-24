@@ -1,9 +1,15 @@
 ﻿@model KartverketWebApp.Models.PositionModel
 
 <div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center">Takk for din rapport!</h2>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4">
-            <div class="card">
+            <div class="card" style="border-radius: 11px; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;">
                 <div class="card-body">
                     <h5>Tittel</h5>
                     <p>@Model.Tittel</p>
@@ -11,7 +17,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card">
+            <div class="card" style="border-radius: 11px; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;">
                 <div class="card-body">
                     <h5>Beskrivelse</h5>
                     <p>@Model.Beskrivelse</p>
@@ -19,7 +25,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card">
+            <div class="card" style="border-radius: 11px; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;">
                 <div class="card-body">
                     <h5>Rapporttype</h5>
                     <p>@Model.RapportType</p>
@@ -30,82 +36,36 @@
 
     <div class="row mt-4">
         <div class="col-12">
-            <div id="map_corrections" style="height: 400px; width: 100%;"></div>
+            <div id="map_corrections" style="height: 400px; width: 100%; border-radius: 11px; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; overflow: hidden;"></div>
         </div>
     </div>
-
-    @section Scripts {
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                console.log("Initializing Leaflet map");
-
-                // Use the Model.Coordinates to initialize the map
-                var coordinates = @Html.Raw(Json.Serialize(Model.Coordinates));
-                console.log("Coordinates data:", coordinates);
-
-                // Check if there's at least one coordinate
-                if (coordinates && coordinates.length > 0) {
-                    var firstCoord = coordinates[0]; // Use the first coordinate for the initial view
-                    var map = L.map('map_corrections', {
-                        center: [firstCoord.Nord, firstCoord.Ost],
-                        zoom: 13
-                    });
-
-                    // Define Kartverket tile layers and add the appropriate one based on Model.MapType
-                    var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                    });
-
-                    var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                    });
-
-                    var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
-                        attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                    });
-
-                    if (Model.MapType === "Norge kart") {
-                        norgeKart.addTo(map);
-                        console.log("Loaded Norge kart");
-                    } else if (Model.MapType === "Turkart") {
-                        turKart.addTo(map);
-                        console.log("Loaded Turkart");
-                    } else if (Model.MapType === "Sjøkart") {
-                        sjoKart.addTo(map);
-                        console.log("Loaded Sjøkart");
-                    } else {
-                        console.warn("Unknown mapType, defaulting to Norge kart");
-                        norgeKart.addTo(map);
-                    }
-
-                    // Add markers for each coordinate
-                    coordinates.forEach(function (coord, coordIndex) {
-                        L.marker([coord.Nord, coord.Ost]).addTo(map).bindPopup(`
-                                        <div>
-                                            <h4>Point ${coordIndex + 1}</h4>
-                                            <p>Nord: ${coord.Nord.toFixed(6)}</p>
-                                            <p>Øst: ${coord.Ost.toFixed(6)}</p>
-                                        </div>
-                                    `);
-                    });
-
-                    // Add a polyline connecting all points
-                    var latlngs = coordinates.map(coord => [coord.Nord, coord.Ost]);
-                    var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
-
-                    // Automatically fit the map to the polyline bounds
-                    map.fitBounds(polyline.getBounds());
-
-                    // Ensure the map resizes correctly
-                    setTimeout(() => {
-                        map.invalidateSize();
-                    }, 300);
-                } else {
-                    console.warn("No valid coordinates found for the position.");
-                }
-            });
-        </script>
-    }
 </div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="~/js/takkRapport.js"></script>
+    <style>
+    .leaflet-marker-icon {
+        background: none;
+        border: none;
+    }
+    /* Fjern blå sirkel rundt markør */
+    .leaflet-marker-shadow {
+        display: none;
+    }
+</style>
+    <script>
+        window.appData = {
+            mapData: @Html.Raw(Json.Serialize(new
+            {
+                mapType = Model.MapType,
+                coordinates = Model.Coordinates.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
+            }))
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.takkRapport = new TakkRapport(window.appData);
+        });
+    </script>
+}

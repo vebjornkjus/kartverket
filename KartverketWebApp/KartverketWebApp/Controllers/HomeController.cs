@@ -199,8 +199,7 @@ namespace KartverketWebApp.Controllers
                 _context.Rapport.Add(newRapport);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("TakkRapport");
-            }
+return RedirectToAction("TakkRapport", new { id = newRapport.RapportId });            }
 
             foreach (var modelState in ModelState.Values)
             {
@@ -214,71 +213,6 @@ namespace KartverketWebApp.Controllers
 
             return View("Index");
         }
-
-        public IActionResult TakkRapport()
-        {
-            try
-            {
-                var latestReport = _context.Kart
-                    .Include(k => k.Koordinater)
-                    .Include(k => k.Steddata)
-                    .OrderByDescending(k => k.KartEndringId)
-                    .FirstOrDefault();
-
-                if (latestReport == null)
-                {
-                    return NotFound("Ingen rapport funnet.");
-                }
-
-                // Create coordinates list
-                var coordinates = latestReport.Koordinater
-                    .Select(k => new KartverketWebApp.Models.PositionModel.Coordinate  // Use fully qualified name
-                    {
-                        Nord = k.Nord,
-                        Ost = k.Ost
-                    })
-                    .ToList();
-
-                var viewModel = new CombinedViewModel
-                {
-                    Tittel = latestReport.Tittel ?? "Ukjent tittel",
-                    RapportType = latestReport.RapportType ?? "Ukjent rapporttype",
-                    Beskrivelse = latestReport.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
-                    Positions = new List<KartverketWebApp.Models.PositionModel>  // Use fully qualified name
-    {
-        new KartverketWebApp.Models.PositionModel  // Use fully qualified name
-        {
-            Kart_endring_id = latestReport.KartEndringId.ToString(),
-            MapType = latestReport.MapType ?? "Turkart",
-            Tittel = latestReport.Tittel,
-            Beskrivelse = latestReport.Beskrivelse,
-            Coordinates = coordinates
-        }
-    }
-                };
-
-                // Add debug logging
-                Console.WriteLine($"ViewModel created with {viewModel.Positions.Count} positions");
-                if (viewModel.Positions.Any())
-                {
-                    Console.WriteLine($"First position has {viewModel.Positions[0].Coordinates.Count} coordinates");
-                    Console.WriteLine($"MapType: {viewModel.Positions[0].MapType}");
-                    foreach (var coord in viewModel.Positions[0].Coordinates)
-                    {
-                        Console.WriteLine($"Coordinate: Nord={coord.Nord}, Ost={coord.Ost}");
-                    }
-                }
-
-                return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in TakkRapport: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                throw;
-            }
-        }
-
         [HttpPost]
         [HttpPost]
         public IActionResult OppdaterRapport(string Tittel, string Beskrivelse, string RapportType)
@@ -757,38 +691,50 @@ public async Task<IActionResult> MinSide()
         }
 
 
-        public IActionResult TakkRapport(int id)
+public async Task<IActionResult> TakkRapport(int id)
+{
+    try
+    {
+        var rapport = await _context.Rapport
+            .Include(r => r.Kart)
+            .ThenInclude(k => k.Koordinater)
+            .FirstOrDefaultAsync(r => r.KartEndringId == id);
+
+        if (rapport == null || rapport.Kart == null)
         {
-            // Retrieve the most recent report
-            var rapport = _context.Rapport
-                .Include(r => r.Kart)
-                .Include(r => r.Kart.Koordinater)
-                .FirstOrDefault(r => r.RapportId == id);
+            return NotFound("Rapport eller kart ikke funnet.");
+        }
 
-            if (rapport == null || rapport.Kart == null)
-            {
-                // Handle the case when the report or its related data is not found
-                return NotFound();
-            }
+        // Debug logging
+        Console.WriteLine($"Koordinater fra databasen:");
+        foreach (var k in rapport.Kart.Koordinater)
+        {
+            Console.WriteLine($"Nord: {k.Nord}, Øst: {k.Ost}");
+        }
 
-            // Prepare the PositionModel
-            var positionModel = new PositionModel
-            {
-                Kart_endring_id = rapport.Kart.KartEndringId.ToString(),
-                Koordsys = rapport.Kart.Koordsys,
-                Tittel = rapport.Kart.Tittel,
-                Beskrivelse = rapport.Kart.Beskrivelse,
-                MapType = rapport.Kart.MapType,
-                RapportType = rapport.Kart.RapportType,
-                Coordinates = rapport.Kart.Koordinater.Select(k => new PositionModel.Coordinate
+        var positionModel = new PositionModel
+        {
+            Kart_endring_id = rapport.Kart.KartEndringId.ToString(),
+            Koordsys = rapport.Kart.Koordsys,
+            Tittel = rapport.Kart.Tittel ?? "Ukjent tittel",
+            Beskrivelse = rapport.Kart.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
+            MapType = rapport.Kart.MapType ?? "Turkart",
+            RapportType = rapport.Kart.RapportType ?? "Ukjent rapporttype",
+            Coordinates = rapport.Kart.Koordinater
+                .Select(k => new PositionModel.Coordinate
                 {
                     Nord = k.Nord,
                     Ost = k.Ost
-                }).ToList()
-            };
+                })
+                .ToList()
+        };
 
-            return View("~/Views/Home/Innsender/TakkRapport.cshtml", positionModel);
-        }
+        return View("~/Views/Home/Innsender/TakkRapport.cshtml", positionModel);
     }
-}
-
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Feil i TakkRapport: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+}}}
