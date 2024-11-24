@@ -215,69 +215,80 @@ namespace KartverketWebApp.Controllers
             return View("Index");
         }
 
-        public IActionResult TakkRapport()
-        {
-            try
+            public async Task<IActionResult> TakkRapport(int? id = null)
             {
-                var latestReport = _context.Kart
-                    .Include(k => k.Koordinater)
-                    .Include(k => k.Steddata)
-                    .OrderByDescending(k => k.KartEndringId)
-                    .FirstOrDefault();
-
-                if (latestReport == null)
+                try
                 {
-                    return NotFound("Ingen rapport funnet.");
-                }
+                    var latestReport = id.HasValue 
+                        ? await _context.Kart
+                            .Include(k => k.Koordinater)
+                            .Include(k => k.Steddata)
+                            .Include(k => k.Rapporter)
+                            .FirstOrDefaultAsync(k => k.Rapporter.Any(r => r.RapportId == id))
+                        : await _context.Kart
+                            .Include(k => k.Koordinater)
+                            .Include(k => k.Steddata)
+                            .OrderByDescending(k => k.KartEndringId)
+                            .FirstOrDefaultAsync();
 
-                // Create coordinates list
-                var coordinates = latestReport.Koordinater
-                    .Select(k => new KartverketWebApp.Models.PositionModel.Coordinate  // Use fully qualified name
+                    if (latestReport == null)
                     {
-                        Nord = k.Nord,
-                        Ost = k.Ost
-                    })
-                    .ToList();
-
-                var viewModel = new CombinedViewModel
-                {
-                    Tittel = latestReport.Tittel ?? "Ukjent tittel",
-                    RapportType = latestReport.RapportType ?? "Ukjent rapporttype",
-                    Beskrivelse = latestReport.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
-                    Positions = new List<KartverketWebApp.Models.PositionModel>  // Use fully qualified name
-    {
-        new KartverketWebApp.Models.PositionModel  // Use fully qualified name
-        {
-            Kart_endring_id = latestReport.KartEndringId.ToString(),
-            MapType = latestReport.MapType ?? "Turkart",
-            Tittel = latestReport.Tittel,
-            Beskrivelse = latestReport.Beskrivelse,
-            Coordinates = coordinates
-        }
-    }
-                };
-
-                // Add debug logging
-                Console.WriteLine($"ViewModel created with {viewModel.Positions.Count} positions");
-                if (viewModel.Positions.Any())
-                {
-                    Console.WriteLine($"First position has {viewModel.Positions[0].Coordinates.Count} coordinates");
-                    Console.WriteLine($"MapType: {viewModel.Positions[0].MapType}");
-                    foreach (var coord in viewModel.Positions[0].Coordinates)
-                    {
-                        Console.WriteLine($"Coordinate: Nord={coord.Nord}, Ost={coord.Ost}");
+                        return NotFound("Ingen rapport funnet.");
                     }
-                }
 
-                return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
+                    var coordinates = latestReport.Koordinater
+                        .Select(k => new PositionModel.Coordinate
+                        {
+                            Nord = k.Nord,
+                            Ost = k.Ost
+                        })
+                        .ToList();
+
+                    var position = new PositionModel
+                    {
+                        Kart_endring_id = latestReport.KartEndringId.ToString(),
+                        MapType = latestReport.MapType ?? "Turkart",
+                        Tittel = latestReport.Tittel,
+                        Beskrivelse = latestReport.Beskrivelse,
+                        RapportType = latestReport.RapportType,
+                        Koordsys = latestReport.Koordsys,
+                        Coordinates = coordinates
+                    };
+
+                    var viewModel = new CombinedViewModel
+                    {
+                        // Grunnleggende rapportinformasjon
+                        Tittel = latestReport.Tittel ?? "Ukjent tittel",
+                        RapportType = latestReport.RapportType ?? "Ukjent rapporttype",
+                        Beskrivelse = latestReport.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
+                        
+                        // Positions for kartet
+                        Positions = new List<PositionModel> { position },
+                        
+                        // Initialiserer andre lister som kan være nødvendige
+                        Stednavn = new List<StednavnViewModel>(),
+                        Rapporter = new List<Rapport> { latestReport.Rapporter?.FirstOrDefault() }.Where(r => r != null).ToList(),
+                        KartData = new List<Kart> { latestReport },
+                        KoordinatData = latestReport.Koordinater.ToList(),
+                        
+                        // Disse er ikke relevante for TakkRapport-visningen, men initialiseres for å unngå null
+                        ActiveRapporter = new List<Rapport>(),
+                        ResolvedRapporter = new List<Rapport>(),
+                        Meldinger = new List<Meldinger>(),
+                        SammtaleModel = new List<SammtaleModel>(),
+                        TildelRapportModel = new List<TildelRapportModel>()
+                    };
+
+                    _logger.LogInformation($"Created ViewModel with {coordinates.Count} coordinates for report {latestReport.KartEndringId}");
+
+                    return View("~/Views/Home/Innsender/TakkRapport.cshtml", viewModel);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in TakkRapport");
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in TakkRapport: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                throw;
-            }
-        }
 
         [HttpPost]
         [HttpPost]
@@ -754,40 +765,6 @@ public async Task<IActionResult> MinSide()
             // Log the fallback to AnsattId = 1
             _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
             return 1; // Default AnsattId
-        }
-
-
-        public IActionResult TakkRapport(int id)
-        {
-            // Retrieve the most recent report
-            var rapport = _context.Rapport
-                .Include(r => r.Kart)
-                .Include(r => r.Kart.Koordinater)
-                .FirstOrDefault(r => r.RapportId == id);
-
-            if (rapport == null || rapport.Kart == null)
-            {
-                // Handle the case when the report or its related data is not found
-                return NotFound();
-            }
-
-            // Prepare the PositionModel
-            var positionModel = new PositionModel
-            {
-                Kart_endring_id = rapport.Kart.KartEndringId.ToString(),
-                Koordsys = rapport.Kart.Koordsys,
-                Tittel = rapport.Kart.Tittel,
-                Beskrivelse = rapport.Kart.Beskrivelse,
-                MapType = rapport.Kart.MapType,
-                RapportType = rapport.Kart.RapportType,
-                Coordinates = rapport.Kart.Koordinater.Select(k => new PositionModel.Coordinate
-                {
-                    Nord = k.Nord,
-                    Ost = k.Ost
-                }).ToList()
-            };
-
-            return View("~/Views/Home/Innsender/TakkRapport.cshtml", positionModel);
         }
     }
 }
