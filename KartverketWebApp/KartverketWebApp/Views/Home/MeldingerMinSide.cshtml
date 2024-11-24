@@ -25,10 +25,9 @@
             </div>
             <nav class="vertical-nav">
                 <ul>
-                    <li><a asp-controller="Home" asp-action="Saksbehandler" class="nav-item"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
-                    <li><a asp-controller="Saksbehandler" asp-action="MineRapporter" class="nav-item"><i class="fa-solid fa-envelope" style="color: #166633;"></i> Rapporter</a></li>
+                    <li><a asp-controller="Home" asp-action="MinSide" class="nav-item"><i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt</a></li>
                     <li><a asp-controller="Meldinger" asp-action="Meldinger" class="nav-item active"><i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger</a></li>
-                    <li><a asp-controller="Saksbehandler" asp-action="TidligereRapporter" class="nav-item"><i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter</a></li>
+                  
                 </ul>
             </nav>
         </div>
@@ -51,8 +50,8 @@
                 <div class="beside-main">
                     <div class="main-melding">
                         <div class="melding-left">
-                        <form id="updateMessageStatusForm" method="post" asp-action="UpdateMessageStatus">
-                            @Html.AntiForgeryToken()
+                            <form id="updateMessageStatusForm" method="post" asp-action="UpdateMessageStatus">
+                                @Html.AntiForgeryToken()
                                 @foreach (var conversation in Model.SammtaleModel)
                                 {
                                     <div id="conversation-@conversation.RapportId"
@@ -63,8 +62,8 @@
                                     </div>
                                 }
 
-                            <input type="hidden" id="messageIdInput" name="id" value="" />
-                        </form>
+                                <input type="hidden" id="messageIdInput" name="id" value="" />
+                            </form>
                         </div>
                         <div class="melding-right">
                             <div id="conversation-container">

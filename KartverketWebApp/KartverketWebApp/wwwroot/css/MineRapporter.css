@@ -61,3 +61,17 @@
         background-color: #e0e0e0;
         color: #000;
     }
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pagination-wrapper {
+    margin-top: 20px;
+    padding: 10px;
+}
+
+.table-container {
+    margin-bottom: 0;
+}

@@ -115,7 +115,7 @@ namespace KartverketWebApp.Controllers
         LIMIT @PageSize OFFSET @Offset";
 
             var fjernetParams = new
-            {
+            {   
                 AnsattId = userInfo.AnsattId,
                 Offset = fjernetOffset,
                 PageSize = pageSize
@@ -234,5 +234,7 @@ namespace KartverketWebApp.Controllers
 
             return View("~/Views/Home/Saksbehandler/MineRapporter.cshtml", combinedViewModel);
         }
+
+
     }
 }

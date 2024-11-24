@@ -19,31 +19,46 @@ using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Data.Common;
+
 namespace KartverketWebApp.Controllers
 {
+    /// <summary>
+    /// Controller for håndtering av meldinger mellom brukere i systemet
+    /// Krever at brukeren er autentisert for å få tilgang til funksjonaliteten
+    /// </summary>
     [Authorize]
     public class MeldingerController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IDbConnection _dbConnection;
 
+        /// <summary>
+        /// Konstruktør som initialiserer databasekontekst og tilkobling
+        /// </summary>
         public MeldingerController(ApplicationDbContext context, IDbConnection dbConnection)
         {
             _context = context;
             _dbConnection = dbConnection;
         }
 
+        /// <summary>
+        /// Henter og viser alle meldinger for innlogget bruker
+        /// Grupperer meldinger etter rapport og viser siste melding i hver samtale
+        /// Returnerer forskjellige views basert på brukertype (saksbehandler eller vanlig bruker)
+        /// </summary>
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> Meldinger()
         {
             var email = User.Identity?.Name;
 
+            // Sjekker om bruker er innlogget
             if (string.IsNullOrEmpty(email))
             {
                 return RedirectToAction("Login", "Account");
             }
 
+            // Henter brukerinformasjon fra databasen
             var bruker = await _context.Bruker
                 .Include(b => b.Personer)
                 .FirstOrDefaultAsync(b => b.Email == email);
@@ -59,13 +74,14 @@ namespace KartverketWebApp.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            // Setter brukerinformasjon i ViewBag for visning i view
             ViewBag.UserName = person.Fornavn;
             ViewBag.UserLastName = person.Etternavn;
             ViewBag.UserEmail = email;
 
             var currentPersonId = person.PersonId;
 
-            // Fetch all relevant messages
+            // Henter alle relevante meldinger for aktive rapporter
             var messages = await _context.Meldinger
                 .Where(m => _context.Rapport.Any(r => r.RapportId == m.RapportId && (r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling")))
                 .Where(m => m.SenderPersonId == currentPersonId || m.MottakerPersonId == currentPersonId)
@@ -75,7 +91,7 @@ namespace KartverketWebApp.Controllers
                 .OrderByDescending(m => m.Tidsstempel)
                 .ToListAsync();
 
-            // Group messages by rapport ID
+            // Grupperer meldinger etter rapportID og forbereder visningsdata
             var conversations = messages
                 .GroupBy(m => m.RapportId)
                 .Select(g => new
@@ -97,6 +113,7 @@ namespace KartverketWebApp.Controllers
                 .OrderByDescending(c => c.LastMessage.Tidsstempel)
                 .ToList();
 
+            // Oppretter viewmodel med samtaledata
             var combinedViewModel = new CombinedViewModel
             {
                 SammtaleModel = conversations.Select(c => new SammtaleModel
@@ -111,22 +128,30 @@ namespace KartverketWebApp.Controllers
                 }).ToList()
             };
 
-            return View("~/Views/Home/Saksbehandler/Meldinger.cshtml", combinedViewModel);
+            // Returnerer forskjellig view basert på brukertype
+            return bruker.BrukerType == "saksbehandler"
+                ? View("~/Views/Home/Saksbehandler/Meldinger.cshtml", combinedViewModel)
+                : View("~/Views/Home/MeldingerMinSide.cshtml", combinedViewModel);
         }
+
+        /// <summary>
+        /// Henter alle meldinger i en spesifikk samtale/rapport
+        /// </summary>
+        /// <param name="rapportId">ID-en til rapporten man ønsker å se meldinger for</param>
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetConversation(int rapportId)
         {
             try
             {
-                // Get the user's email from claims
+                // Henter brukerens email fra innlogging
                 var userEmail = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     return BadRequest("User not authenticated properly.");
                 }
 
-                // Get the user's PersonId from Bruker and Person tables
+                // Henter brukerens PersonId
                 var bruker = await _context.Bruker
                     .Include(b => b.Personer)
                     .FirstOrDefaultAsync(b => b.Email == userEmail);
@@ -138,6 +163,7 @@ namespace KartverketWebApp.Controllers
 
                 var personId = bruker.Personer.First().PersonId;
 
+                // Henter alle meldinger i samtalen og formaterer for visning
                 var messages = await _context.Meldinger
                     .Where(m => m.RapportId == rapportId)
                     .Include(m => m.Sender)
@@ -148,15 +174,9 @@ namespace KartverketWebApp.Controllers
                         SenderName = m.Sender.Fornavn + " " + m.Sender.Etternavn,
                         Innhold = m.Innhold,
                         Tidsstempel = m.Tidsstempel.ToString("dd.MM.yyyy HH:mm"),
-                        IsSender = m.SenderPersonId == personId  // Using personId instead of userId
+                        IsSender = m.SenderPersonId == personId
                     })
                     .ToListAsync();
-
-                // Add debug logging
-                foreach (var message in messages)
-                {
-                    Console.WriteLine($"Message: {message.Innhold}, IsSender: {message.IsSender}, SenderPersonId: {message.SenderName}");
-                }
 
                 return Json(messages);
             }
@@ -168,27 +188,31 @@ namespace KartverketWebApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Sender en ny melding i en samtale
+        /// </summary>
+        /// <param name="rapportId">ID-en til rapporten meldingen tilhører</param>
+        /// <param name="mottakerPersonId">ID-en til personen som skal motta meldingen</param>
+        /// <param name="innhold">Selve meldingsteksten</param>
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> SendMessage([FromForm] int rapportId, [FromForm] int mottakerPersonId, [FromForm] string innhold)
         {
-            Console.WriteLine($"SendMessage called with: RapportId={rapportId}, MottakerPersonId={mottakerPersonId}, Innhold={innhold}");
-
             try
             {
+                // Validerer at meldingen ikke er tom
                 if (string.IsNullOrWhiteSpace(innhold))
                 {
                     return Json(new { success = false, message = "Message content cannot be empty." });
                 }
 
-                // Get the user's email from claims
+                // Henter avsenderens informasjon
                 var userEmail = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     return Json(new { success = false, message = "User not authenticated properly." });
                 }
 
-                // Get the user's PersonId from Bruker and Person tables
                 var bruker = await _context.Bruker
                     .Include(b => b.Personer)
                     .FirstOrDefaultAsync(b => b.Email == userEmail);
@@ -199,22 +223,17 @@ namespace KartverketWebApp.Controllers
                 }
 
                 var senderPersonId = bruker.Personer.First().PersonId;
-                Console.WriteLine($"Found sender PersonId: {senderPersonId}");
 
-                // Verify the related entities exist
+                // Verifiserer at rapport og mottaker eksisterer
                 var rapportExists = await _context.Rapport.AnyAsync(r => r.RapportId == rapportId);
                 var mottakerExists = await _context.Person.AnyAsync(p => p.PersonId == mottakerPersonId);
 
-                if (!rapportExists)
+                if (!rapportExists || !mottakerExists)
                 {
-                    return Json(new { success = false, message = $"Rapport with ID {rapportId} does not exist." });
+                    return Json(new { success = false, message = "Invalid rapport or recipient." });
                 }
 
-                if (!mottakerExists)
-                {
-                    return Json(new { success = false, message = $"Mottaker with ID {mottakerPersonId} does not exist." });
-                }
-
+                // Oppretter og lagrer ny melding
                 var nyMelding = new Meldinger
                 {
                     RapportId = rapportId,
@@ -233,32 +252,8 @@ namespace KartverketWebApp.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in SendMessage: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
-        }
-
-
-
-        [HttpPost]
-        public IActionResult UpdateMessageStatus(int id)
-        {
-            // SQL query to update the status
-            string query = @"
-        UPDATE Meldinger
-        SET Status = 'åpnet'
-        WHERE MeldingsId = @MeldingsId AND Status = 'sendt';
-    ";
-
-            // Execute the query
-            var rowsAffected = _dbConnection.Execute(query, new { MeldingsId = id });
-
-            // Return a simple success or failure response
-            return Json(new { success = rowsAffected > 0 });
         }
     }
 }

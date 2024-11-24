@@ -306,9 +306,6 @@ namespace KartverketWebApp.Controllers
             }
         }
 
-        [HttpPost]
-
-
 
         [HttpPost]
         public IActionResult UpdateStatusAndRedirect(int id)

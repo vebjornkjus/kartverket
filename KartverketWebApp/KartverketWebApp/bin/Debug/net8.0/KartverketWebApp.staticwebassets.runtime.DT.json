@@ -48,6 +48,14 @@
             },
             "Patterns": null
           },
+          "MinSideRapporter.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/MinSideRapporter.css"
+            },
+            "Patterns": null
+          },
           "RapportDetaljert.css": {
             "Children": null,
             "Asset": {
