@@ -1,6 +1,5 @@
 @model KartverketWebApp.Models.MinSideViewModel
 <link rel="stylesheet" href="/css/minside.css">
-
 @{
     ViewData["Title"] = "Min Side";
 }
@@ -9,17 +8,23 @@
 
 @if (Model != null)
 {
-<h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn !</h3>
+    <h3 style="text-align: center;">Velkommen, @Model.Person.Fornavn!</h3>
+    <div class="text-center">
+        <h4>Personlig informasjon</h4>
+        <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
+        <p>Brukertype: @Model.Bruker.BrukerType</p>
 
-<div class="text-center">
-    <h4>Personlig informasjon</h4>
-    <p>Navn: @Model.Person.Fornavn @Model.Person.Etternavn</p>
-    <p>Brukertype: @Model.Bruker.BrukerType</p>
-</div>
-
+       <form method="post" action="@Url.Action("SlettBruker", "MinSide")" style="display:inline;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Bruker.BrukerId" />
+    <button type="submit" class="btn btn-danger" 
+            onclick="return confirm('Er du sikker på at du vil slette brukeren din? Dine rapporter vil bli bevart, men anonymisert. Dette kan ikke angres.');">
+        Slett min bruker
+    </button>
+</form>
+    </div>
 
     <h4 class="reports-title">Dine rapporter</h4>
-
     @if (Model.Rapporter != null && Model.Rapporter.Any())
     {
         <table class="table">
@@ -40,7 +45,7 @@
                         <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
                         <td>
                             <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
-                            @rapport.Kart?.Tittel
+                                @rapport.Kart?.Tittel
                             </a>
                         </td>
                     </tr>
@@ -51,6 +56,20 @@
     else
     {
         <p>Du har ingen rapporter.</p>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @TempData["Success"]
+        </div>
     }
 }
 else
