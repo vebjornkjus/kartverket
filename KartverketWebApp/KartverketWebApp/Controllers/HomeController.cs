@@ -257,10 +257,6 @@ namespace KartverketWebApp.Controllers
 
                     var viewModel = new CombinedViewModel
                     {
-                        // Grunnleggende rapportinformasjon
-                        Tittel = latestReport.Tittel ?? "Ukjent tittel",
-                        RapportType = latestReport.RapportType ?? "Ukjent rapporttype",
-                        Beskrivelse = latestReport.Beskrivelse ?? "Ingen beskrivelse tilgjengelig",
                         
                         // Positions for kartet
                         Positions = new List<PositionModel> { position },

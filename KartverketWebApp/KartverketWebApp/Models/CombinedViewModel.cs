@@ -24,11 +24,7 @@ namespace KartverketWebApp.Models
             Positions = new List<PositionModel>();
             Stednavn = new List<StednavnViewModel>();
             Rapporter = new List<Rapport>();
-        }
-             public string Tittel { get; set; } // Rapportens tittel
-        public string RapportType { get; set; } // Rapportens type
-        public string Beskrivelse { get; set; } // Rapportens beskrivelse
-        
+        }        
 
     }
     }
