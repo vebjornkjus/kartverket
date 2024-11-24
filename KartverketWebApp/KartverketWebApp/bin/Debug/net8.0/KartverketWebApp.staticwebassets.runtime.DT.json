@@ -32,6 +32,14 @@
             },
             "Patterns": null
           },
+          "MineRapporter.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/MineRapporter.css"
+            },
+            "Patterns": null
+          },
           "MinSide.css": {
             "Children": null,
             "Asset": {
@@ -77,6 +85,14 @@
             "Asset": {
               "ContentRootIndex": 0,
               "SubPath": "css/TakkRapport.css"
+            },
+            "Patterns": null
+          },
+          "TidligereRapporter.css": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "css/TidligereRapporter.css"
             },
             "Patterns": null
           }
