@@ -8693,19 +8693,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\frede\\.nuget\\packages\\": {}
+    "C:\\Users\\kfhol\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\UnitTesting\\UnitTesting.csproj",
+      "projectUniqueName": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kanskje siste kartverket\\kartverket\\UnitTesting\\UnitTesting.csproj",
       "projectName": "UnitTesting",
-      "projectPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\UnitTesting\\UnitTesting.csproj",
-      "packagesPath": "C:\\Users\\frede\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\UnitTesting\\obj\\",
+      "projectPath": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kanskje siste kartverket\\kartverket\\UnitTesting\\UnitTesting.csproj",
+      "packagesPath": "C:\\Users\\kfhol\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kanskje siste kartverket\\kartverket\\UnitTesting\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\frede\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\kfhol\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -8720,8 +8720,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {
-              "projectPath": "C:\\Users\\frede\\Desktop\\skole\\Høst2024\\Programeringsprosjekt\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj"
+            "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kanskje siste kartverket\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj": {
+              "projectPath": "C:\\Users\\kfhol\\OneDrive\\Dokumenter\\kanskje siste kartverket\\kartverket\\KartverketWebApp\\KartverketWebApp\\KartverketWebApp.csproj"
             }
           }
         }

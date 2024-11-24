@@ -17,6 +17,13 @@ namespace KartverketWebApp.Models
 
         public string? RapportType { get; set; }
 
+        public List<Position> Positions { get; set; } = new List<Position>();
+
+        public class Position
+        {
+            public string? MapType { get; set; }
+            public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
+        }
         public class Coordinate
         {
             public double Nord { get; set; }

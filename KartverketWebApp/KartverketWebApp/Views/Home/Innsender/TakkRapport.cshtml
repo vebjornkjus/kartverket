@@ -1,135 +1,169 @@
-﻿@model KartverketWebApp.Models.CombinedViewModel
-@{
-    var position = Model.Positions.FirstOrDefault();
+﻿@{
+    ViewData["Title"] = "Takk for rapport";
 }
+<link rel="stylesheet" href="~/css/TakkRapport.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/index.css" />
 
+<div class="background-container"></div>
 <div class="container">
- 
     <div class="row">
+        <!-- Map on the left -->
+        <div class="col-md-8">
+            <div id="map_corrections" style="height: 700px; width: 100%;"></div>
+        </div>
+
+        <!-- Edit form on the right -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h5>Tittel</h5>
-                    <p>@position?.Tittel</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Beskrivelse</h5>
-                    <p>@position?.Beskrivelse</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Rapporttype</h5>
-                    <p>@position?.RapportType</p>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title">Rapport Detaljer</h5>
+                        <button class="btn btn-primary" onclick="toggleEdit()">Rediger</button>
+                    </div>
 
-    <div class="row mt-4">
-        <div class="col-12">
-            <div id="map_corrections" style="height: 400px; width: 100%;"></div>
-        </div>
-    </div>
+                    <!-- View Mode -->
+                    <div id="viewMode">
+                        <div class="mb-3">
+                            <h6>Tittel</h6>
+                            <p>@Model.Tittel</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Rapport Type</h6>
+                            <p>@Model.RapportType</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Beskrivelse</h6>
+                            <p>@Model.Beskrivelse</p>
+                        </div>
+                    </div>
 
-    @section Scripts {
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+                    <!-- Edit Mode -->
+                    <div id="editMode" style="display: none;">
+                        <form asp-controller="Home" asp-action="OppdaterRapport" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label for="Tittel" class="form-label">Tittel</label>
+                                <input type="text" class="form-control" id="Tittel" name="Tittel" value="@Model.Tittel" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="RapportType" class="form-label">Rapport Type</label>
+                                <input type="text" class="form-control" id="RapportType" name="RapportType" value="@Model.RapportType" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Beskrivelse" class="form-label">Beskrivelse</label>
+                                <textarea class="form-control" id="Beskrivelse" name="Beskrivelse" rows="6" required>@Model.Beskrivelse</textarea>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Avbryt</button>
+                                <button type="submit" class="btn btn-success">Lagre</button>
+                            </div>
+                        </form>
+                    </div>
 
-        <script>
-            // Debug logging
-            console.log('Full positions data:', @Html.Raw(Json.Serialize(Model.Positions)));
 
-            // Ensure the model is properly serialized
-            var positions = @Html.Raw(Json.Serialize(Model.Positions));
+                    @section Scripts {
+                        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                console.log("Initializing Leaflet map");
 
-            if (positions && positions.length > 0) {
-                positions.forEach(function (position, index) {
-                    // Debug logging
-                    console.log('Position object:', position);
-                    console.log('MapType:', position.MapType); // Try uppercase
-                    console.log('mapType:', position.mapType); // Try lowercase
-                    console.log('maptype:', position.maptype); // Try all lowercase
+                                var positions = @Html.Raw(Json.Serialize(Model.Positions));
+                                console.log("Positions data:", positions);
 
-                    // Check if coordinates exists and has items
-                    if (position.coordinates && position.coordinates.length > 0) {
-                        // Use the first coordinate to set map view
-                        var firstCoord = position.coordinates[0];
-                        var map = L.map('map_corrections').setView([firstCoord.nord, firstCoord.ost], 13);
+                                // Check if there's at least one position
+                                if (positions && positions.length > 0) {
+                                    var position = positions[0]; // Use the first position
+                                    console.log("Processing position:", position);
 
-                        // Define all available layers
-                        var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
-                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                        });
+                                    // Ensure the container exists
+                                    var mapContainer = document.getElementById('map_corrections');
+                                    if (!mapContainer) {
+                                        console.error("Map container 'map_corrections' not found.");
+                                        return;
+                                    }
 
-                        var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
-                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                        });
+                                    // Check for valid coordinates
+                                    if (position.coordinates && position.coordinates.length > 0) {
+                                        var firstCoord = position.coordinates[0]; // Use the first coordinate for the initial view
+                                        var map = L.map('map_corrections', {
+                                            center: [firstCoord.nord, firstCoord.ost],
+                                            zoom: 13
+                                        });
 
-                        var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
-                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
-                        });
+                                        // Define Kartverket tile layers
+                                        var norgeKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', {
+                                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                                        });
 
-                        // Select layer based on maptype with debugging
-                        var selectedLayer;
-                        var mapType = position.MapType || position.mapType || position.maptype;
-                        console.log('Final mapType value:', mapType);
+                                        var turKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png', {
+                                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                                        });
 
-                        switch ((mapType || '').toLowerCase()) {
-                            case 'turkart':
-                                console.log('Selected: Turkart');
-                                selectedLayer = turKart;
-                                break;
-                            case 'sjøkart':
-                            case 'sjokart':
-                                console.log('Selected: Sjøkart');
-                                selectedLayer = sjoKart;
-                                break;
-                            case 'norgekart':
-                            case 'norge kart':
-                                console.log('Selected: Norgekart');
-                                selectedLayer = norgeKart;
-                                break;
-                            default:
-                                console.log('Selected: Default (Norgekart)');
-                                selectedLayer = norgeKart;
-                                break;
-                        }
+                                        var sjoKart = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/sjokartraster/default/webmercator/{z}/{y}/{x}.png', {
+                                            attribution: '&copy; <a href="https://www.kartverket.no/">Kartverket</a>'
+                                        });
 
-                        // Add the selected layer to the map
-                        selectedLayer.addTo(map);
+                                        // Load the appropriate map layer based on position.mapType
+                                        if (position.mapType === "Norge kart") {
+                                            norgeKart.addTo(map);
+                                            console.log("Loaded Norge kart");
+                                        } else if (position.mapType === "Turkart") {
+                                            turKart.addTo(map);
+                                            console.log("Loaded Turkart");
+                                        } else if (position.mapType === "Sjøkart") {
+                                            sjoKart.addTo(map);
+                                            console.log("Loaded Sjøkart");
+                                        } else {
+                                            console.warn("Unknown mapType, defaulting to Norge kart");
+                                            norgeKart.addTo(map);
+                                        }
 
-                        // Collect the coordinates for the polyline
-                        var latlngs = position.coordinates.map(function (coord) {
-                            return [coord.nord, coord.ost];
-                        });
+                                        // Add markers for each coordinate
+                                        position.coordinates.forEach(function (coord, coordIndex) {
+                                            L.marker([coord.nord, coord.ost]).addTo(map).bindPopup(`
+                                                                            <div>
+                                                                                <h4>Point ${coordIndex + 1}</h4>
+                                                                                <p>Nord: ${coord.nord.toFixed(6)}</p>
+                                                                                <p>Øst: ${coord.ost.toFixed(6)}</p>
+                                                                            </div>
+                                                                        `);
+                                        });
 
-                        // Draw the polyline on the map
-                        var polyline = L.polyline(latlngs, {
-                            color: 'blue',
-                            weight: 3,
-                            opacity: 0.7
-                        }).addTo(map);
+                                        // Add a polyline connecting all points
+                                        var latlngs = position.coordinates.map(coord => [coord.nord, coord.ost]);
+                                        var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
 
-                        // Fit the map to show all points
-                        map.fitBounds(polyline.getBounds(), {
-                            padding: [50, 50]
-                        });
-                    } else {
-                        console.warn('Position is missing coordinates:', position);
+                                        // Automatically fit the map to the polyline bounds
+                                        map.fitBounds(polyline.getBounds());
+
+                                        // Ensure the map resizes correctly
+                                        setTimeout(() => {
+                                            map.invalidateSize();
+                                        }, 300);
+                                    } else {
+                                        console.warn("No valid coordinates found for the position.");
+                                    }
+                                } else {
+                                    console.warn("No position data available for map rendering.");
+                                }
+                            });
+                        </script>
+                        <script>
+                            function toggleEdit() {
+                                const viewMode = document.getElementById('viewMode');
+                                const editMode = document.getElementById('editMode');
+
+                                if (viewMode.style.display !== 'none') {
+                                    viewMode.style.display = 'none';
+                                    editMode.style.display = 'block';
+                                } else {
+                                    viewMode.style.display = 'block';
+                                    editMode.style.display = 'none';
+                                }
+                            }
+                        </script>
                     }
-                });
-            } else {
-                console.warn('No positions available to display on the map.');
-                var map = L.map('map_corrections').setView([65.4, 17.3], 4);
-                norgeKart.addTo(map);
-            }
-        </script>
-    }
-</div>
+
+
+

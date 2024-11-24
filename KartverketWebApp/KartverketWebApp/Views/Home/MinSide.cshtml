@@ -111,6 +111,39 @@
                             {
                                 <p>Du har ingen rapporter.</p>
                             }
+    <h4 class="reports-title">Dine rapporter</h4>
+    @if (Model.Rapporter != null && Model.Rapporter.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Status</th>
+                    <th>Opprettet</th>
+                    <th>Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rapport in Model.Rapporter)
+                {
+                    <tr>
+                        <td>@rapport.RapportId</td>
+                        <td>@rapport.RapportStatus</td>
+                        <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                        <td>
+                            <a asp-controller="Home" asp-action="MinSideRapporter" asp-route-id="@rapport.RapportId">
+                                @rapport.Kart?.Tittel
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Du har ingen rapporter.</p>
+    }
 
                             @if (TempData["Error"] != null)
                             {
