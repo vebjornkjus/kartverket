@@ -63,10 +63,15 @@ namespace KartverketWebApp.Controllers
             ViewBag.UserLastName = person.Etternavn;
             ViewBag.UserEmail = email;
 
+            var currentPersonId = person.PersonId;
+
             var conversations = await _context.Meldinger
+                // First filter messages to only include relevant rapport statuses
                 .Where(m => _context.Rapport
                     .Where(r => r.RapportStatus == "Uåpnet" || r.RapportStatus == "Under behandling")
                     .Any(r => r.RapportId == m.RapportId))
+                // Then filter to only include conversations where the current user is involved
+                .Where(m => m.SenderPersonId == currentPersonId || m.MottakerPersonId == currentPersonId)
                 .Include(m => m.Sender)
                 .Include(m => m.Mottaker)
                 .GroupBy(m => m.RapportId)
@@ -78,17 +83,18 @@ namespace KartverketWebApp.Controllers
                         .Select(r => r.Kart.Tittel)
                         .FirstOrDefault(),
                     LastMessage = group.OrderByDescending(m => m.Tidsstempel).FirstOrDefault(),
-                    SenderName = group.FirstOrDefault().Mottaker.Fornavn + " " + group.FirstOrDefault().Mottaker.Etternavn,
+                    // Determine the other party in the conversation (not the current user)
+                    SenderName = group.FirstOrDefault().MottakerPersonId == currentPersonId
+                        ? group.FirstOrDefault().Sender.Fornavn + " " + group.FirstOrDefault().Sender.Etternavn
+                        : group.FirstOrDefault().Mottaker.Fornavn + " " + group.FirstOrDefault().Mottaker.Etternavn,
                     LastSenderName = group.OrderByDescending(m => m.Tidsstempel)
                         .Select(m => m.Sender.Fornavn + " " + m.Sender.Etternavn)
                         .FirstOrDefault(),
                     Status = group.OrderByDescending(m => m.Tidsstempel).Select(m => m.Status).FirstOrDefault(),
-                    RecipientId = group.FirstOrDefault().MottakerPersonId // Include RecipientId
+                    RecipientId = group.FirstOrDefault().MottakerPersonId
                 })
                 .ToListAsync();
 
-            // Map to SammtaleModel
-            var currentPersonId = person.PersonId; // ID of the logged-in person
             var combinedViewModel = new CombinedViewModel
             {
                 SammtaleModel = conversations.Select(c => new SammtaleModel
