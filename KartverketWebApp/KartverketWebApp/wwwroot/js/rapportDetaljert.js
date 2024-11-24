@@ -199,7 +199,6 @@
 
         try {
             console.log('Henter ansatte data...');
-            // Endret endpoint til å peke mot Detaljert controller
             const response = await fetch('/Detaljert/HentTilgjengeligeAnsatte');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

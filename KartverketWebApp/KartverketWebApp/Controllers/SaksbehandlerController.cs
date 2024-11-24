@@ -9,7 +9,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace KartverketWebApp.Controllers
 {
-
+    // ViewModel for å håndtere rapportdata
     public class RapportViewModel
     {
         public int RapportId { get; set; }
@@ -38,7 +38,7 @@ namespace KartverketWebApp.Controllers
             _dbConnection = dbConnection;
         }
 
-
+        // Henter tidligere rapporter (avklarte og fjernede) for innlogget saksbehandler
         [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         [HttpGet]
         public async Task<IActionResult> TidligereRapporter(int avklartPage = 1, int fjernetPage = 1, int pageSize = 10)
@@ -46,6 +46,7 @@ namespace KartverketWebApp.Controllers
             using var connection = _dbConnection;
             connection.Open();
 
+            // Henter e-postadressen til den innloggede brukeren
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             if (string.IsNullOrEmpty(userEmail))
             {
@@ -55,6 +56,7 @@ namespace KartverketWebApp.Controllers
 
             _logger.LogInformation($"Fetching data for user email: {userEmail}");
 
+            // Henter brukerinfo fra databasen
             const string userQuery = @"
         SELECT b.*, p.*, a.*
         FROM Bruker b
@@ -70,13 +72,16 @@ namespace KartverketWebApp.Controllers
                 return NotFound("User not found.");
             }
 
+            // Setter brukerinfo i ViewBag for visning i view
             ViewBag.UserName = userInfo.Fornavn;
             ViewBag.UserLastName = userInfo.Etternavn;
             ViewBag.UserEmail = userEmail;
 
+            // Beregner offset for paginering
             var avklartOffset = (avklartPage - 1) * pageSize;
             var fjernetOffset = (fjernetPage - 1) * pageSize;
 
+            // Henter avklarte rapporter
             const string avklartQuery = @"
         SELECT 
             r.RapportId, 
@@ -100,6 +105,7 @@ namespace KartverketWebApp.Controllers
 
             var avklartReports = (await connection.QueryAsync<RapportViewModel>(avklartQuery, avklartParams)).ToList();
 
+            // Henter fjernede rapporter
             const string fjernetQuery = @"
         SELECT 
             r.RapportId, 
@@ -115,7 +121,7 @@ namespace KartverketWebApp.Controllers
         LIMIT @PageSize OFFSET @Offset";
 
             var fjernetParams = new
-            {   
+            {
                 AnsattId = userInfo.AnsattId,
                 Offset = fjernetOffset,
                 PageSize = pageSize
@@ -123,6 +129,7 @@ namespace KartverketWebApp.Controllers
 
             var fjernetReports = (await connection.QueryAsync<RapportViewModel>(fjernetQuery, fjernetParams)).ToList();
 
+            // Henter totalt antall avklarte og fjernede rapporter
             const string avklartCountQuery = @"
         SELECT COUNT(*) as count
         FROM Rapport
@@ -139,12 +146,14 @@ namespace KartverketWebApp.Controllers
 
             var fjernetCount = await connection.QueryFirstAsync<int>(fjernetCountQuery, new { AnsattId = userInfo.AnsattId });
 
+            // Populerer ViewModel med data
             var viewModel = new CombinedViewModel
             {
                 AvklartRapporter = avklartReports,
                 FjernetRapporter = fjernetReports
             };
 
+            // Setter sideinformasjon i ViewBag for visning i view
             ViewBag.AvklartCurrentPage = avklartPage;
             ViewBag.AvklartTotalPages = (int)Math.Ceiling((double)avklartCount / pageSize);
 
@@ -154,12 +163,13 @@ namespace KartverketWebApp.Controllers
             return View("~/Views/Home/Saksbehandler/TidligereRapporter.cshtml", viewModel);
         }
 
+        // Henter aktive rapporter (uåpnede og under behandling) for innlogget saksbehandler
         [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         [HttpGet]
         public async Task<IActionResult> MineRapporter(int activePage = 1, int pageSize = 10)
         {
-            // Fetch the logged-in user's email
-            var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
+            // Henter e-postadressen til den innloggede brukeren
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
             if (string.IsNullOrEmpty(userEmail))
             {
                 _logger.LogWarning("User email not found in claims.");
@@ -168,7 +178,7 @@ namespace KartverketWebApp.Controllers
 
             _logger.LogInformation($"Fetching data for user email: {userEmail}");
 
-            // Find the user in the database using Dapper
+            // Henter brukerinfo fra databasen
             var brukerQuery = "SELECT * FROM Bruker WHERE Email = @Email";
             var bruker = await _dbConnection.QueryFirstOrDefaultAsync<Bruker>(brukerQuery, new { Email = userEmail });
             if (bruker == null)
@@ -177,7 +187,6 @@ namespace KartverketWebApp.Controllers
                 return NotFound("User not found.");
             }
 
-            // Fetch the associated Person and Ansatt entities using Dapper
             var personQuery = "SELECT * FROM Person WHERE BrukerId = @BrukerId";
             var person = await _dbConnection.QueryFirstOrDefaultAsync<Person>(personQuery, new { BrukerId = bruker.BrukerId });
             if (person == null)
@@ -194,12 +203,12 @@ namespace KartverketWebApp.Controllers
                 return NotFound("Ansatt or kommunenummer not found.");
             }
 
-            // Add user information to ViewBag
+            // Setter brukerinfo i ViewBag for visning i view
             ViewBag.UserName = person.Fornavn;
             ViewBag.UserLastName = person.Etternavn;
             ViewBag.UserEmail = userEmail;
 
-            // Fetch only active reports using Dapper
+            // Henter aktive rapporter (uåpnede og under behandling)
             var activeReportsQuery = @"
         SELECT r.*, k.*
         FROM Rapport r
@@ -219,22 +228,21 @@ namespace KartverketWebApp.Controllers
                 new { AnsattId = ansatt.AnsattId, Offset = (activePage - 1) * pageSize, PageSize = pageSize },
                 splitOn: "KartEndringId")).ToList();
 
-            // Fetch the total count of active reports using Dapper
+            // Henter antall aktive rapporter
             var totalActiveReportsQuery = "SELECT COUNT(*) FROM Rapport WHERE TildelAnsattId = @AnsattId AND (RapportStatus = 'Uåpnet' OR RapportStatus = 'Under behandling')";
             var totalActiveReports = await _dbConnection.QueryFirstAsync<int>(totalActiveReportsQuery, new { AnsattId = ansatt.AnsattId });
 
-            // Populate the CombinedViewModel
+            // Populerer ViewModel med data
             var combinedViewModel = new CombinedViewModel
             {
                 ActiveRapporter = activeReports
             };
 
+            // Setter sideinformasjon i ViewBag for visning i view
             ViewBag.ActiveCurrentPage = activePage;
             ViewBag.ActiveTotalPages = (int)Math.Ceiling((double)totalActiveReports / pageSize);
 
             return View("~/Views/Home/Saksbehandler/MineRapporter.cshtml", combinedViewModel);
         }
-
-
     }
 }

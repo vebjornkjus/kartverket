@@ -97,10 +97,10 @@ namespace KartverketWebApp.Data
                 new { Id = 4, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
                 new { Id = 5, Fylkenavn = "Innlandet", Kommunenavn = "V�g�", Fylkenummer = 34, Kommunenummer = 3435 },
                 new { Id = 6, Fylkenavn = "Troms og Finnmark", Kommunenavn = "Troms�", Fylkenummer = 55, Kommunenummer = 5401 },
-                new { Id = 7, Fylkenavn = "Nordland", Kommunenavn = "Bod�", Fylkenummer = 18, Kommunenummer = 1804 },
-                new { Id = 8, Fylkenavn = "Oslo", Kommunenavn = "Oslo", Fylkenummer = 3, Kommunenummer = 0301 },
-                new { Id = 9, Fylkenavn = "Finnmark", Kommunenavn = "Vads�", Fylkenummer = 56, Kommunenummer = 5405 },
-                new { Id = 10, Fylkenavn = "Vestfold og Telemark", Kommunenavn = "Skien", Fylkenummer = 40, Kommunenummer = 3807 }
+                new { Id = 7, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
+                new { Id = 8, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
+                new { Id = 9, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 },
+                new { Id = 10, Fylkenavn = "Agder", Kommunenavn = "Kristiansand", Fylkenummer = 42, Kommunenummer = 4204 }
             );
 
             // Insert data into Bruker
@@ -123,7 +123,7 @@ namespace KartverketWebApp.Data
                 new { BrukerId = 16, Email = "RogalandStavanger@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 17, Email = "Tr�ndelagTrondheim@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 18, Email = "VikenDrammen@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
-                new { BrukerId = 19, Email = "VikenFredrikstad@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
+                new { BrukerId = 19, Email = "AgderKristiansand2@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 20, Email = "AgderKristiansand@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 21, Email = "RogalandSandnes@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
                 new { BrukerId = 22, Email = "TromsOgFinnmarkTroms�@example.com", Passord = "passord123", BrukerType = "saksbehandler" },
@@ -165,7 +165,7 @@ namespace KartverketWebApp.Data
                 new { AnsattId = 4, PersonId = 16, Kommunenummer = 1101, AnsettelsesDato = DateTime.Parse("2024-03-10") },
                 new { AnsattId = 5, PersonId = 17, Kommunenummer = 5001, AnsettelsesDato = DateTime.Parse("2024-04-05") },
                 new { AnsattId = 6, PersonId = 18, Kommunenummer = 3005, AnsettelsesDato = DateTime.Parse("2024-05-12") },
-                new { AnsattId = 7, PersonId = 19, Kommunenummer = 3004, AnsettelsesDato = DateTime.Parse("2024-06-18") },
+                new { AnsattId = 7, PersonId = 19, Kommunenummer = 4204, AnsettelsesDato = DateTime.Parse("2024-06-18") },
                 new { AnsattId = 8, PersonId = 20, Kommunenummer = 4204, AnsettelsesDato = DateTime.Parse("2024-07-25") },
                 new { AnsattId = 9, PersonId = 21, Kommunenummer = 1108, AnsettelsesDato = DateTime.Parse("2024-08-30") },
                 new { AnsattId = 10, PersonId = 22, Kommunenummer = 5401, AnsettelsesDato = DateTime.Parse("2024-09-14") },
@@ -190,13 +190,13 @@ namespace KartverketWebApp.Data
                 new { RapportId = 1, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 1, KartEndringId = 1, BehandletDato = (DateTime?)null },
                 new { RapportId = 2, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 2, KartEndringId = 2, BehandletDato = (DateTime?)null },
                 new { RapportId = 3, RapportStatus = "Avklart", Opprettet = new DateTime(2022, 3, 13, 10, 0, 0), TildelAnsattId = 1, PersonId = 3, KartEndringId = 3, BehandletDato = new DateTime(2022, 3, 15, 10, 0, 0) },
-                new { RapportId = 4, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 4, KartEndringId = 4, BehandletDato = (DateTime?)null },
+                new { RapportId = 4, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 8, PersonId = 4, KartEndringId = 4, BehandletDato = (DateTime?)null },
                 new { RapportId = 5, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 5, KartEndringId = 5, BehandletDato = (DateTime?)null },
                 new { RapportId = 6, RapportStatus = "Avklart", Opprettet = new DateTime(2022, 8, 20, 14, 30, 0), TildelAnsattId = 1, PersonId = 6, KartEndringId = 6, BehandletDato = new DateTime(2022, 8, 22, 14, 30, 0) },
-                new { RapportId = 7, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 7, KartEndringId = 7, BehandletDato = (DateTime?)null },
-                new { RapportId = 8, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 8, KartEndringId = 8, BehandletDato = (DateTime?)null },
-                new { RapportId = 9, RapportStatus = "Avklart", Opprettet = new DateTime(2023, 1, 8, 9, 15, 0), TildelAnsattId = 1, PersonId = 9, KartEndringId = 9, BehandletDato = new DateTime(2023, 1, 10, 9, 15, 0) },
-                new { RapportId = 10, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 1, PersonId = 10, KartEndringId = 10, BehandletDato = (DateTime?)null }
+                new { RapportId = 7, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 8, PersonId = 7, KartEndringId = 7, BehandletDato = (DateTime?)null },
+                new { RapportId = 8, RapportStatus = "Under behandling", Opprettet = DateTime.Now, TildelAnsattId = 8, PersonId = 8, KartEndringId = 8, BehandletDato = (DateTime?)null },
+                new { RapportId = 9, RapportStatus = "Avklart", Opprettet = new DateTime(2023, 1, 8, 9, 15, 0), TildelAnsattId = 8, PersonId = 9, KartEndringId = 9, BehandletDato = new DateTime(2023, 1, 10, 9, 15, 0) },
+                new { RapportId = 10, RapportStatus = "Uåpnet", Opprettet = DateTime.Now, TildelAnsattId = 8, PersonId = 10, KartEndringId = 10, BehandletDato = (DateTime?)null }
             );
 
             // Insert data into Koordinater
@@ -233,22 +233,23 @@ namespace KartverketWebApp.Data
                 new { KoordinatId = 20, KartEndringId = 6, Rekkefolge = 3, Nord = 69.6494, Ost = 18.9555 },
 
                 // Coordinates for KartEndringId 7 (Nordland - Lofoten)
-                new { KoordinatId = 21, KartEndringId = 7, Rekkefolge = 1, Nord = 68.4392, Ost = 17.4276 },
-                new { KoordinatId = 22, KartEndringId = 7, Rekkefolge = 2, Nord = 68.4393, Ost = 17.4277 },
+                new { KoordinatId = 21, KartEndringId = 7, Rekkefolge = 1, Nord = 58.1468, Ost = 7.9956 },
+                new { KoordinatId = 22, KartEndringId = 7, Rekkefolge = 2, Nord = 58.1469, Ost = 7.9965 },
 
-                // Coordinates for KartEndringId 8 (Oslo - East)
-                new { KoordinatId = 23, KartEndringId = 8, Rekkefolge = 1, Nord = 59.9141, Ost = 10.7524 },
-                new { KoordinatId = 24, KartEndringId = 8, Rekkefolge = 2, Nord = 59.9142, Ost = 10.7525 },
+                // Coordinates for KartEndringId 8 (Kristiansand - East)
+                new { KoordinatId = 23, KartEndringId = 8, Rekkefolge = 1, Nord = 58.1470, Ost = 7.9974 },
+                new { KoordinatId = 24, KartEndringId = 8, Rekkefolge = 2, Nord = 58.1471, Ost = 7.9983 },
 
-                // Coordinates for KartEndringId 9 (Finnmark - Kirkenes)
-                new { KoordinatId = 25, KartEndringId = 9, Rekkefolge = 1, Nord = 70.0738, Ost = 29.7492 },
-                new { KoordinatId = 26, KartEndringId = 9, Rekkefolge = 2, Nord = 70.0739, Ost = 29.7493 },
-                new { KoordinatId = 27, KartEndringId = 9, Rekkefolge = 3, Nord = 70.0740, Ost = 29.7494 },
-                new { KoordinatId = 28, KartEndringId = 9, Rekkefolge = 4, Nord = 70.0741, Ost = 29.7495 },
+                // Coordinates for KartEndringId 9 (Kristiansand - Center)
+                new { KoordinatId = 25, KartEndringId = 9, Rekkefolge = 1, Nord = 58.1472, Ost = 7.9992 },
+                new { KoordinatId = 26, KartEndringId = 9, Rekkefolge = 2, Nord = 58.1473, Ost = 8.0001 },
+                new { KoordinatId = 27, KartEndringId = 9, Rekkefolge = 3, Nord = 58.1474, Ost = 8.0010 },
+                new { KoordinatId = 28, KartEndringId = 9, Rekkefolge = 4, Nord = 58.1475, Ost = 8.0019 },
 
-                // Coordinates for KartEndringId 10 (Vestfold og Telemark - Skien)
-                new { KoordinatId = 29, KartEndringId = 10, Rekkefolge = 1, Nord = 59.0578, Ost = 10.0364 },
-                new { KoordinatId = 30, KartEndringId = 10, Rekkefolge = 2, Nord = 59.0579, Ost = 10.0365 }
+                // Coordinates for KartEndringId 10 (Kristiansand - West)
+                new { KoordinatId = 29, KartEndringId = 10, Rekkefolge = 1, Nord = 58.1476, Ost = 7.9947 },
+                new { KoordinatId = 30, KartEndringId = 10, Rekkefolge = 2, Nord = 58.1477, Ost = 7.9938 }
+
             );
 
             // Insert data into Meldinger
@@ -266,8 +267,8 @@ namespace KartverketWebApp.Data
                 new { MeldingsId = 6, RapportId = 3, SenderPersonId = 3, MottakerPersonId = 12, Innhold = "Fjellskredet er n� under overv�king.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 4
-                new { MeldingsId = 7, RapportId = 4, SenderPersonId = 12, MottakerPersonId = 4, Innhold = "Anne, kan du sende bilder av den skadede stien?", Tidsstempel = DateTime.Now.AddDays(-1), Status = "sendt" },
-                new { MeldingsId = 8, RapportId = 4, SenderPersonId = 4, MottakerPersonId = 12, Innhold = "Selvf�lgelig, her er bildene.", Tidsstempel = DateTime.Now, Status = "sendt" },
+                new { MeldingsId = 7, RapportId = 4, SenderPersonId = 20, MottakerPersonId = 4, Innhold = "Anne, kan du sende bilder av den skadede stien?", Tidsstempel = DateTime.Now.AddDays(-1), Status = "sendt" },
+                new { MeldingsId = 8, RapportId = 4, SenderPersonId = 4, MottakerPersonId = 20, Innhold = "Selvf�lgelig, her er bildene.", Tidsstempel = DateTime.Now, Status = "sendt" },
 
                 // Meldinger for RapportId 5
                 new { MeldingsId = 9, RapportId = 5, SenderPersonId = 12, MottakerPersonId = 5, Innhold = "Nina, har du innsikt i b�tvrakene?", Tidsstempel = DateTime.Now, Status = "sendt" },

@@ -43,7 +43,7 @@ namespace KartverketWebApp.Controllers
 
         /// <summary>
         /// Henter og viser alle meldinger for innlogget bruker
-        /// Grupperer meldinger etter rapport og viser siste melding i hver samtale
+        /// Grupperer meldinger basert rapport og viser siste melding i hver samtale
         /// Returnerer forskjellige views basert på brukertype (saksbehandler eller vanlig bruker)
         /// </summary>
         [Authorize]
@@ -206,6 +206,12 @@ namespace KartverketWebApp.Controllers
                     return Json(new { success = false, message = "Message content cannot be empty." });
                 }
 
+                // Validerer at rapportId er gyldig
+                if (rapportId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid report ID." });
+                }
+
                 // Henter avsenderens informasjon
                 var userEmail = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
@@ -230,7 +236,7 @@ namespace KartverketWebApp.Controllers
 
                 if (!rapportExists || !mottakerExists)
                 {
-                    return Json(new { success = false, message = "Invalid rapport or recipient." });
+                    return Json(new { success = false, message = "Invalid report or recipient." });
                 }
 
                 // Oppretter og lagrer ny melding

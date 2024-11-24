@@ -51,6 +51,7 @@ namespace KartverketWebApp.Controllers
         {
             try
             {
+                // SQL-spørring for å oppdatere rapportens status til 'Fjernet' og sette behandlingsdato
                 const string query = @"
             UPDATE Rapport 
             SET RapportStatus = 'Fjernet',
@@ -83,6 +84,7 @@ namespace KartverketWebApp.Controllers
         {
             try
             {
+                // SQL-spørring for å oppdatere rapportens status til 'Avklart' og sette behandlingsdato
                 const string query = @"
             UPDATE Rapport 
             SET RapportStatus = 'Avklart',
@@ -107,6 +109,7 @@ namespace KartverketWebApp.Controllers
                 return RedirectToAction("Saksbehandler", "Home");
             }
         }
+
         /// <summary>
         /// Henter liste over tilgjengelige saksbehandlere i samme kommune som innlogget bruker
         /// Returnerer ikke den innloggede brukeren i listen
@@ -171,6 +174,7 @@ namespace KartverketWebApp.Controllers
         {
             try
             {
+                // SQL-spørring for å oppdatere rapportstatus og tildele den til en ny saksbehandler
                 const string query = @"
             UPDATE Rapport 
             SET TildelAnsattId = @NyAnsattId,
