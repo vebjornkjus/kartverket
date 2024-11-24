@@ -107,21 +107,25 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 3. Du kan teste ut de ulike verktøyene
 4. Rapporter blir tildelt ansatt basert på kommune nummer
 5. Tegne en rapport i Kristiansand for å følge scenarioet
-6. Fullfør og trykk rapporter
-7. Fyll ut info. Legg til bilde om du vil. Rapporter!
-8. Her kan du redigere rapporten.
-9. Videre kan du gå til min side og se rapporten.
+6. Rapporter som blir rapportert i kommune det ikke finnes ansatte i, blir tildelt ansatt 
+7. Fullfør og trykk rapporter
+8. Fyll ut info. Legg til bilde om du vil. Rapporter!
+9. Her kan du redigere rapporten.
+10. Videre kan du gå til min side og se rapporten.
 
-10. Logg ut og logg inn med:
-   AgderKristiansand@example.com
-   passord123
-11. Dette er saksbehandlersiden
-12. Trykk på en rapport. Her er en mer detaljert oversikt
-13. Avklar en rapport og fjern en annen. Du kan også sende en rapport til en ansatt i samme kommune.
-14. Gå inn på en rapport bla ned. Her kan du sende melding angående rapporten. Prøv det!
-15. Denne Meldingen vil nå komme opp på meldings siden. Rapporter siden viser alle rapporter med litt mer detaljer enn oversikten. De avklarte og fjernet raportene vil komme på Tidligere rapporter siden
-16. Hvis du logger inn på brukeren du sendte melding til vil du kunne se meldingen på min side. Kun saksbehandlere har mulighet til å starte en samtale.
-
+11. Logg ut og logg inn med:
+   AgderKristiansand2@example.com
+   passord123.
+12. Dette er saksbehandler siden. Trykk på rapporten du netopp sendte inn
+13. Bla helt ned til bunnen og send en melding. Denne vil komme i melding siden din.
+14. Oppe til høyre, trykk send til og send til Nils. Du kan kun sende til andre ansatte i kristiansand
+15. Bytt bruker, logg in med:
+    AgderKristiansand@example.com
+    passord123
+16. Prøv å avklar en rapport og fjerne en annen. disse vil nå komme i tidligere rapporter siden.
+17. Logg på brukeren du lagde.
+18. I min side vil du kunne redigere og se status for rapporten
+19. I meldinger vil du se meldingen du sendte til brukerern
 ////legg til admin ting her//////
 
 
