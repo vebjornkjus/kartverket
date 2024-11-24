@@ -106,6 +106,12 @@ app.UseEndpoints(endpoints =>
         name: "meldinger",
         pattern: "meldinger/{action=Index}/{rapportId?}",
         defaults: new { controller = "Meldinger" });
+
+    // Saksbehandler-specific route
+    endpoints.MapControllerRoute(
+        name: "saksbehandler",
+        pattern: "saksbehandler/{action=Index}/{rapportId?}",
+        defaults: new { controller = "Saksbehandler" });
 });
 
 app.Run();

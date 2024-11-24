@@ -1,0 +1,197 @@
+﻿@model KartverketWebApp.Models.CombinedViewModel
+<link rel="stylesheet" href="~/css/Saksbehandler.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/TidligereRapporter.css" asp-append-version="true" />
+
+<div class="saksbehandlerMain">
+    <div class="SaksbehandlerContainer">
+        <div class="saksbehandlerNavigering">
+            <div class="innlogetBruker">
+                <div class="brukerIkon"><i class="fa-solid fa-user fa-2xl"></i></div>
+                <div class="brukerinfo">
+                    <p>@ViewBag.UserName @ViewBag.UserLastName</p>
+                    <p>@ViewBag.UserEmail</p>
+                </div>
+            </div>
+            <nav class="vertical-nav">
+                <ul>
+                    <li>
+                        <a asp-controller="Home" asp-action="Saksbehandler" class="nav-item">
+                            <i class="fa-solid fa-house" style="color: #166633;"></i> Oversikt
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-bell" style="color: #166633;"></i> Varslinger
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-envelope" style="color: #166633;"></i> Mine Rapporter
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="MineRapporter" class="nav-item">
+                            <i class="fa-solid fa-message" style="color: #166633;"></i> Meldinger
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Saksbehandler" asp-action="TidligereRapporter" class="nav-item active">
+                            <i class="fa-solid fa-clock" style="color: #166633;"></i> Tidligere rapporter
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div id="overviewOmrade">
+            <div class="nav-beside">
+                <div class="beside-topp">
+                    <h1 id="hei">Hei, @ViewBag.UserName</h1>
+                    <p id="date-container"></p>
+                    <script>
+                        function displayDateAndWeekday() {
+                            const container = document.getElementById("date-container");
+                            const now = new Date();
+                            const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                            container.textContent = now.toLocaleDateString("no-NO", options);
+                        }
+                        displayDateAndWeekday();
+                    </script>
+                </div>
+                <div class="beside-main">
+                    <div class="main-container">
+                        <!-- Avklarte Rapporter -->
+                        <div class="table-container mb-5">
+                            <h3>Avklarte Rapporter</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Kart Tittel</th>
+                                        <th>Status</th>
+                                        <th>Opprettet</th>
+                                        <th>Handlinger</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.AvklartRapporter != null && Model.AvklartRapporter.Any())
+                                    {
+                                        foreach (var rapport in Model.AvklartRapporter)
+                                        {
+                                            <tr>
+                                                <td>@rapport.RapportId</td>
+                                                <td>@rapport.Tittel</td>
+                                                <td>@rapport.RapportStatus</td>
+                                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                                <td>
+                                                    <a href="@Url.Action("RapportDetaljer", "Saksbehandler", new { id = rapport.RapportId })"
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="fa-solid fa-eye"></i> Se detaljer
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">Ingen avklarte rapporter</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <!-- Pagination Controls for Avklarte Rapporter -->
+                            <nav aria-label="Page navigation" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    @if (ViewBag.AvklartCurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { avklartPage = ViewBag.AvklartCurrentPage - 1 })">Forrige</a>
+                                        </li>
+                                    }
+                                    @for (int i = 1; i <= ViewBag.AvklartTotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.AvklartCurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { avklartPage = i })">@i</a>
+                                        </li>
+                                    }
+                                    @if (ViewBag.AvklartCurrentPage < ViewBag.AvklartTotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { avklartPage = ViewBag.AvklartCurrentPage + 1 })">Neste</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Fjernede Rapporter -->
+                        <div class="table-container">
+                            <h3>Fjernede Rapporter</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Kart Tittel</th>
+                                        <th>Status</th>
+                                        <th>Opprettet</th>
+                                        <th>Handlinger</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.FjernetRapporter != null && Model.FjernetRapporter.Any())
+                                    {
+                                        foreach (var rapport in Model.FjernetRapporter)
+                                        {
+                                            <tr>
+                                                <td>@rapport.RapportId</td>
+                                                <td>@rapport.Tittel</td>
+                                                <td>@rapport.RapportStatus</td>
+                                                <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
+                                                <td>
+                                                    <a href="@Url.Action("RapportDetaljer", "Saksbehandler", new { id = rapport.RapportId })"
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="fa-solid fa-eye"></i> Se detaljer
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">Ingen fjernede rapporter</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <!-- Pagination Controls for Fjernede Rapporter -->
+                            <nav aria-label="Page navigation" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    @if (ViewBag.FjernetCurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { fjernetPage = ViewBag.FjernetCurrentPage - 1 })">Forrige</a>
+                                        </li>
+                                    }
+                                    @for (int i = 1; i <= ViewBag.FjernetTotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.FjernetCurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { fjernetPage = i })">@i</a>
+                                        </li>
+                                    }
+                                    @if (ViewBag.FjernetCurrentPage < ViewBag.FjernetTotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("TidligereRapporter", "Saksbehandler", new { fjernetPage = ViewBag.FjernetCurrentPage + 1 })">Neste</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

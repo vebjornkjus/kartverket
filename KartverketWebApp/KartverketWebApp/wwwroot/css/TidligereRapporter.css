@@ -1,0 +1,63 @@
+﻿/* Table Container Styles */
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 11px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+    .table-container h3 {
+        color: #166633;
+        margin-bottom: 0;
+        font-family: Arial, sans-serif;
+    }
+
+/* Button Styles */
+.btn-primary {
+    background-color: #166633;
+    border-color: #166633;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #145628;
+        border-color: #145628;
+    }
+
+/* Pagination Styles */
+.pagination {
+    justify-content: center;
+    margin-top: 10px;
+}
+
+    .pagination .page-link {
+        padding: 5px 10px;
+        font-size: 14px;
+        color: #166633;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .pagination .active .page-link {
+        background-color: #166633;
+        border-color: #166633;
+        color: white;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e0e0e0;
+        color: #000;
+    }

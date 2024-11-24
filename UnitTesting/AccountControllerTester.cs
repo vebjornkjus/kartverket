@@ -17,37 +17,38 @@ namespace KartverketWebApp.Tests
 {
     public class AccountControllerTests
     {
-        private readonly Mock<IPasswordHasher<IdentityUser>> _mockPasswordHasher;
-        private readonly Mock<IAuthenticationService> _mockAuthService;
-        private readonly AccountController _controller;
-        private readonly ApplicationDbContext _context;
+        // Mock-objekter og dependencies som brukes på tvers av testene
+        private readonly Mock<IPasswordHasher<IdentityUser>> _mockPasswordHasher;  // Simulerer passordhashing uten faktisk kryptering
+        private readonly Mock<IAuthenticationService> _mockAuthService;            // Simulerer autentiseringstjenester (innlogging/utlogging)
+        private readonly AccountController _controller;                            // Controller-instansen som testes
+        private readonly ApplicationDbContext _context;                           // In-memory database for testing
 
         public AccountControllerTests()
         {
-            // Setup in-memory database
+            // Oppsett av in-memory database for testing
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             _context = new ApplicationDbContext(options);
 
+            // Initialiserer mock-objekter
             _mockPasswordHasher = new Mock<IPasswordHasher<IdentityUser>>();
             _mockAuthService = new Mock<IAuthenticationService>();
 
-            // Setup service collection
+            // Konfigurerer dependency injection for testene
             var services = new ServiceCollection();
-            services.AddScoped(_ => _mockAuthService.Object);
-            services.AddControllersWithViews();
+            services.AddScoped(_ => _mockAuthService.Object);  // Registrerer mock authentication service
+            services.AddControllersWithViews();                // Legger til MVC-tjenester
 
-            // Build service provider
             var serviceProvider = services.BuildServiceProvider();
 
-            // Setup HttpContext
+            // Setter opp HTTP-kontekst for testing
             var httpContext = new DefaultHttpContext
             {
                 RequestServices = serviceProvider
             };
 
-            // Setup controller context
+            // Initialiserer controller med nødvendige dependencies og kontekst
             _controller = new AccountController(_context, _mockPasswordHasher.Object)
             {
                 ControllerContext = new ControllerContext
@@ -56,36 +57,35 @@ namespace KartverketWebApp.Tests
                 }
             };
 
-            // Mock UrlHelper
+            // Konfigurerer URL-helper for controller
             var mockUrlHelper = new Mock<IUrlHelper>();
-            mockUrlHelper.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns("Home/Index");
+            mockUrlHelper.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+                        .Returns("Home/Index");
             _controller.Url = mockUrlHelper.Object;
         }
 
         [Fact]
         public void Login_Get_ReturnsView()
         {
-            // Act
+            // Test at GET-request til login returnerer korrekt view
             var result = _controller.Login();
-
-            // Assert
             Assert.IsType<ViewResult>(result);
         }
 
         [Theory]
-        [InlineData("invalid-email", "Password123")] // Ugyldig e-post
-        [InlineData("", "Password123")] // Tom e-post
-        [InlineData("test@example.com", "")] // Tomt passord
+        [InlineData("invalid-email", "Password123")]    // Tester ugyldig e-postformat
+        [InlineData("", "Password123")]                 // Tester tom e-post
+        [InlineData("test@example.com", "")]           // Tester tomt passord
         public async Task Login_Post_InvalidModel_ReturnsViewWithErrors(string username, string password)
         {
-            // Arrange
+            // Arrange: Setter opp ugyldig login-modell
             var model = new LoginViewModel { Username = username, Password = password };
             _controller.ModelState.AddModelError("", "Test error");
 
-            // Act
+            // Act: Forsøker innlogging med ugyldig modell
             var result = await _controller.Login(model);
 
-            // Assert
+            // Assert: Verifiserer at feil håndteres korrekt
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.False(_controller.ModelState.IsValid);
             Assert.Equal(model, viewResult.Model);
@@ -94,7 +94,7 @@ namespace KartverketWebApp.Tests
         [Fact]
         public async Task Login_Post_ValidCredentials_RedirectsToHome()
         {
-            // Arrange
+            // Arrange: Setter opp gyldig bruker og innloggingsdata
             var model = new LoginViewModel
             {
                 Username = "test@example.com",
@@ -116,15 +116,17 @@ namespace KartverketWebApp.Tests
                 BrukerId = bruker.BrukerId
             };
 
-            // Add test data to in-memory database
+            // Legger til testdata i databasen
             await _context.Bruker.AddAsync(bruker);
             await _context.Person.AddAsync(person);
             await _context.SaveChangesAsync();
 
+            // Konfigurerer mock-oppførsel for passordverifisering
             _mockPasswordHasher
                 .Setup(x => x.VerifyHashedPassword(It.IsAny<IdentityUser>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(PasswordVerificationResult.Success);
 
+            // Konfigurerer mock-oppførsel for innlogging
             _mockAuthService
                 .Setup(x => x.SignInAsync(
                     It.IsAny<HttpContext>(),
@@ -133,10 +135,10 @@ namespace KartverketWebApp.Tests
                     It.IsAny<AuthenticationProperties>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
+            // Act: Utfører innlogging
             var result = await _controller.Login(model);
 
-            // Assert
+            // Assert: Verifiserer redirect til hjemmeside
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirectResult.ActionName);
             Assert.Equal("Home", redirectResult.ControllerName);
@@ -145,7 +147,7 @@ namespace KartverketWebApp.Tests
         [Fact]
         public async Task Register_Post_ValidModel_CreatesUserAndRedirects()
         {
-            // Arrange
+            // Arrange: Setter opp gyldig registreringsmodell
             var model = new RegisterViewModel
             {
                 Email = "test@example.com",
@@ -154,10 +156,12 @@ namespace KartverketWebApp.Tests
                 Etternavn = "Testesen"
             };
 
+            // Konfigurerer mock-oppførsel for passordhashing
             _mockPasswordHasher
                 .Setup(x => x.HashPassword(It.IsAny<IdentityUser>(), It.IsAny<string>()))
                 .Returns("hashedPassword");
 
+            // Konfigurerer mock-oppførsel for automatisk innlogging etter registrering
             _mockAuthService
                 .Setup(x => x.SignInAsync(
                     It.IsAny<HttpContext>(),
@@ -166,60 +170,60 @@ namespace KartverketWebApp.Tests
                     It.IsAny<AuthenticationProperties>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
+            // Act: Utfører registrering
             var result = await _controller.Register(model);
 
-            // Assert
+            // Assert: Verifiserer brukeropprettelse og redirect
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirectResult.ActionName);
             Assert.Equal("Home", redirectResult.ControllerName);
 
-            // Verify database changes
+            // Verifiserer at bruker og person ble opprettet i databasen
             Assert.Single(await _context.Bruker.ToListAsync());
             Assert.Single(await _context.Person.ToListAsync());
         }
 
         [Theory]
-        [InlineData("short", false)] // For kort
-        [InlineData("onlysmall123", false)] // Mangler stor bokstav
-        [InlineData("ONLYBIG123", false)] // Mangler liten bokstav
-        [InlineData("OnlyLetters", false)] // Mangler tall
-        [InlineData("ValidPass123", true)] // Gyldig passord
+        [InlineData("short", false)]                // Tester for kort passord
+        [InlineData("onlysmall123", false)]        // Tester passord uten stor bokstav
+        [InlineData("ONLYBIG123", false)]          // Tester passord uten liten bokstav
+        [InlineData("OnlyLetters", false)]         // Tester passord uten tall
+        [InlineData("ValidPass123", true)]         // Tester gyldig passord
         public void ErPassordGyldig_ValidatesCorrectly(string password, bool expectedResult)
         {
-            // Arrange - using private method through reflection
+            // Henter private metode via reflection for testing
             var methodInfo = typeof(AccountController).GetMethod("ErPassordGyldig",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-            // Act
+            // Utfører passordvalidering
             var result = (bool)methodInfo.Invoke(_controller, new object[] { password });
 
-            // Assert
+            // Verifiserer resultat
             Assert.Equal(expectedResult, result);
         }
 
         [Theory]
-        [InlineData("test@example.com", true)]
-        [InlineData("invalid-email", false)]
-        [InlineData("", false)]
-        [InlineData("test@example", false)]
+        [InlineData("test@example.com", true)]     // Tester gyldig e-postformat
+        [InlineData("invalid-email", false)]       // Tester ugyldig e-postformat
+        [InlineData("", false)]                    // Tester tom e-post
+        [InlineData("test@example", false)]        // Tester ufullstendig e-postformat
         public void ErEpostGyldig_ValidatesCorrectly(string email, bool expectedResult)
         {
-            // Arrange - using private method through reflection
+            // Henter private metode via reflection for testing
             var methodInfo = typeof(AccountController).GetMethod("ErEpostGyldig",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-            // Act
+            // Utfører e-postvalidering
             var result = (bool)methodInfo.Invoke(_controller, new object[] { email });
 
-            // Assert
+            // Verifiserer resultat
             Assert.Equal(expectedResult, result);
         }
 
         [Fact]
         public async Task Logout_SignsOutAndRedirectsToHome()
         {
-            // Arrange
+            // Konfigurerer mock-oppførsel for utlogging
             _mockAuthService
                 .Setup(x => x.SignOutAsync(
                     It.IsAny<HttpContext>(),
@@ -227,10 +231,10 @@ namespace KartverketWebApp.Tests
                     It.IsAny<AuthenticationProperties>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
+            // Utfører utlogging
             var result = await _controller.Logout();
 
-            // Assert
+            // Verifiserer at utlogging ble utført
             _mockAuthService.Verify(
                 x => x.SignOutAsync(
                     It.IsAny<HttpContext>(),
@@ -240,6 +244,7 @@ namespace KartverketWebApp.Tests
                 Times.Once
             );
 
+            // Verifiserer redirect til hjemmeside
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirectResult.ActionName);
             Assert.Equal("Home", redirectResult.ControllerName);
@@ -247,6 +252,7 @@ namespace KartverketWebApp.Tests
 
         public void Dispose()
         {
+            // Rydder opp testmiljøet og sletter in-memory database
             _context.Database.EnsureDeleted();
             _context.Dispose();
         }

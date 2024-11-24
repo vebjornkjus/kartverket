@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KartverketWebApp.Controllers
 {
+    [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
     public class RapportStatusController : Controller
     {
         // Private fields for dependencies
