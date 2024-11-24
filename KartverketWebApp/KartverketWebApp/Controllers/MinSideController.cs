@@ -143,4 +143,33 @@ public async Task<IActionResult> SlettBruker(int id)
 
     // Hvis bruker ikke finnes, rediriger til startsiden
     return RedirectToAction("Index", "Home");
+}
+[HttpGet]
+[Route("Home/MinSideRapporter/{rapportId}")]
+public async Task<IActionResult> MinSideRapporter(int rapportId)
+
+{
+    var rapport = await _context.Rapport
+        .Include(r => r.Kart)
+            .ThenInclude(k => k.Koordinater)
+        .Include(r => r.Kart.Steddata)
+        .Include(r => r.Person)
+            .ThenInclude(p => p.Bruker)
+        .FirstOrDefaultAsync(r => r.RapportId == rapportId);
+
+    if (rapport == null)
+    {
+        return NotFound(); // Returner en "404 Not Found"-side hvis rapporten ikke finnes
+    }
+
+    var model = new DetaljertViewModel
+    {
+        Rapport = rapport,
+        Kart = rapport.Kart,
+        Person = rapport.Person,
+        Bruker = rapport.Person?.Bruker,
+        Steddata = rapport.Kart?.Steddata
+    };
+
+    return View("~/Views/Home/MinSideRapporter.cshtml", model); // Pass på at stien til view er korrekt
 }}}
