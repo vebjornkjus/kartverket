@@ -52,11 +52,48 @@ namespace KartverketWebApp.Controllers
 
             if (bruker != null)
             {
-                _context.Bruker.Remove(bruker);
+                //finn eller opprett "Slettet bruker"
+                var slettetBruker = await _context.Bruker 
+                    .Include(b => b.Personer)
+                    .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
+                if (slettetBruker == null)
+                {
+                    var slettetPerson = new Person
+                    {
+                        Fornavn = "Slettet",
+                        Etternavn = "Bruker"
+                    };
+
+                    slettetBruker = new Bruker
+                    {
+                        Email = "slettet.bruker@kartverket.no",
+                        BrukerType = "Slettet",
+                        Passord = "SlettetBruker123!", // Lagt til passord
+                        Personer = new List<Person> { slettetPerson }
+                    };
+
+                    _context.Bruker.Add(slettetBruker);
+                    await _context.SaveChangesAsync();
+                }
+                //finn rapporter knyttet til personen som skal slettes
+                if (person != null)
+                {
+                    var rapporter = await _context.Rapport
+                        .Where(r => r.PersonId == person.PersonId)
+                        .ToListAsync();
+                    //overfør rapporter til "slettet bruker"
+                    foreach (var rapport in rapporter)
+                    {
+                        rapport.PersonId = slettetBruker.Personer.First().PersonId;
+                        _context.Update(rapport);
+                    }
+                }
                 if (person != null)
                 {
                     _context.Person.Remove(person);
+                    _context.Bruker.Remove(bruker);
                 }
+                
 
                 await _context.SaveChangesAsync();
             }
