@@ -47,42 +47,6 @@ namespace KartverketWebApp.Controllers
         [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetAvklart(int rapportId)
-        {
-            try
-            {
-                const string query = @"
-            UPDATE Rapport 
-            SET RapportStatus = 'Avklart',
-                BehandletDato = @BehandletDato
-            WHERE RapportId = @RapportId";
-
-                var parameters = new
-                {
-                    RapportId = rapportId,
-                    BehandletDato = DateTime.Now
-                };
-
-                await _dbConnection.ExecuteAsync(query, parameters);
-                _logger.LogInformation($"Rapport {rapportId} er satt til Avklart");
-
-                // Redirect til RapportDetaljert i HomeController
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Feil ved setting av rapport {rapportId} til Avklart: {ex.Message}");
-                TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
-            }
-        }
-
-        /// <summary>
-        /// Setter status på en rapport til 'Fjernet' og oppdaterer behandlingsdato
-        /// </summary>
-        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetFjernet(int rapportId)
         {
             try
@@ -102,14 +66,45 @@ namespace KartverketWebApp.Controllers
                 await _dbConnection.ExecuteAsync(query, parameters);
                 _logger.LogInformation($"Rapport {rapportId} er satt til Fjernet");
 
-                // Redirect til RapportDetaljert i HomeController
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                return RedirectToAction("Saksbehandler", "Home");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Feil ved setting av rapport {rapportId} til Fjernet: {ex.Message}");
                 TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
-                return RedirectToAction("RapportDetaljert", "Home", new { id = rapportId });
+                return RedirectToAction("Saksbehandler", "Home");
+            }
+        }
+
+        [Authorize(Policy = "AdminOrSaksbehandlerPolicy")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetAvklart(int rapportId)
+        {
+            try
+            {
+                const string query = @"
+            UPDATE Rapport 
+            SET RapportStatus = 'Avklart',
+                BehandletDato = @BehandletDato
+            WHERE RapportId = @RapportId";
+
+                var parameters = new
+                {
+                    RapportId = rapportId,
+                    BehandletDato = DateTime.Now
+                };
+
+                await _dbConnection.ExecuteAsync(query, parameters);
+                _logger.LogInformation($"Rapport {rapportId} er satt til Avklart");
+
+                return RedirectToAction("Saksbehandler", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Feil ved setting av rapport {rapportId} til Avklart: {ex.Message}");
+                TempData["Error"] = "Det oppstod en feil ved oppdatering av rapporten.";
+                return RedirectToAction("Saksbehandler", "Home");
             }
         }
         /// <summary>

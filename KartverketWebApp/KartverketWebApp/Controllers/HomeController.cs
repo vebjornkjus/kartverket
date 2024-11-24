@@ -577,54 +577,60 @@ namespace KartverketWebApp.Controllers
             }
         }
 
- [HttpGet]
-[Authorize] // Sørger for at kun innloggede brukere kan få tilgang
-public async Task<IActionResult> MinSide()
-{
-    // Hent e-post fra den innloggede brukeren
-    var email = User.Identity?.Name;
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> MinSide()
+        {
+            // Hent e-post fra den innloggede brukeren
+            var email = User.Identity?.Name;
 
-    if (string.IsNullOrEmpty(email))
-    {
-        _logger.LogWarning("Ingen bruker er logget inn.");
-        return RedirectToAction("Login", "Account");
-    }
+            if (string.IsNullOrEmpty(email))
+            {
+                _logger.LogWarning("Ingen bruker er logget inn.");
+                return RedirectToAction("Login", "Account");
+            }
 
-    // Hent bruker fra databasen basert på e-post
-    var bruker = await _context.Bruker
-        .Include(b => b.Personer) // Henter relaterte personer
-        .FirstOrDefaultAsync(b => b.Email == email);
+            // Hent bruker fra databasen basert på e-post
+            var bruker = await _context.Bruker
+                .Include(b => b.Personer)
+                .FirstOrDefaultAsync(b => b.Email == email);
 
-    if (bruker == null)
-    {
-        _logger.LogWarning($"Bruker med e-post {email} ble ikke funnet.");
-        return RedirectToAction("Login", "Account");
-    }
+            if (bruker == null)
+            {
+                _logger.LogWarning($"Bruker med e-post {email} ble ikke funnet.");
+                return RedirectToAction("Login", "Account");
+            }
 
-    // Hent den første tilknyttede personen
-    var person = bruker.Personer.FirstOrDefault();
-    if (person == null)
-    {
-        _logger.LogWarning($"Ingen personer er tilknyttet brukeren med e-post {email}.");
-        return RedirectToAction("Login", "Account");
-    }
+            // Hent den første tilknyttede personen
+            var person = bruker.Personer.FirstOrDefault();
+            if (person == null)
+            {
+                _logger.LogWarning($"Ingen personer er tilknyttet brukeren med e-post {email}.");
+                return RedirectToAction("Login", "Account");
+            }
 
-    // Hent rapporter knyttet til personen
-    var rapporter = await _context.Rapport
-        .Include(r => r.Kart) // Henter relasjoner til Kart
-        .Where(r => r.PersonId == person.PersonId) // Filtrer rapportene for denne personen
-        .ToListAsync();
+            // Hent rapporter knyttet til personen
+            var rapporter = await _context.Rapport
+                .Include(r => r.Kart)
+                .Where(r => r.PersonId == person.PersonId)
+                .ToListAsync();
 
-    // Opprett ViewModel for å sende data til view
-    var viewModel = new MinSideViewModel
-    {
-        Bruker = bruker,
-        Person = person,
-        Rapporter = rapporter
-    };
+            // Opprett ViewModel for å sende data til view
+            var viewModel = new MinSideViewModel
+            {
+                Bruker = bruker,
+                Person = person,
+                Rapporter = rapporter
+            };
 
-    return View(viewModel);
-}
+            // Legg til brukerinformasjon i ViewBag
+            ViewBag.UserName = person.Fornavn;
+            ViewBag.UserLastName = person.Etternavn;
+            ViewBag.UserEmail = email;
+
+            return View(viewModel);
+        }
+    
 
 
         [HttpGet]
