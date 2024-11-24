@@ -21,15 +21,20 @@
 <body>
     <header>
         <div class="nav-stedholder">
-            @if (User.Identity.IsAuthenticated && 
-                 (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler"))))
+            @if (User.Identity.IsAuthenticated &&
+            (User.Claims.Any(c => c.Type == "BrukerType" && (c.Value == "admin" || c.Value == "saksbehandler"))))
             {
-                <!-- For admin og saksbehandler - logo uten link og kun logg ut -->
+                <!-- For admin og saksbehandler - logo uten link -->
                 <div class="navbar-brand">
                     <img src="~/images/standard_kartverket.png" asp-append-version="true" alt="Image" class="kartverket_logo">
                 </div>
-
                 <div id="saksbehandler">
+                    @if (User.Claims.Any(c => c.Type == "BrukerType" && c.Value == "saksbehandler"))
+                    {
+                        <a asp-controller="Home" asp-action="Saksbehandler">
+                            <button class="btn btn-secondary">Til Oversikt</button>
+                        </a>
+                    }
                     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                         <button type="submit" class="btn btn-primary">Logg ut</button>
                     </form>
