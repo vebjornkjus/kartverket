@@ -44,7 +44,7 @@
                         <td>@rapport.RapportStatus</td>
                         <td>@rapport.Opprettet.ToString("dd.MM.yyyy")</td>
                         <td>
-                            <a asp-controller="Home" asp-action="RapportDetaljert" asp-route-id="@rapport.RapportId">
+                            <a asp-controller="Home" asp-action="MinSideRapporter" asp-route-id="@rapport.RapportId">
                                 @rapport.Kart?.Tittel
                             </a>
                         </td>

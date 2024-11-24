@@ -1,0 +1,166 @@
+@model KartverketWebApp.Models.DetaljertViewModel
+<link rel="stylesheet" href="~/css/RapportDetaljert.css" />
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="~/js/rapportDetaljert.js"></script>
+    <script>
+        // Initialize data
+        window.appData = {
+            rapportId: @Model.Rapport.RapportId,
+            mapData: @Html.Raw(Json.Serialize(new
+            {
+                MapType = Model.Kart?.MapType,
+                Coordinates = Model.Kart?.Koordinater?.Select(k => new { nord = k.Nord, ost = k.Ost }).ToList()
+            }))
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.rapportDetaljert = new RapportDetaljert(window.appData);
+        });
+    </script>
+}
+
+<div class="center-container">
+    <div class="detaljert-main">
+        <div class="main_rapport">
+            <!-- Kart Details Section -->
+            <div class="info">
+                <h2>Kart Detaljer</h2>
+                <div class="custom-table-wrapper info-table-scrollable">
+                    <table class="custom-table">
+                        <tbody>
+                            <tr>
+                                <th>Kart Tittel</th>
+                                <td>@Model.Kart?.Tittel</td>
+                            </tr>
+                            <tr>
+                                <th>Beskrivelse</th>
+                                <td>@Model.Kart?.Beskrivelse</td>
+                            </tr>
+                            <tr>
+                                <th>Kart Type</th>
+                                <td>@Model.Kart?.MapType</td>
+                            </tr>
+                            <tr>
+                                <th>Rapport Type</th>
+                                <td>@Model.Kart?.RapportType</td>
+                            </tr>
+                            <tr>
+                                <th>Rapport Status</th>
+                                <td>@Model.Rapport?.RapportStatus</td>
+                            </tr>
+                            <tr>
+                                <th>Opprettet</th>
+                                <td>@Model.Rapport?.Opprettet.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="rapport_map">
+                <div id="map_detaljert" style="height: 100%; width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Info-Bottom Elements -->
+        <div class="info-bottom-container">
+            <!-- Person Information -->
+            <div class="info-bottom">
+                <h2>Person Informasjon</h2>
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
+                        <tbody>
+                            <tr>
+                                <th>Navn</th>
+                                <td>@Model.Person?.Fornavn @Model.Person?.Etternavn</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>@Model.Bruker?.Email</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Steddata Information -->
+            <div class="info-bottom">
+                <h2>Steddata Informasjon</h2>
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
+                        <tbody>
+                            <tr>
+                                <th>Kommune</th>
+                                <td>@Model.Steddata?.Kommunenavn</td>
+                            </tr>
+                            <tr>
+                                <th>Kommunenummer</th>
+                                <td>@Model.Steddata?.Kommunenummer</td>
+                            </tr>
+                            <tr>
+                                <th>Fylke</th>
+                                <td>@Model.Steddata?.Fylkenavn</td>
+                            </tr>
+                            <tr>
+                                <th>Fylkesnummer</th>
+                                <td>@Model.Steddata?.Fylkenummer</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Koordinater Information -->
+            <div class="info-bottom">
+                <h2>Koordinater</h2>
+                @if (Model.Kart?.Koordinater != null && Model.Kart.Koordinater.Any())
+                {
+                    <div class="custom-table-wrapper koordinater-scrollable">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nord</th>
+                                    <th>Øst</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var koordinat in Model.Kart.Koordinater)
+                                {
+                                    <tr>
+                                        <td>@koordinat.Rekkefolge</td>
+                                        <td>@koordinat.Nord</td>
+                                        <td>@koordinat.Ost</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p>Ingen koordinater tilgjengelig for denne rapporten.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Bottom Extra Container -->
+        <div class="bottom-extra-container">
+            @if (!string.IsNullOrEmpty(Model.Kart?.FilePath))
+            {
+                <!-- Boks for Vedlagt Bilde -->
+                <div class="submission-box">
+                    <h2>Vedlagt Bilde</h2>
+                    <div class="submission-content">
+                        <img src="~/@Model.Kart.FilePath" alt="Vedlagt bilde" class="responsive-image" />
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
