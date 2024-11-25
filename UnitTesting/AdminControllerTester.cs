@@ -104,7 +104,7 @@ namespace KartverketWebApp.Tests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.NotNull(viewResult);
-            var model = Assert.IsAssignableFrom<IEnumerable<BrukerOversiktViewModel>>(viewResult.Model);
+            var model = Assert.IsAssignableFrom<IEnumerable<AdminViewModel>>(viewResult.Model);
             Assert.Equal(testBrukere.Count, model.Count());
 
             // Verify model content
@@ -274,7 +274,7 @@ namespace KartverketWebApp.Tests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.NotNull(viewResult);
-            var model = Assert.IsAssignableFrom<BrukerOversiktViewModel>(viewResult.Model);
+            var model = Assert.IsAssignableFrom<AdminViewModel>(viewResult.Model);
 
             Assert.Equal(bruker.BrukerId, model.BrukerId);
             Assert.Equal(bruker.Email, model.Email);
@@ -305,7 +305,7 @@ namespace KartverketWebApp.Tests
             await _context.Person.AddAsync(originalPerson);
             await _context.SaveChangesAsync();
 
-            var updatedModel = new BrukerOversiktViewModel
+            var updatedModel = new AdminViewModel
             {
                 BrukerId = 1,
                 Email = "updated@example.com",
