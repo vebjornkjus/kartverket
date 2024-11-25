@@ -51,12 +51,15 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 </a>
 
 Kristoffer har og bidrat men kommer ikke opp:(
+---
+
+## **Visualisrert Database** 📑
+![Bilde fra Google Drive](https://drive.google.com/uc?export=view&id=138KNbuhLaRDdX2dy3fIppUxjwNX8oaid)
 
 ## **Komponenter** 🏗️
 
 - **Arkitektur**: MVC (Model-View-Controller)
 - **Database**: MariaDB
-- **Visualisert database**: https://drive.google.com/file/d/138KNbuhLaRDdX2dy3fIppUxjwNX8oaid/view?usp=sharing 
 - **Hovedklasser**:
   - `Rapport` 📝
   - `Steddata` 📍
