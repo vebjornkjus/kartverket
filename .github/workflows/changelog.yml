@@ -1,4 +1,4 @@
-name: Update Changelog
+name: Generate Changelog
 
 on:
   push:
@@ -6,34 +6,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-readme:
+  changelog:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Get latest commits
-        id: commits
-        run: |
-          COMMITS=$(git log -5 --pretty=format:'"- %s (%an) [%ad]"' --date=short)
-          echo "commits<<EOF" >> $GITHUB_ENV
-          echo "$COMMITS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
 
-      - name: Update README
-        run: |
-          # Les hele README filen
-          content=$(cat README.md)
-          
-          # Finn seksjonen mellom ### Siste Endringer og neste ###
-          new_changes="### Siste Endringer\n\n${{ env.commits }}\n\n###"
-          
-          # Erstatt den eksisterende seksjonen med nye endringer
-          echo "$content" | sed "/### Siste Endringer/,/###/c\\$new_changes" > README.md
-          
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Oppdatert siste endringer i README"
-          git push
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Generate Changelog
+      id: changelog
+      uses: mikepenz/release-changelog-builder-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        configuration: |
+          {
+            "categories": [
+              {
+                "title": "## 🚀 Nye Funksjoner",
+                "labels": ["feature", "enhancement"]
+              },
+              {
+                "title": "## 🐛 Feilrettinger",
+                "labels": ["fix", "bug"]
+              },
+              {
+                "title": "## 📝 Dokumentasjon",
+                "labels": ["documentation"]
+              },
+              {
+                "title": "## 🔨 Vedlikehold",
+                "labels": ["maintenance"]
+              }
+            ]
+          }
+        
+    - name: Update CHANGELOG.md
+      run: |
+        echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
+        
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md
+        git commit -m "📝 Oppdatert CHANGELOG.md" || exit 0
+        git push
