@@ -4,6 +4,12 @@
 [![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
+![Build Status](https://github.com/vebjornkjus/kartverket/workflows/.NET%20Build%20&%20Test/badge.svg)
+
+## Contributors
+<a href="https://github.com/{ditt-brukernavn}/{repo-navn}/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo={ditt-brukernavn}/{repo-navn}" />
+</a>
 
 En applikasjon for administrasjon og visning av geografiske data, samt rapporthåndtering.
 
