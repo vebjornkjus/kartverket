@@ -106,6 +106,7 @@ namespace KartverketWebApp.UnitTests
             Assert.NotEmpty(model.Rapporter); // Sikre at listen inneholder data
             Assert.Single(model.Rapporter); // Sikre at det kun finnes én rapport
 
+
             // Ekstra validering
             Assert.Equal("Test", model.Fornavn);
             Assert.Equal("Bruker", model.Etternavn);
