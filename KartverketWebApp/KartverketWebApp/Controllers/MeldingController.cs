@@ -52,11 +52,13 @@ namespace KartverketWebApp.Controllers
         {
             var email = User.Identity?.Name;
 
+            // Sjekker om bruker er innlogget
             if (string.IsNullOrEmpty(email))
             {
                 return RedirectToAction("Login", "Account");
             }
 
+            // Henter brukerinformasjon fra databasen
             var bruker = await _context.Bruker
                 .Include(b => b.Personer)
                 .FirstOrDefaultAsync(b => b.Email == email);
@@ -72,12 +74,14 @@ namespace KartverketWebApp.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            // Setter brukerinformasjon i ViewBag for visning i view
             ViewBag.UserName = person.Fornavn;
             ViewBag.UserLastName = person.Etternavn;
             ViewBag.UserEmail = email;
 
             var currentPersonId = person.PersonId;
 
+            // Henter alle relevante meldinger for aktive rapporter
             var messages = await _context.Meldinger
                 .Where(m => (m.SenderPersonId == currentPersonId || m.MottakerPersonId == currentPersonId) &&
                        _context.Rapport.Any(r => r.RapportId == m.RapportId &&
@@ -88,47 +92,50 @@ namespace KartverketWebApp.Controllers
                 .OrderByDescending(m => m.Tidsstempel)
                 .ToListAsync();
 
+            // Grupperer meldinger etter rapportID og forbereder visningsdata
             var conversations = messages
                 .GroupBy(m => m.RapportId)
-                .Select(g =>
+                .Select(g => new
                 {
-                    var lastMessage = g.OrderByDescending(m => m.Tidsstempel).First(); // Henter nyeste melding i samtalen
-
-                    return new
-                    {
-                        RapportId = g.Key,
-                        Tittel = lastMessage.Rapport?.Kart?.Tittel ?? "Ukjent tittel",
-                        LastMessage = lastMessage,
-                        // Hvis siste melding er fra innlogget bruker, vis "Deg", ellers vis avsenderens navn
-                        LastSenderName = lastMessage.SenderPersonId == currentPersonId
-                            ? "Deg"
-                            : $"{lastMessage.Sender.Fornavn} {lastMessage.Sender.Etternavn}",
-                        Status = lastMessage.Status,
-                        RecipientId = lastMessage.MottakerPersonId,
-                        Tidsstempel = lastMessage.Tidsstempel
-                    };
+                    RapportId = g.Key,
+                    Tittel = g.FirstOrDefault()?.Rapport?.Kart?.Tittel ?? "Ukjent tittel",
+                    LastMessage = g.OrderByDescending(m => m.Tidsstempel).First(),
+                    SenderName = g.OrderByDescending(m => m.Tidsstempel).First().SenderPersonId == currentPersonId
+                        ? "Deg"
+                        : g.OrderByDescending(m => m.Tidsstempel).First().Sender.Fornavn + " " +
+                          g.OrderByDescending(m => m.Tidsstempel).First().Sender.Etternavn,
+                    LastSenderName = g.OrderByDescending(m => m.Tidsstempel).First().SenderPersonId == currentPersonId
+                        ? "Deg"
+                        : g.OrderByDescending(m => m.Tidsstempel).First().Sender.Fornavn + " " +
+                          g.OrderByDescending(m => m.Tidsstempel).First().Sender.Etternavn,
+                    Status = g.OrderByDescending(m => m.Tidsstempel).First().Status,
+                    RecipientId = g.OrderByDescending(m => m.Tidsstempel).First().MottakerPersonId
                 })
-                .OrderByDescending(c => c.Tidsstempel)
+                .OrderByDescending(c => c.LastMessage.Tidsstempel)
                 .ToList();
 
+            // Oppretter viewmodel med samtaledata
             var combinedViewModel = new CombinedViewModel
             {
                 SammtaleModel = conversations.Select(c => new SammtaleModel
                 {
                     RapportId = c.RapportId,
                     Tittel = c.Tittel,
-                    LastMessage = c.LastMessage.Innhold,
-                    LastSenderName = c.LastSenderName,  // Dette vil nå være riktig basert på siste melding
+                    LastMessage = c.LastMessage.Innhold ?? "Ingen melding",
+                    SenderName = c.SenderName,
+                    LastSenderName = c.LastSenderName,
                     Status = c.Status,
                     RecipientId = c.RecipientId,
-                    Tidsstempel = c.Tidsstempel
+                    Tidsstempel = c.LastMessage.Tidsstempel  // Legg til denne linjen
                 }).ToList()
             };
 
+            // Returnerer forskjellig view basert på brukertype
             return bruker.BrukerType == "saksbehandler"
                 ? View("~/Views/Home/Saksbehandler/Meldinger.cshtml", combinedViewModel)
                 : View("~/Views/Home/MeldingerMinSide.cshtml", combinedViewModel);
         }
+
         /// <summary>
         /// Henter alle meldinger i en spesifikk samtale/rapport
         /// </summary>
@@ -139,12 +146,14 @@ namespace KartverketWebApp.Controllers
         {
             try
             {
+                // Henter brukerens email fra innlogging
                 var userEmail = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     return BadRequest("User not authenticated properly.");
                 }
 
+                // Henter brukerens PersonId
                 var bruker = await _context.Bruker
                     .Include(b => b.Personer)
                     .FirstOrDefaultAsync(b => b.Email == userEmail);
@@ -155,8 +164,8 @@ namespace KartverketWebApp.Controllers
                 }
 
                 var personId = bruker.Personer.First().PersonId;
-                var norwegianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
 
+                // Henter alle meldinger i samtalen og formaterer for visning
                 var messages = await _context.Meldinger
                     .Where(m => m.RapportId == rapportId)
                     .Include(m => m.Sender)
@@ -166,10 +175,7 @@ namespace KartverketWebApp.Controllers
                     {
                         SenderName = m.Sender.Fornavn + " " + m.Sender.Etternavn,
                         Innhold = m.Innhold,
-                        Tidsstempel = TimeZoneInfo.ConvertTimeFromUtc(
-                            m.Tidsstempel.ToUniversalTime(),
-                            norwegianTimeZone
-                        ).ToString("dd.MM.yyyy HH:mm"),
+                        Tidsstempel = m.Tidsstempel.ToString("dd.MM.yyyy HH:mm"),
                         IsSender = m.SenderPersonId == personId
                     })
                     .ToListAsync();
@@ -235,9 +241,6 @@ namespace KartverketWebApp.Controllers
                     return Json(new { success = false, message = "Invalid report or recipient." });
                 }
 
-                var norwegianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
-                var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, norwegianTimeZone);
-
                 // Oppretter og lagrer ny melding
                 var nyMelding = new Meldinger
                 {
@@ -245,7 +248,7 @@ namespace KartverketWebApp.Controllers
                     SenderPersonId = senderPersonId,
                     MottakerPersonId = mottakerPersonId,
                     Innhold = innhold,
-                    Tidsstempel = currentTime,
+                    Tidsstempel = DateTime.Now,
                     Status = "sendt"
                 };
 
