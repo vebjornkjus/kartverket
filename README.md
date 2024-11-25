@@ -6,8 +6,6 @@
 [![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
 ![Build Status](https://github.com/vebjornkjus/kartverket/workflows/.NET%20Build%20&%20Test/badge.svg)
 
-En applikasjon for administrasjon og visning av geografiske data, samt rapporthåndtering.
-
 ---
 
 ## **Innhold** 📑
