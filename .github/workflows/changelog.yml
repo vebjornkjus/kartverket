@@ -1,0 +1,55 @@
+name: Generate Changelog
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Lar deg kjøre workflowen manuelt
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Henter hele git historien
+
+    - name: Generate Changelog
+      id: changelog
+      uses: mikepenz/release-changelog-builder-action@v3
+      with:
+        configuration: |
+          {
+            "categories": [
+              {
+                "title": "## 🚀 Nye Funksjoner",
+                "labels": ["feature", "enhancement"]
+              },
+              {
+                "title": "## 🐛 Feilrettinger",
+                "labels": ["fix", "bug"]
+              },
+              {
+                "title": "## 📝 Dokumentasjon",
+                "labels": ["documentation"]
+              },
+              {
+                "title": "## 🔨 Vedlikehold",
+                "labels": ["maintenance"]
+              }
+            ],
+            "template": "${{CHANGELOG}}\n\n## 📦 Alle endringer\n\n${{UNCATEGORIZED}}",
+            "pr_template": "- ${{TITLE}} (@${{AUTHOR}})"
+          }
+        
+    - name: Update CHANGELOG.md
+      run: |
+        echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
+        
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md
+        git commit -m "📝 Oppdatert CHANGELOG.md" || exit 0
+        git push
