@@ -89,6 +89,13 @@ namespace KartverketWebApp.Controllers
                         _context.Update(rapport);
                     }
                 }
+
+                var ansatt = await _context.Ansatt.Where(a => a.PersonId == person.PersonId).ToListAsync();
+                if (ansatt.Any())
+                {
+                    _context.Ansatt.RemoveRange(ansatt);
+                }
+
                 if (person != null)
                 {
                     _context.Person.Remove(person);
