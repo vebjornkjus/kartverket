@@ -56,6 +56,88 @@ Kristoffer har og bidrat men kommer ikke opp:(
 ## **Visualisrert Database** 📑
 ![Bilde fra Google Drive](https://drive.google.com/uc?export=view&id=138KNbuhLaRDdX2dy3fIppUxjwNX8oaid)
 
+
+## **Filstruktur** 🌲
+.Kartverket
+├── API_Models
+│   ├── ApiSettings.cs
+│   ├── SokeResponse.cs
+│   └── StednavnResponse.cs
+├── Controllers
+│   ├── AccountController.cs
+│   ├── AdminController.cs
+│   ├── DetaljertController.cs
+│   ├── HomeController.cs
+│   ├── MeldingController.cs
+│   ├── MinSideController.cs
+│   └── SaksbehandlerController.cs
+├── Data
+│   ├── Ansatt.cs
+│   ├── ApplicationDbContext.cs
+│   ├── Bruker.cs
+│   ├── Kart.cs
+│   ├── Koordinater.cs
+│   ├── Meldinger.cs
+│   ├── Person.cs
+│   ├── Rapport.cs
+│   └── Steddata.cs
+├── Models
+│   ├── AdminViewModel.cs
+│   ├── CombinedViewModel.cs
+│   ├── DetaljertViewModel.cs
+│   ├── ErrorViewModel.cs
+│   ├── KoordinatModel.cs
+│   ├── LoginViewModel.cs
+│   ├── MinSideViewModel.cs
+│   ├── PositionModel.cs
+│   ├── RegisterViewModel.cs
+│   ├── SammtaleModel.cs
+│   ├── SokeModel.cs
+│   ├── StednavnViewModel.cs
+│   ├── TidligereRapporterModel.cs
+│   └── TildelRapportModel.cs
+├── Program.cs
+├── Properties
+├── Services
+│   ├── ISokeService.cs
+│   ├── IStednavn.cs
+│   ├── SokeService.cs
+│   └── StednavnService.cs
+├── Views
+│   ├── Account
+│   │   ├── Login.cshtml
+│   │   └── Register.cshtml
+│   ├── Home
+│   │   ├── Admin
+│   │   │   ├── BrukerOversikt.cshtml
+│   │   │   └── RedigerBruker.cshtml
+│   │   ├── CorrectionsOverview.cshtml
+│   │   ├── Index.cshtml
+│   │   ├── Innsender
+│   │   │   └── TakkRapport.cshtml
+│   │   ├── MeldingerMinSide.cshtml
+│   │   ├── MinSide.cshtml
+│   │   ├── MinSideRapporter.cshtml
+│   │   ├── Privacy.cshtml
+│   │   ├── Saksbehandler
+│   │   │   ├── Meldinger.cshtml
+│   │   │   ├── MineRapporter.cshtml
+│   │   │   ├── RapportDetaljert.cshtml
+│   │   │   ├── Saksbehandler.cshtml
+│   │   │   └── TidligereRapporter.cshtml
+│   │   └── Soke.cshtml
+│   ├── Shared
+│   │   ├── Error.cshtml
+│   │   ├── _Layout.cshtml
+│   │   ├── _Map.cshtml
+│   │   ├── _Oversikt.cshtml
+│   │   ├── _TidligereRapporter.cshtml
+│   │   └── _ValidationScriptsPartial.cshtml
+│   ├── _ViewImports.cshtml
+│   └── _ViewStart.cshtml
+├── appsettings.Development.json
+└── appsettings.json
+
 ## **Komponenter** 🏗️
 
 - **Arkitektur**: MVC (Model-View-Controller)
