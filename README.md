@@ -158,16 +158,8 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-## 🔄 Prosjekt Aktivitet
+### Siste Endringer
 
-[![Commit Activity](https://img.shields.io/github/commit-activity/m/vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/commits/main)
-[![Last Commit](https://img.shields.io/github/last-commit/vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/commits/main)
-[![Contributors](https://img.shields.io/github/contributors/vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/pulls)
+[Endringer vil vises automatisk her]
 
-### 👥 Topp Bidragsytere
-[![Contributors](https://contrib.rocks/image?repo=vebjornkjus/kartverket)](https://github.com/vebjornkjus/kartverket/graphs/contributors)
-
-### 📊 Aktivitetsgraf
-![Activity Graph](https://activity-graph.herokuapp.com/graph?username=vebjornkjus&repo=kartverket)
+###
