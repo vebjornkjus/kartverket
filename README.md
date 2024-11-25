@@ -41,9 +41,8 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
    ```
 4. Åpne i nettleseren:
    ```
-   http://localhost:5000
+   http://[localhost:5000](https://localhost:53607/)
    ```
-
 ---
 
 ## Contributors
@@ -72,8 +71,8 @@ Kristoffer har og bidrat men kommer ikke opp:(
 
 ## **Funksjonaliteter** 💡
 
-### **Standard Bruker** 👤
-- **Tegne på kart og sende inn rapporter**  
+ **Standard Bruker** 👤
+- Tegne på kart og sende inn rapporter  
   **Verktøy:**  
   - Polylinje-verktøy: For å tegne linjer på kartet.  
   - Dirkete sporing: Legger til punkter basert på hvor brukeren befinner seg.
@@ -82,33 +81,23 @@ Kristoffer har og bidrat men kommer ikke opp:(
   - Steddata (kommune, fylke) hnetes automatisk fra Kartverkets API.'
 - **Meldingsfunksjon:**
   - Innmelder kan opprettholde kontakten med saksbehandler via meldings funksjon.   
-
----
-
-### **Saksbehandler** 👔
+ **Saksbehandler** 👔
 - **Oversikt over rapporter:**  
   - Se alle innsendte rapporter.
   - Rapporter blir automatisk tildelt bassert på kommunenummmer.  
   - Filtrere og sortere rapporter basert på status, dato eller sted.(Kommer)  
 - **Håndtering av rapporter:**  
-  - Tildele rapporter til andre ansatte. (Kommer) 
+  - Tildele rapporter til andre ansatte. 
   - Endre status for rapporter (f.eks., "Under behandling", "Avsluttet").  
   - Behandle rapportdata direkte fra dashboardet.
 - **Meldingsfunksjon:**
   - Saksbehandler kan opprettholde kontakten med Innmelder via meldings funksjon. 
-
----
-
-### **Administrator** 👑
+  -**Administrator** 👑
 - **Brukeradministrasjon:**  
-  - Legge til, redigere, eller fjerne brukere (standardbrukere, Sakshendlere og Spesialbruker). Kommer
-  - Administrere roller og rettigheter for brukere.(kommer)
+  - Legge til, redigere, eller fjerne brukere (standardbrukere, Sakshendlere og Admin).
+  - Administrere roller og rettigheter for brukere.
 
 ---
-
-### **Spesialbruker** ⚡
-- **Proriterte rapporter:**  
-  - Utrykkningspersonell eller lignende får rapporter prioritert(kommer)
 
 ---
 ## **Test scenario** 🧪
@@ -156,9 +145,14 @@ Kristoffer har og bidrat men kommer ikke opp:(
     2. Velge side (Oversikt, varslinger, rapporter, meldinger, tidligere rapporter)
     3. Hvis du velger rapporter: Grønne rader er uåpnet.
     4. Trykk på en rad for å se detaljert rapport.
-    5. Velg handling for rapporten.(Kommer)
+    5. Velg handling for rapporten.
+    6. Evt. Opprette melding.
 
+- **Admin**
+   1. Kan redigere brukere
+   2. Slette brukere
 ---
+
 
 ## 🔄 Prosjekt Aktivitet
 
