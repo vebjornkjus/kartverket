@@ -5,6 +5,7 @@ using KartverketWebApp.Data;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KartverketWebApp.Controllers
 {
@@ -25,7 +26,7 @@ namespace KartverketWebApp.Controllers
                 .Join(_context.Person,
                     b => b.BrukerId,
                     p => p.BrukerId,
-                    (b, p) => new BrukerOversiktViewModel
+                    (b, p) => new AdminViewModel
                     {
                         BrukerId = b.BrukerId,
                         Email = b.Email,
@@ -53,7 +54,7 @@ namespace KartverketWebApp.Controllers
             if (bruker != null)
             {
                 //finn eller opprett "Slettet bruker"
-                var slettetBruker = await _context.Bruker 
+                var slettetBruker = await _context.Bruker
                     .Include(b => b.Personer)
                     .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
                 if (slettetBruker == null)
@@ -93,7 +94,7 @@ namespace KartverketWebApp.Controllers
                     _context.Person.Remove(person);
                     _context.Bruker.Remove(bruker);
                 }
-                
+
 
                 await _context.SaveChangesAsync();
             }
@@ -108,7 +109,7 @@ namespace KartverketWebApp.Controllers
                 .Join(_context.Person,
                       b => b.BrukerId,
                       p => p.BrukerId,
-                      (b, p) => new BrukerOversiktViewModel
+                      (b, p) => new AdminViewModel
                       {
                           BrukerId = b.BrukerId,
                           Email = b.Email,
@@ -127,17 +128,51 @@ namespace KartverketWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RedigerBruker(BrukerOversiktViewModel model)
+        public async Task<IActionResult> RedigerBruker(AdminViewModel model)
         {
             var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == model.BrukerId);
             var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == model.BrukerId);
 
             if (bruker != null && person != null)
             {
+                // Oppdater brukerdata
                 bruker.Email = model.Email;
                 bruker.BrukerType = model.BrukerType;
                 person.Fornavn = model.Fornavn;
                 person.Etternavn = model.Etternavn;
+
+                // Hvis brukertype er "saksbehandler"
+                if (model.BrukerType == "saksbehandler" && model.Kommunenummer.HasValue)
+                {
+                    var eksisterendeAnsatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.PersonId == person.PersonId);
+
+                    if (eksisterendeAnsatt == null)
+                    {
+                        // Opprett ny ansattoppføring
+                        var ansatt = new Ansatt
+                        {
+                            PersonId = person.PersonId,
+                            Kommunenummer = model.Kommunenummer.Value,
+                            AnsettelsesDato = DateTime.Now
+                        };
+                        _context.Ansatt.Add(ansatt);
+                    }
+                    else
+                    {
+                        // Oppdater eksisterende ansattoppføring
+                        eksisterendeAnsatt.Kommunenummer = model.Kommunenummer.Value;
+                        _context.Ansatt.Update(eksisterendeAnsatt);
+                    }
+                }
+                else
+                {
+                    // Fjern eventuell ansattoppføring hvis brukertype ikke er "saksbehandler"
+                    var ansatt = await _context.Ansatt.FirstOrDefaultAsync(a => a.PersonId == person.PersonId);
+                    if (ansatt != null)
+                    {
+                        _context.Ansatt.Remove(ansatt);
+                    }
+                }
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction("BrukerOversikt");

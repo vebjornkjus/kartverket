@@ -81,6 +81,71 @@ form {
         overflow: hidden;
     }
 
+/* Fjern opp/ned pilene fra nummer input */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Stiler for redigeringsformen */
+.form-group {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #444;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+/* Knapper i redigeringsformen */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+/* Container for knappene */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 /* Mobilvennlighet */
 @media (max-width: 768px) {
     .table {
@@ -95,5 +160,9 @@ form {
 
     .btn-secondary {
         width: 100%;
+    }
+
+    .form-group {
+        padding: 0 15px;
     }
 }
