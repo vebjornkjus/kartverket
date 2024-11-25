@@ -115,7 +115,12 @@ namespace KartverketWebApp.Controllers
                           Email = b.Email,
                           BrukerType = b.BrukerType,
                           Fornavn = p.Fornavn,
-                          Etternavn = p.Etternavn
+                          Etternavn = p.Etternavn,
+
+                          Kommunenummer = _context.Ansatt
+                      .Where(a => a.PersonId == p.PersonId)
+                      .Select(a => a.Kommunenummer)
+                      .FirstOrDefault()
                       })
                 .FirstOrDefaultAsync(b => b.BrukerId == id);
 
