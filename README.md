@@ -51,6 +51,8 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
   <img src="https://contrib.rocks/image?repo=vebjornkjus/kartverket" />
 </a>
 
+Kristoffer har og bidrat men kommer ikke opp:(
+
 ## **Komponenter** 🏗️
 
 - **Arkitektur**: MVC (Model-View-Controller)
