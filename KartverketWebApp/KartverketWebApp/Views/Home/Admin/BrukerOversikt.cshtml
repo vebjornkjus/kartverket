@@ -3,6 +3,13 @@
     ViewData["Title"] = "Bruker Oversikt";
 }
 
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @ViewData["Error"]
+    </div>
+}
+
 <!DOCTYPE html>
 <html lang="no">
 <head>

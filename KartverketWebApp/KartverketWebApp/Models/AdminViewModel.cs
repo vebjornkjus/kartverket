@@ -8,6 +8,7 @@
         public string Fornavn { get; set; }
         public string Etternavn { get; set; }
         public int? Kommunenummer { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
 }

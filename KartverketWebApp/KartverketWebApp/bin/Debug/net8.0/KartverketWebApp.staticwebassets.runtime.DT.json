@@ -180,6 +180,14 @@
       },
       "js": {
         "Children": {
+          "Admin.js": {
+            "Children": null,
+            "Asset": {
+              "ContentRootIndex": 0,
+              "SubPath": "js/Admin.js"
+            },
+            "Patterns": null
+          },
           "Meldinger.js": {
             "Children": null,
             "Asset": {

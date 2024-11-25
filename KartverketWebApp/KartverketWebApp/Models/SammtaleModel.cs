@@ -12,6 +12,7 @@ namespace KartverketWebApp.Models
             public string SenderName { get; set; }
             public string Status { get; set; }
             public int RecipientId { get; set; }
+            public DateTime Tidsstempel { get; set; }  // Legg til denne
 
     }
 

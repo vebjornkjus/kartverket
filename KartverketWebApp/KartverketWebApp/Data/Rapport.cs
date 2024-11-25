@@ -10,7 +10,7 @@ namespace KartverketWebApp.Data
         public string RapportStatus { get; set; }
         public DateTime Opprettet { get; set; }
 
-        public int TildelAnsattId { get; set; } 
+        public int? TildelAnsattId { get; set; } 
         public int PersonId { get; set; }
         public int KartEndringId { get; set; } 
 

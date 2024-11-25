@@ -48,58 +48,110 @@ namespace KartverketWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SlettBruker(int id)
         {
-            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == id);
-            var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == id);
-
-            if (bruker != null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                //finn eller opprett "Slettet bruker"
-                var slettetBruker = await _context.Bruker
+                var bruker = await _context.Bruker
                     .Include(b => b.Personer)
-                    .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
-                if (slettetBruker == null)
-                {
-                    var slettetPerson = new Person
-                    {
-                        Fornavn = "Slettet",
-                        Etternavn = "Bruker"
-                    };
+                    .FirstOrDefaultAsync(b => b.BrukerId == id);
 
-                    slettetBruker = new Bruker
-                    {
-                        Email = "slettet.bruker@kartverket.no",
-                        BrukerType = "Slettet",
-                        Passord = "SlettetBruker123!", // Lagt til passord
-                        Personer = new List<Person> { slettetPerson }
-                    };
-
-                    _context.Bruker.Add(slettetBruker);
-                    await _context.SaveChangesAsync();
-                }
-                //finn rapporter knyttet til personen som skal slettes
-                if (person != null)
+                if (bruker != null)
                 {
-                    var rapporter = await _context.Rapport
-                        .Where(r => r.PersonId == person.PersonId)
-                        .ToListAsync();
-                    //overfør rapporter til "slettet bruker"
-                    foreach (var rapport in rapporter)
+                    // Get the deleted user or create if not exists
+                    var slettetBruker = await _context.Bruker
+                        .Include(b => b.Personer)
+                        .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
+
+                    if (slettetBruker == null)
                     {
-                        rapport.PersonId = slettetBruker.Personer.First().PersonId;
-                        _context.Update(rapport);
+                        var slettetPerson = new Person
+                        {
+                            Fornavn = "Slettet",
+                            Etternavn = "Bruker"
+                        };
+
+                        slettetBruker = new Bruker
+                        {
+                            Email = "slettet.bruker@kartverket.no",
+                            BrukerType = "Slettet",
+                            Passord = "SlettetBruker123!",
+                            Personer = new List<Person> { slettetPerson }
+                        };
+
+                        _context.Bruker.Add(slettetBruker);
+                        await _context.SaveChangesAsync();
                     }
-                }
-                if (person != null)
-                {
-                    _context.Person.Remove(person);
+
+                    // For each person associated with the user being deleted
+                    foreach (var person in bruker.Personer)
+                    {
+                        // Handle Rapporter
+                        var rapporter = await _context.Rapport
+                            .Where(r => r.PersonId == person.PersonId)
+                            .ToListAsync();
+                        foreach (var rapport in rapporter)
+                        {
+                            rapport.PersonId = slettetBruker.Personer.First().PersonId;
+                        }
+
+                        // Handle Meldinger where person is sender
+                        var sendteMeldinger = await _context.Meldinger
+                            .Where(m => m.SenderPersonId == person.PersonId)
+                            .ToListAsync();
+                        foreach (var melding in sendteMeldinger)
+                        {
+                            melding.SenderPersonId = slettetBruker.Personer.First().PersonId;
+                        }
+
+                        // Handle Meldinger where person is receiver
+                        var mottatteMeldinger = await _context.Meldinger
+                            .Where(m => m.MottakerPersonId == person.PersonId)
+                            .ToListAsync();
+                        foreach (var melding in mottatteMeldinger)
+                        {
+                            melding.MottakerPersonId = slettetBruker.Personer.First().PersonId;
+                        }
+
+                        // Handle Ansatt records
+                        var ansatte = await _context.Ansatt
+                            .Where(a => a.PersonId == person.PersonId)
+                            .ToListAsync();
+                        foreach (var ansatt in ansatte)
+                        {
+                            // Handle Rapporter assigned to this employee
+                            var tildeltRapporter = await _context.Rapport
+                                .Where(r => r.TildelAnsattId == ansatt.AnsattId)
+                                .ToListAsync();
+                            foreach (var rapport in tildeltRapporter)
+                            {
+                                rapport.TildelAnsattId = null;  // Or assign to another employee if needed
+                            }
+
+                            _context.Ansatt.Remove(ansatt);
+                        }
+
+                        // Remove the person
+                        _context.Person.Remove(person);
+                    }
+
+                    // Finally remove the user
                     _context.Bruker.Remove(bruker);
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return RedirectToAction("BrukerOversikt");
                 }
 
-
-                await _context.SaveChangesAsync();
+                await transaction.RollbackAsync();
+                return RedirectToAction("BrukerOversikt", new { error = "Bruker ikke funnet." });
             }
-
-            return RedirectToAction("BrukerOversikt");
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log the error
+                return RedirectToAction("BrukerOversikt", new { error = "Kunne ikke slette bruker." });
+            }
         }
 
         [HttpGet]
