@@ -1,5 +1,3 @@
-C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.dll
-C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.deps.json
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.runtimeconfig.json
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\appsettings.Development.json
@@ -9,6 +7,7 @@ C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\Kartverk
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\xunit.runner.reporters.netcoreapp10.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\xunit.runner.utility.netcoreapp10.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.exe
+C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\Microsoft.AspNetCore.Identity.UI.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\Pomelo.EntityFrameworkCore.MySql.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\Microsoft.Extensions.Identity.Core.dll
@@ -33,4 +32,5 @@ C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\Kartverk
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\Microsoft.Extensions.Diagnostics.Abstractions.dll
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\bin\Debug\KartverketWebApp.pdb
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
+C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 C:\Users\frede\Desktop\skole\Høst2024\Programeringsprosjekt\kartverket\KartverketWebApp\obj\Debug\docker-c.35A3FFBA.Up2Date

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using KartverketWebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using KartverketWebApp.Data;
@@ -48,35 +49,30 @@ namespace KartverketWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SlettBruker(int id)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var bruker = await _context.Bruker.FirstOrDefaultAsync(b => b.BrukerId == id);
+            var person = await _context.Person.FirstOrDefaultAsync(p => p.BrukerId == id);
+
+            if (bruker != null)
             {
-                var bruker = await _context.Bruker
+                //finn eller opprett "Slettet bruker"
+                var slettetBruker = await _context.Bruker
                     .Include(b => b.Personer)
-                    .FirstOrDefaultAsync(b => b.BrukerId == id);
-
-                if (bruker != null)
+                    .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
+                if (slettetBruker == null)
                 {
-                    // Get the deleted user or create if not exists
-                    var slettetBruker = await _context.Bruker
-                        .Include(b => b.Personer)
-                        .FirstOrDefaultAsync(b => b.Email == "slettet.bruker@kartverket.no");
-
-                    if (slettetBruker == null)
+                    var slettetPerson = new Person
                     {
-                        var slettetPerson = new Person
-                        {
-                            Fornavn = "Slettet",
-                            Etternavn = "Bruker"
-                        };
+                        Fornavn = "Slettet",
+                        Etternavn = "Bruker"
+                    };
 
-                        slettetBruker = new Bruker
-                        {
-                            Email = "slettet.bruker@kartverket.no",
-                            BrukerType = "Slettet",
-                            Passord = "SlettetBruker123!",
-                            Personer = new List<Person> { slettetPerson }
-                        };
+                    slettetBruker = new Bruker
+                    {
+                        Email = "slettet.bruker@kartverket.no",
+                        BrukerType = "Slettet",
+                        Passord = "SlettetBruker123!", // Lagt til passord
+                        Personer = new List<Person> { slettetPerson }
+                    };
 
                     _context.Bruker.Add(slettetBruker);
                     await _context.SaveChangesAsync();
@@ -107,24 +103,11 @@ namespace KartverketWebApp.Controllers
                     _context.Bruker.Remove(bruker);
                 }
 
-                    // Finally remove the user
-                    _context.Bruker.Remove(bruker);
 
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return RedirectToAction("BrukerOversikt");
-                }
-
-                await transaction.RollbackAsync();
-                return RedirectToAction("BrukerOversikt", new { error = "Bruker ikke funnet." });
+                await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                // Log the error
-                return RedirectToAction("BrukerOversikt", new { error = "Kunne ikke slette bruker." });
-            }
+
+            return RedirectToAction("BrukerOversikt");
         }
 
         [HttpGet]
