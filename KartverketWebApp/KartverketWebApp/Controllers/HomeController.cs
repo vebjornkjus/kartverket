@@ -335,7 +335,7 @@ namespace KartverketWebApp.Controllers
         public async Task<IActionResult> Saksbehandler(int ansattId = 1, int activePage = 1, int resolvedPage = 1, int pageSize = 10)
         {
 
-                
+
             // Fetch the logged-in user's email
             var userEmail = User.FindFirstValue(ClaimTypes.Name); // Retrieve the logged-in user's email
             if (string.IsNullOrEmpty(userEmail))
@@ -633,7 +633,7 @@ namespace KartverketWebApp.Controllers
 
             return View(viewModel);
         }
-    
+
 
 
         [Authorize]
@@ -707,6 +707,57 @@ namespace KartverketWebApp.Controllers
             _logger.LogWarning($"No matching Ansatt found for Kommunenummer: {kommunenummer}. Assigning to default AnsattId: 1.");
             return 1; // Default AnsattId
         }
+    
+    [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SlettRapport(string kartEndringId)
+        {
+            if (!int.TryParse(kartEndringId, out int kartId))
+            {
+                TempData["ErrorMessage"] = "Ugyldig rapport-ID.";
+                return RedirectToAction("TakkRapport");
+            }
+
+            try
+            {
+                // Find the Kart entry
+                var kart = await _context.Kart
+                    .Include(k => k.Rapporter)
+                    .Include(k => k.Koordinater)
+                    .FirstOrDefaultAsync(k => k.KartEndringId == kartId);
+
+                if (kart == null)
+                {
+                    TempData["ErrorMessage"] = "Rapport ikke funnet.";
+                    return RedirectToAction("Index");
+                }
+
+                // Remove related records
+                if (kart.Koordinater != null)
+                {
+                    _context.Koordinater.RemoveRange(kart.Koordinater);
+                }
+
+                if (kart.Rapporter != null)
+                {
+                    _context.Rapport.RemoveRange(kart.Rapporter);
+                }
+
+                // Remove the Kart entry
+                _context.Kart.Remove(kart);
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Rapport slettet.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Feil ved sletting av rapport");
+                TempData["ErrorMessage"] = "Det oppstod en feil ved sletting av rapporten.";
+                return RedirectToAction("TakkRapport");
+            }
+        }
     }
 }
-

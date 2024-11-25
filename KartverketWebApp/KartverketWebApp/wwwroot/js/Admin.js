@@ -4,6 +4,7 @@
     const kommuneNummerContainer = document.getElementById("kommuneNummerContainer");
 
     function toggleKommunenummer() {
+        // Vis felt kun når brukertypen er saksbehandler
         if (brukerTypeField.value === "saksbehandler") {
             kommuneNummerContainer.style.display = "block";
             kommuneNummerField.required = true;

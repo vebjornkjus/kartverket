@@ -1,13 +1,15 @@
-Her er en **enkel mal** du kan kopiere **direkte** inn i en `README.md`-fil på GitHub:
+```
+# **Kartverket Applikasjon** 🗺️
 
-```markdown
-# **Kartverket Applikasjon**
+[![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
 
 En applikasjon for administrasjon og visning av geografiske data, samt rapporthåndtering.
 
 ---
 
-## **Innhold**
+## **Innhold** 📑
 - [Applikasjonens Oppsett](#applikasjonens-oppsett)
 - [Komponenter](#komponenter)
 - [Funksjonaliteter](#funksjonaliteter)
@@ -16,12 +18,12 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-## **Applikasjonens Oppsett**
+## **Applikasjonens Oppsett** ⚙️
 
 ### **Krav**
-- Docker
-- MariaDB
-- .NET SDK
+- Docker 🐳
+- MariaDB 🗄️
+- .NET SDK 🔧
 
 ### **Kjøring**
 1. Klon repoet:
@@ -43,26 +45,26 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-## **Komponenter**
+## **Komponenter** 🏗️
 
 - **Arkitektur**: MVC (Model-View-Controller)
 - **Database**: MariaDB
 - **Visualisert database**: https://drive.google.com/file/d/138KNbuhLaRDdX2dy3fIppUxjwNX8oaid/view?usp=sharing 
 - **Hovedklasser**:
-  - `Rapport`
-  - `Steddata`
-  - `Kart`
-  - `Koordinater`
-  - `Person`
-  - `Bruker`
-  - `Ansatt`
-  - `Meldinger`
+  - `Rapport` 📝
+  - `Steddata` 📍
+  - `Kart` 🗺️
+  - `Koordinater` 📐
+  - `Person` 👤
+  - `Bruker` 🔑
+  - `Ansatt` 👔
+  - `Meldinger` 💬
 
 ---
 
-## **Funksjonaliteter**
+## **Funksjonaliteter** 💡
 
-### **Standard Bruker**
+### **Standard Bruker** 👤
 - **Tegne på kart og sende inn rapporter**  
   **Verktøy:**  
   - Polylinje-verktøy: For å tegne linjer på kartet.  
@@ -75,7 +77,7 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-### **Saksbehandler**
+### **Saksbehandler** 👔
 - **Oversikt over rapporter:**  
   - Se alle innsendte rapporter.
   - Rapporter blir automatisk tildelt bassert på kommunenummmer.  
@@ -89,19 +91,19 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-### **Administrator**
+### **Administrator** 👑
 - **Brukeradministrasjon:**  
   - Legge til, redigere, eller fjerne brukere (standardbrukere, Sakshendlere og Spesialbruker). Kommer
   - Administrere roller og rettigheter for brukere.(kommer)
 
 ---
 
-### **Spesialbruker**
+### **Spesialbruker** ⚡
 - **Proriterte rapporter:**  
   - Utrykkningspersonell eller lignende får rapporter prioritert(kommer)
 
 ---
-## **Test scenario**
+## **Test scenario** 🧪
 1. Opprett en bruker
 2. Velg Kart type
 3. Du kan teste ut de ulike verktøyene
@@ -126,13 +128,14 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 17. Logg på brukeren du lagde.
 18. I min side vil du kunne redigere og se status for rapporten
 19. I meldinger vil du se meldingen du sendte til brukerern
-////legg til admin ting her//////
-
-
+20. Logg nå inn på en admin bruker:
+    Admin@example.com
+    passord123
+21. Endre din bruker til saksbehandler. Prøv å slett en annen
 
 ---
 
-## **Brukerveiledning**
+## **Brukerveiledning** 📖
 - **Innmelder**
   1. Velg kart for rapporten
   2. Velg verktøy
@@ -149,7 +152,7 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 
 ---
 
-## **Endringslogg**
+## **Endringslogg** 📝
 
 | **Dato**       | **Commit melding**                                      | **Forfatter**            | **Verifisert** |
 |-----------------|--------------------------------------------------------|-----------------------|--------------|
@@ -182,5 +185,4 @@ En applikasjon for administrasjon og visning av geografiske data, samt rapporth�
 | **Sep 13, 2024** | Lagt inn prototype                                     | FredrikHusebruh       | No           |
 | **Sep 10, 2024** | Lagt til web-applikasjon struktur                      | vebjornkjus           | Yes          |
 | **Sep 10, 2024** | Initial commit                                         | vebjornkjus           | Yes          |
-
----
+```
