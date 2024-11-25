@@ -78,61 +78,34 @@ namespace KartverketWebApp.Controllers
                             Personer = new List<Person> { slettetPerson }
                         };
 
-                        _context.Bruker.Add(slettetBruker);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    // For each person associated with the user being deleted
-                    foreach (var person in bruker.Personer)
+                    _context.Bruker.Add(slettetBruker);
+                    await _context.SaveChangesAsync();
+                }
+                //finn rapporter knyttet til personen som skal slettes
+                if (person != null)
+                {
+                    var rapporter = await _context.Rapport
+                        .Where(r => r.PersonId == person.PersonId)
+                        .ToListAsync();
+                    //overfør rapporter til "slettet bruker"
+                    foreach (var rapport in rapporter)
                     {
-                        // Handle Rapporter
-                        var rapporter = await _context.Rapport
-                            .Where(r => r.PersonId == person.PersonId)
-                            .ToListAsync();
-                        foreach (var rapport in rapporter)
-                        {
-                            rapport.PersonId = slettetBruker.Personer.First().PersonId;
-                        }
-
-                        // Handle Meldinger where person is sender
-                        var sendteMeldinger = await _context.Meldinger
-                            .Where(m => m.SenderPersonId == person.PersonId)
-                            .ToListAsync();
-                        foreach (var melding in sendteMeldinger)
-                        {
-                            melding.SenderPersonId = slettetBruker.Personer.First().PersonId;
-                        }
-
-                        // Handle Meldinger where person is receiver
-                        var mottatteMeldinger = await _context.Meldinger
-                            .Where(m => m.MottakerPersonId == person.PersonId)
-                            .ToListAsync();
-                        foreach (var melding in mottatteMeldinger)
-                        {
-                            melding.MottakerPersonId = slettetBruker.Personer.First().PersonId;
-                        }
-
-                        // Handle Ansatt records
-                        var ansatte = await _context.Ansatt
-                            .Where(a => a.PersonId == person.PersonId)
-                            .ToListAsync();
-                        foreach (var ansatt in ansatte)
-                        {
-                            // Handle Rapporter assigned to this employee
-                            var tildeltRapporter = await _context.Rapport
-                                .Where(r => r.TildelAnsattId == ansatt.AnsattId)
-                                .ToListAsync();
-                            foreach (var rapport in tildeltRapporter)
-                            {
-                                rapport.TildelAnsattId = null;  // Or assign to another employee if needed
-                            }
-
-                            _context.Ansatt.Remove(ansatt);
-                        }
-
-                        // Remove the person
-                        _context.Person.Remove(person);
+                        rapport.PersonId = slettetBruker.Personer.First().PersonId;
+                        _context.Update(rapport);
                     }
+                }
+
+                var ansatt = await _context.Ansatt.Where(a => a.PersonId == person.PersonId).ToListAsync();
+                if (ansatt.Any())
+                {
+                    _context.Ansatt.RemoveRange(ansatt);
+                }
+
+                if (person != null)
+                {
+                    _context.Person.Remove(person);
+                    _context.Bruker.Remove(bruker);
+                }
 
                     // Finally remove the user
                     _context.Bruker.Remove(bruker);
